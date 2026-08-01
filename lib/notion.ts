@@ -15,6 +15,7 @@ export type EventItem = {
   id: string;
   title: string;
   published: boolean;
+  featured: boolean;
   date: string;
   startTime: string;
   endTime: string;
@@ -39,6 +40,10 @@ const names = {
   published:
     process.env.NOTION_PROP_PUBLISHED ||
     "公開",
+
+  featured:
+    process.env.NOTION_PROP_FEATURED ||
+    "F1",
 
   date:
     process.env.NOTION_PROP_DATE ||
@@ -156,6 +161,10 @@ function value(prop?: Property): string {
     return prop.phone_number || "";
   }
 
+  if (prop.type === "checkbox") {
+    return prop.checkbox ? "true" : "false";
+  }
+
   if (prop.type === "formula") {
     if (prop.formula?.type === "string") {
       return prop.formula.string || "";
@@ -169,12 +178,42 @@ function value(prop?: Property): string {
 
     if (prop.formula?.type === "boolean") {
       return prop.formula.boolean
-        ? "はい"
-        : "いいえ";
+        ? "true"
+        : "false";
     }
   }
 
   return text(prop);
+}
+
+function checkboxValue(
+  prop?: Property,
+): boolean {
+  if (!prop) {
+    return false;
+  }
+
+  if (prop.type === "checkbox") {
+    return Boolean(prop.checkbox);
+  }
+
+  if (
+    prop.type === "formula" &&
+    prop.formula?.type === "boolean"
+  ) {
+    return Boolean(prop.formula.boolean);
+  }
+
+  const currentValue =
+    value(prop).toLowerCase();
+
+  return [
+    "true",
+    "yes",
+    "はい",
+    "公開",
+    "オン",
+  ].includes(currentValue);
 }
 
 function formatDate(prop?: Property): string {
@@ -334,6 +373,10 @@ function convertPage(
       properties[names.published],
     ),
 
+    featured: checkboxValue(
+      properties[names.featured],
+    ),
+
     date: formatDate(
       properties[names.date],
     ),
@@ -359,10 +402,6 @@ function convertPage(
       page.cover,
     ),
 
-    /*
-     * Notionの申込URLが未入力でも
-     * 東京イベントナビ公式LINEへ移動します。
-     */
     url:
       value(properties[names.url]) ||
       "https://lin.ee/Q6dBeSg",
