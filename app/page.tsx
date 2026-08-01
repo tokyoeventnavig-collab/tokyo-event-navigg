@@ -1,20 +1,244 @@
 import Image from "next/image";
 import Link from "next/link";
 import heroBanner from "../hero-banner.png";
-import { getEvents } from "../lib/notion";
+import {
+  getEvents,
+  type EventItem,
+} from "../lib/notion";
 
 export const revalidate = 300;
+
+function getEventTimestamp(
+  event: EventItem,
+): number {
+  if (!event.dateStart) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const date = new Date(
+    event.dateStart.includes("T")
+      ? event.dateStart
+      : `${event.dateStart}T00:00:00+09:00`,
+  );
+
+  const timestamp = date.getTime();
+
+  return Number.isNaN(timestamp)
+    ? Number.POSITIVE_INFINITY
+    : timestamp;
+}
+
+function EventCard({
+  event,
+}: {
+  event: EventItem;
+}) {
+  const hasTime =
+    event.startTime || event.endTime;
+
+  return (
+    <article className="card">
+      <Link
+        href={`/events/${event.id}`}
+        className="cardImageLink"
+      >
+        {event.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={event.image}
+            alt={event.title}
+            className="image"
+          />
+        ) : (
+          <div className="image placeholder">
+            TOKYO EVENT NAVI
+          </div>
+        )}
+      </Link>
+
+      <div className="cardBody">
+        {event.category && (
+          <div className="category">
+            {event.category}
+          </div>
+        )}
+
+        <h2 className="eventTitle">
+          <Link href={`/events/${event.id}`}>
+            {event.title}
+          </Link>
+        </h2>
+
+        <div className="eventMeta">
+          {event.date && (
+            <div className="metaRow">
+              <span className="metaIcon">
+                📅
+              </span>
+
+              <div>
+                <span className="metaLabel">
+                  開催日
+                </span>
+
+                <strong>
+                  {event.date}
+                </strong>
+              </div>
+            </div>
+          )}
+
+          {hasTime && (
+            <div className="metaRow">
+              <span className="metaIcon">
+                🕐
+              </span>
+
+              <div>
+                <span className="metaLabel">
+                  開催時間
+                </span>
+
+                <strong>
+                  {event.startTime || "未定"}
+
+                  {event.endTime
+                    ? ` 〜 ${event.endTime}`
+                    : ""}
+                </strong>
+              </div>
+            </div>
+          )}
+
+          {event.location && (
+            <div className="metaRow">
+              <span className="metaIcon">
+                📍
+              </span>
+
+              <div>
+                <span className="metaLabel">
+                  会場
+                </span>
+
+                <strong>
+                  {event.location}
+                </strong>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <Link
+          className="detailButton"
+          href={`/events/${event.id}`}
+        >
+          詳細を見る
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+function EventSection({
+  title,
+  events,
+  emptyMessage,
+}: {
+  title: string;
+  events: EventItem[];
+  emptyMessage: string;
+}) {
+  return (
+    <section className="eventSection">
+      <div className="sectionHead">
+        <h1>{title}</h1>
+        <span>{events.length}件</span>
+      </div>
+
+      {events.length === 0 ? (
+        <div className="empty">
+          {emptyMessage}
+        </div>
+      ) : (
+        <div className="grid">
+          {events.map((event) => (
+            <EventCard
+              event={event}
+              key={`${title}-${event.id}`}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default async function Home() {
   const allEvents = await getEvents();
 
   /*
-   * NotionのF1にチェックが入っている
-   * イベントだけを人気イベントとして表示します。
+   * 人気イベント
+   * NotionのF1にチェックがあるもの。
+   * 開催日時が近い順に表示します。
    */
-  const events = allEvents.filter(
-    (event) => event.featured,
-  );
+  const featuredEvents = allEvents
+    .filter((event) => event.featured)
+    .sort(
+      (a, b) =>
+        getEventTimestamp(a) -
+        getEventTimestamp(b),
+    );
+
+  /*
+   * 新着イベント
+   * Notionでページが作成された日時が
+   * 新しい順に最大10件表示します。
+   */
+  const newEvents = [...allEvents]
+    .sort((a, b) => {
+      const aTime = a.createdTime
+        ? new Date(
+            a.createdTime,
+          ).getTime()
+        : 0;
+
+      const bTime = b.createdTime
+        ? new Date(
+            b.createdTime,
+          ).getTime()
+        : 0;
+
+      return bTime - aTime;
+    })
+    .slice(0, 10);
+
+  /*
+   * 今週のイベント
+   * 現在時刻から7日後までに
+   * 開催されるイベントだけを表示します。
+   */
+  const now = Date.now();
+
+  const sevenDaysLater =
+    now + 7 * 24 * 60 * 60 * 1000;
+
+  const weeklyEvents = allEvents
+    .filter((event) => {
+      const eventTime =
+        getEventTimestamp(event);
+
+      return (
+        Number.isFinite(eventTime) &&
+        eventTime >= now &&
+        eventTime <= sevenDaysLater
+      );
+    })
+    .sort(
+      (a, b) =>
+        getEventTimestamp(a) -
+        getEventTimestamp(b),
+    );
 
   return (
     <main className="homePage">
@@ -27,135 +251,25 @@ export default async function Home() {
         />
       </header>
 
-      <section className="container section">
-        <div className="sectionHead">
-          <h1>人気イベント</h1>
-          <span>{events.length}件</span>
-        </div>
+      <div className="container sections">
+        <EventSection
+          title="人気イベント"
+          events={featuredEvents}
+          emptyMessage="現在、人気イベントはありません。Notionの「F1」にチェックを入れてください。"
+        />
 
-        {events.length === 0 ? (
-          <div className="empty">
-            現在、人気イベントはありません。
-            Notionの「F1」にチェックを入れてください。
-          </div>
-        ) : (
-          <div className="grid">
-            {events.map((event) => {
-              const hasTime =
-                event.startTime || event.endTime;
+        <EventSection
+          title="新着イベント"
+          events={newEvents}
+          emptyMessage="現在、新着イベントはありません。"
+        />
 
-              return (
-                <article
-                  className="card"
-                  key={event.id}
-                >
-                  <Link
-                    href={`/events/${event.id}`}
-                    className="cardImageLink"
-                  >
-                    {event.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="image"
-                      />
-                    ) : (
-                      <div className="image placeholder">
-                        TOKYO EVENT NAVI
-                      </div>
-                    )}
-                  </Link>
-
-                  <div className="cardBody">
-                    {event.category && (
-                      <div className="category">
-                        {event.category}
-                      </div>
-                    )}
-
-                    <h2 className="eventTitle">
-                      <Link
-                        href={`/events/${event.id}`}
-                      >
-                        {event.title}
-                      </Link>
-                    </h2>
-
-                    <div className="eventMeta">
-                      {event.date && (
-                        <div className="metaRow">
-                          <span className="metaIcon">
-                            📅
-                          </span>
-
-                          <div>
-                            <span className="metaLabel">
-                              開催日
-                            </span>
-
-                            <strong>
-                              {event.date}
-                            </strong>
-                          </div>
-                        </div>
-                      )}
-
-                      {hasTime && (
-                        <div className="metaRow">
-                          <span className="metaIcon">
-                            🕐
-                          </span>
-
-                          <div>
-                            <span className="metaLabel">
-                              開催時間
-                            </span>
-
-                            <strong>
-                              {event.startTime ||
-                                "未定"}
-
-                              {event.endTime
-                                ? ` 〜 ${event.endTime}`
-                                : ""}
-                            </strong>
-                          </div>
-                        </div>
-                      )}
-
-                      {event.location && (
-                        <div className="metaRow">
-                          <span className="metaIcon">
-                            📍
-                          </span>
-
-                          <div>
-                            <span className="metaLabel">
-                              会場
-                            </span>
-
-                            <strong>
-                              {event.location}
-                            </strong>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <Link
-                      className="detailButton"
-                      href={`/events/${event.id}`}
-                    >
-                      詳細を見る
-                    </Link>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </section>
+        <EventSection
+          title="今週のイベント"
+          events={weeklyEvents}
+          emptyMessage="現在時刻から7日以内に開催されるイベントはありません。"
+        />
+      </div>
 
       <style>{`
         * {
@@ -181,13 +295,22 @@ export default async function Home() {
         }
 
         .container {
-          width: min(1120px, calc(100% - 40px));
+          width: min(
+            1120px,
+            calc(100% - 40px)
+          );
           margin: 0 auto;
         }
 
-        .section {
+        .sections {
+          display: grid;
+          gap: 80px;
           padding-top: 58px;
-          padding-bottom: 100px;
+          padding-bottom: 110px;
+        }
+
+        .eventSection {
+          min-width: 0;
         }
 
         .sectionHead {
@@ -200,7 +323,11 @@ export default async function Home() {
 
         .sectionHead h1 {
           margin: 0;
-          font-size: clamp(27px, 4vw, 38px);
+          font-size: clamp(
+            27px,
+            4vw,
+            38px
+          );
           line-height: 1.3;
         }
 
@@ -213,7 +340,10 @@ export default async function Home() {
         .grid {
           display: grid;
           grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+            repeat(
+              3,
+              minmax(0, 1fr)
+            );
           gap: 22px;
           align-items: stretch;
         }
@@ -222,7 +352,8 @@ export default async function Home() {
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          border: 1px solid #e8e8e4;
+          border:
+            1px solid #e8e8e4;
           border-radius: 17px;
           background: #fff;
           box-shadow:
@@ -291,7 +422,8 @@ export default async function Home() {
 
         .metaRow {
           display: grid;
-          grid-template-columns: 27px 1fr;
+          grid-template-columns:
+            27px 1fr;
           align-items: start;
           gap: 9px;
         }
@@ -343,17 +475,26 @@ export default async function Home() {
           line-height: 1.8;
         }
 
-        @media (max-width: 900px) {
+        @media (
+          max-width: 900px
+        ) {
           .grid {
             grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
         }
 
-        @media (max-width: 640px) {
+        @media (
+          max-width: 640px
+        ) {
           .container {
-            width:
-              min(100% - 24px, 1120px);
+            width: min(
+              100% - 24px,
+              1120px
+            );
           }
 
           .topBanner {
@@ -363,13 +504,18 @@ export default async function Home() {
             margin-left: -25%;
           }
 
-          .section {
+          .sections {
+            gap: 55px;
             padding-top: 34px;
             padding-bottom: 70px;
           }
 
           .sectionHead {
             margin-bottom: 22px;
+          }
+
+          .sectionHead h1 {
+            font-size: 26px;
           }
 
           .grid {
