@@ -19,43 +19,87 @@ export type EventItem = {
   startTime: string;
   endTime: string;
   location: string;
+  venueAddress: string;
   image: string;
   url: string;
   category: string;
   description: string;
+  participationCondition: string;
+  organizer: string;
 };
 
 const API_KEY = process.env.NOTION_API_KEY;
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
 const names = {
-  title: process.env.NOTION_PROP_TITLE || "イベント名",
-  published: process.env.NOTION_PROP_PUBLISHED || "公開",
-  date: process.env.NOTION_PROP_DATE || "開催日",
+  title:
+    process.env.NOTION_PROP_TITLE ||
+    "イベント名",
+
+  published:
+    process.env.NOTION_PROP_PUBLISHED ||
+    "公開",
+
+  date:
+    process.env.NOTION_PROP_DATE ||
+    "開催日",
+
   startTime:
-    process.env.NOTION_PROP_START_TIME || "開始時間",
+    process.env.NOTION_PROP_START_TIME ||
+    "開始時間",
+
   endTime:
-    process.env.NOTION_PROP_END_TIME || "終了時間",
+    process.env.NOTION_PROP_END_TIME ||
+    "終了時間",
+
   location:
-    process.env.NOTION_PROP_LOCATION || "会場名",
+    process.env.NOTION_PROP_LOCATION ||
+    "会場名",
+
+  venueAddress:
+    process.env.NOTION_PROP_VENUE_ADDRESS ||
+    "会場住所",
+
   image:
-    process.env.NOTION_PROP_IMAGE || "フライヤー",
+    process.env.NOTION_PROP_IMAGE ||
+    "フライヤー",
+
   url:
-    process.env.NOTION_PROP_URL || "申込URL",
+    process.env.NOTION_PROP_URL ||
+    "申込URL",
+
   category:
-    process.env.NOTION_PROP_CATEGORY || "カテゴリー",
+    process.env.NOTION_PROP_CATEGORY ||
+    "カテゴリー",
+
   description:
-    process.env.NOTION_PROP_DESCRIPTION || "イベント概要",
+    process.env.NOTION_PROP_DESCRIPTION ||
+    "イベント概要",
+
+  participationCondition:
+    process.env.NOTION_PROP_PARTICIPATION_CONDITION ||
+    "参加条件",
+
+  organizer:
+    process.env.NOTION_PROP_ORGANIZER ||
+    "主催者",
 };
 
 function text(prop?: Property): string {
-  if (!prop) return "";
+  if (!prop) {
+    return "";
+  }
 
   const items: NotionText[] =
     prop.title ||
     prop.rich_text ||
     (prop.formula?.type === "string"
-      ? [{ plain_text: prop.formula.string || "" }]
+      ? [
+          {
+            plain_text:
+              prop.formula.string || "",
+          },
+        ]
       : []);
 
   return items
@@ -65,7 +109,9 @@ function text(prop?: Property): string {
 }
 
 function value(prop?: Property): string {
-  if (!prop) return "";
+  if (!prop) {
+    return "";
+  }
 
   if (
     prop.type === "title" ||
@@ -111,12 +157,21 @@ function value(prop?: Property): string {
   }
 
   if (prop.type === "formula") {
-    return String(
-      prop.formula?.string ??
-        prop.formula?.number ??
-        prop.formula?.boolean ??
-        "",
-    );
+    if (prop.formula?.type === "string") {
+      return prop.formula.string || "";
+    }
+
+    if (prop.formula?.type === "number") {
+      return prop.formula.number == null
+        ? ""
+        : String(prop.formula.number);
+    }
+
+    if (prop.formula?.type === "boolean") {
+      return prop.formula.boolean
+        ? "はい"
+        : "いいえ";
+    }
   }
 
   return text(prop);
@@ -150,21 +205,19 @@ function formatDate(prop?: Property): string {
 function formatTimeText(input: string): string {
   const trimmed = input.trim();
 
-  if (!trimmed) return "";
+  if (!trimmed) {
+    return "";
+  }
 
-  /*
-   * 「18:30」「18：30」「18時30分」などを
-   * できるだけ統一して表示します。
-   */
   const colonMatch = trimmed.match(
     /(\d{1,2})[：:](\d{2})/,
   );
 
   if (colonMatch) {
-    const hour = colonMatch[1].padStart(2, "0");
-    const minute = colonMatch[2];
+    const hour =
+      colonMatch[1].padStart(2, "0");
 
-    return `${hour}:${minute}`;
+    return `${hour}:${colonMatch[2]}`;
   }
 
   const japaneseMatch = trimmed.match(
@@ -172,7 +225,9 @@ function formatTimeText(input: string): string {
   );
 
   if (japaneseMatch) {
-    const hour = japaneseMatch[1].padStart(2, "0");
+    const hour =
+      japaneseMatch[1].padStart(2, "0");
+
     const minute = (
       japaneseMatch[2] || "00"
     ).padStart(2, "0");
@@ -184,22 +239,30 @@ function formatTimeText(input: string): string {
 }
 
 function timeValue(prop?: Property): string {
-  if (!prop) return "";
+  if (!prop) {
+    return "";
+  }
 
   const dateStart =
     prop?.date?.start ||
     prop?.formula?.date?.start;
 
-  if (dateStart && dateStart.includes("T")) {
+  if (
+    dateStart &&
+    dateStart.includes("T")
+  ) {
     const date = new Date(dateStart);
 
     if (!Number.isNaN(date.getTime())) {
-      return new Intl.DateTimeFormat("ja-JP", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Tokyo",
-      }).format(date);
+      return new Intl.DateTimeFormat(
+        "ja-JP",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "Asia/Tokyo",
+        },
+      ).format(date);
     }
   }
 
@@ -231,14 +294,19 @@ function imageValue(
   return "";
 }
 
-function isPublished(prop?: Property): boolean {
-  if (!prop) return true;
+function isPublished(
+  prop?: Property,
+): boolean {
+  if (!prop) {
+    return true;
+  }
 
   if (prop.type === "checkbox") {
     return Boolean(prop.checkbox);
   }
 
-  const currentValue = value(prop).toLowerCase();
+  const currentValue =
+    value(prop).toLowerCase();
 
   return [
     "公開",
@@ -249,8 +317,11 @@ function isPublished(prop?: Property): boolean {
   ].includes(currentValue);
 }
 
-function convertPage(page: NotionPage): EventItem {
-  const properties = page.properties || {};
+function convertPage(
+  page: NotionPage,
+): EventItem {
+  const properties =
+    page.properties || {};
 
   return {
     id: page.id,
@@ -263,7 +334,9 @@ function convertPage(page: NotionPage): EventItem {
       properties[names.published],
     ),
 
-    date: formatDate(properties[names.date]),
+    date: formatDate(
+      properties[names.date],
+    ),
 
     startTime: timeValue(
       properties[names.startTime],
@@ -277,15 +350,22 @@ function convertPage(page: NotionPage): EventItem {
       properties[names.location],
     ),
 
+    venueAddress: value(
+      properties[names.venueAddress],
+    ),
+
     image: imageValue(
       properties[names.image],
       page.cover,
     ),
 
+    /*
+     * Notionの申込URLが未入力でも
+     * 東京イベントナビ公式LINEへ移動します。
+     */
     url:
       value(properties[names.url]) ||
-      page.url ||
-      "",
+      "https://lin.ee/Q6dBeSg",
 
     category: value(
       properties[names.category],
@@ -293,6 +373,16 @@ function convertPage(page: NotionPage): EventItem {
 
     description: value(
       properties[names.description],
+    ),
+
+    participationCondition: value(
+      properties[
+        names.participationCondition
+      ],
+    ),
+
+    organizer: value(
+      properties[names.organizer],
     ),
   };
 }
@@ -311,8 +401,10 @@ export async function getEvents(): Promise<
         method: "POST",
         headers: {
           Authorization: `Bearer ${API_KEY}`,
-          "Notion-Version": "2022-06-28",
-          "Content-Type": "application/json",
+          "Notion-Version":
+            "2022-06-28",
+          "Content-Type":
+            "application/json",
         },
         body: JSON.stringify({
           page_size: 100,
@@ -324,7 +416,8 @@ export async function getEvents(): Promise<
     );
 
     if (!response.ok) {
-      const body = await response.text();
+      const body =
+        await response.text();
 
       console.error(
         `Notion API error ${response.status}: ${body}`,
@@ -333,14 +426,16 @@ export async function getEvents(): Promise<
       return [];
     }
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     return (data.results || [])
       .map((page: NotionPage) =>
         convertPage(page),
       )
       .filter(
-        (event: EventItem) => event.published,
+        (event: EventItem) =>
+          event.published,
       );
   } catch (error) {
     console.error(
@@ -366,7 +461,8 @@ export async function getEventById(
         method: "GET",
         headers: {
           Authorization: `Bearer ${API_KEY}`,
-          "Notion-Version": "2022-06-28",
+          "Notion-Version":
+            "2022-06-28",
         },
         next: {
           revalidate: 300,
@@ -375,7 +471,8 @@ export async function getEventById(
     );
 
     if (!response.ok) {
-      const body = await response.text();
+      const body =
+        await response.text();
 
       console.error(
         `Notion page error ${response.status}: ${body}`,
@@ -387,7 +484,8 @@ export async function getEventById(
     const page =
       (await response.json()) as NotionPage;
 
-    const event = convertPage(page);
+    const event =
+      convertPage(page);
 
     if (!event.published) {
       return null;
