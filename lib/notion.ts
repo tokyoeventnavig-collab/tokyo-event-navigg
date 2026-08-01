@@ -15,7 +15,7 @@ export type EventItem = {
 };
 
 const API_KEY = process.env.NOTION_API_KEY;
-const DATA_SOURCE_ID = process.env.NOTION_DATA_SOURCE_ID;
+const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
 const names = {
   title: process.env.NOTION_PROP_TITLE || "イベント名",
@@ -86,17 +86,16 @@ function isPublished(prop?: Property): boolean {
 }
 
 export async function getEvents(): Promise<EventItem[]> {
-  if (!API_KEY || !DATA_SOURCE_ID) {
-    throw new Error("NOTION_API_KEY または NOTION_DATA_SOURCE_ID が未設定です。");
-  }
+  // 初回デプロイを止めないため、未設定なら空一覧を返す
+  if (!API_KEY || !DATABASE_ID) return [];
 
   const response = await fetch(
-    `https://api.notion.com/v1/data_sources/${DATA_SOURCE_ID}/query`,
+    `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${API_KEY}`,
-        "Notion-Version": "2026-03-11",
+        "Notion-Version": "2022-06-28",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ page_size: 100 }),
@@ -106,7 +105,8 @@ export async function getEvents(): Promise<EventItem[]> {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`Notion API error ${response.status}: ${body}`);
+    console.error(`Notion API error ${response.status}: ${body}`);
+    return [];
   }
 
   const data = await response.json();

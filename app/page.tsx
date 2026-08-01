@@ -1,4 +1,4 @@
-import { getEvents } from "@/lib/notion";
+import { getEvents } from "../lib/notion";
 
 export const revalidate = 300;
 
