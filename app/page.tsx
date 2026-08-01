@@ -6,7 +6,15 @@ import { getEvents } from "../lib/notion";
 export const revalidate = 300;
 
 export default async function Home() {
-  const events = await getEvents();
+  const allEvents = await getEvents();
+
+  /*
+   * NotionのF1にチェックが入っている
+   * イベントだけを人気イベントとして表示します。
+   */
+  const events = allEvents.filter(
+    (event) => event.featured,
+  );
 
   return (
     <main className="homePage">
@@ -21,13 +29,14 @@ export default async function Home() {
 
       <section className="container section">
         <div className="sectionHead">
-          <h1>開催予定のイベント</h1>
+          <h1>人気イベント</h1>
           <span>{events.length}件</span>
         </div>
 
         {events.length === 0 ? (
           <div className="empty">
-            現在、公開中のイベントはありません。
+            現在、人気イベントはありません。
+            Notionの「F1」にチェックを入れてください。
           </div>
         ) : (
           <div className="grid">
@@ -36,7 +45,10 @@ export default async function Home() {
                 event.startTime || event.endTime;
 
               return (
-                <article className="card" key={event.id}>
+                <article
+                  className="card"
+                  key={event.id}
+                >
                   <Link
                     href={`/events/${event.id}`}
                     className="cardImageLink"
@@ -63,7 +75,9 @@ export default async function Home() {
                     )}
 
                     <h2 className="eventTitle">
-                      <Link href={`/events/${event.id}`}>
+                      <Link
+                        href={`/events/${event.id}`}
+                      >
                         {event.title}
                       </Link>
                     </h2>
@@ -99,7 +113,9 @@ export default async function Home() {
                             </span>
 
                             <strong>
-                              {event.startTime || "未定"}
+                              {event.startTime ||
+                                "未定"}
+
                               {event.endTime
                                 ? ` 〜 ${event.endTime}`
                                 : ""}
@@ -196,7 +212,8 @@ export default async function Home() {
 
         .grid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns:
+            repeat(3, minmax(0, 1fr));
           gap: 22px;
           align-items: stretch;
         }
@@ -208,7 +225,9 @@ export default async function Home() {
           border: 1px solid #e8e8e4;
           border-radius: 17px;
           background: #fff;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.045);
+          box-shadow:
+            0 10px 30px
+            rgba(0, 0, 0, 0.045);
         }
 
         .cardImageLink {
@@ -321,17 +340,20 @@ export default async function Home() {
           background: #fff;
           color: #777;
           text-align: center;
+          line-height: 1.8;
         }
 
         @media (max-width: 900px) {
           .grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr));
           }
         }
 
         @media (max-width: 640px) {
           .container {
-            width: min(100% - 24px, 1120px);
+            width:
+              min(100% - 24px, 1120px);
           }
 
           .topBanner {
