@@ -1,11 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import heroBanner from "../../../hero-banner.png";
 import { getEventById } from "../../../lib/notion";
 
 export const revalidate = 300;
 
-const APPLICATION_URL =
-  "https://lin.ee/Q6dBeSg";
+const APPLICATION_URL = "https://lin.ee/Q6dBeSg";
 
 type EventDetailPageProps = {
   params: Promise<{
@@ -21,8 +22,7 @@ export async function generateMetadata({
 
   if (!event) {
     return {
-      title:
-        "イベントが見つかりません｜東京イベントナビ",
+      title: "イベントが見つかりません｜東京イベントナビ",
     };
   }
 
@@ -44,12 +44,8 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  const hasTime =
-    event.startTime || event.endTime;
-
-  const mapsQuery =
-    event.venueAddress ||
-    event.location;
+  const hasTime = event.startTime || event.endTime;
+  const mapsQuery = event.venueAddress || event.location;
 
   const mapsUrl = mapsQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -59,23 +55,28 @@ export default async function EventDetailPage({
 
   return (
     <main className="eventPage">
-      <header className="siteHeader">
-        <div className="wideContainer headerInner">
-          <Link className="brand" href="/">
-            <span className="brandEnglish">
-              TOKYO EVENT NAVI
-            </span>
+      <header className="bannerHeader">
+        <Link href="/" className="bannerLink">
+          <Image
+            src={heroBanner}
+            alt="東京イベントナビ｜つながる・見つかる・楽しめる"
+            className="topBanner"
+            priority
+          />
+        </Link>
+      </header>
 
-            <span className="brandJapanese">
-              東京イベントナビ
-            </span>
+      <nav className="navigation">
+        <div className="wideContainer navigationInner">
+          <Link href="/" className="brandLink">
+            TOKYO EVENT NAVI
           </Link>
 
-          <Link className="backLink" href="/">
-            イベント一覧
+          <Link href="/" className="backLink">
+            イベント一覧へ
           </Link>
         </div>
-      </header>
+      </nav>
 
       <section className="eventHero">
         <div className="wideContainer heroGrid">
@@ -96,75 +97,70 @@ export default async function EventDetailPage({
 
           <div className="heroContent">
             {event.category && (
-              <p className="category">
-                {event.category}
-              </p>
+              <p className="category">{event.category}</p>
             )}
 
             <h1>{event.title}</h1>
 
             <p className="heroLead">
-              気になるイベントを見つけたら、
-              公式LINEから簡単にお申し込みいただけます。
-              定員に達する前に、まずは詳細をご確認ください。
+              気になるイベントを見つけたら、公式LINEから簡単にお申し込みいただけます。
+              開催内容をご確認のうえ、お気軽にお問い合わせください。
             </p>
 
             <div className="quickInformation">
               {event.date && (
                 <div className="quickRow">
-                  <span className="quickIcon">
-                    📅
-                  </span>
+                  <span className="quickIcon">📅</span>
 
                   <div>
-                    <span className="quickLabel">
-                      開催日
-                    </span>
-
-                    <strong>
-                      {event.date}
-                    </strong>
+                    <span className="quickLabel">開催日</span>
+                    <strong>{event.date}</strong>
                   </div>
                 </div>
               )}
 
               {hasTime && (
                 <div className="quickRow">
-                  <span className="quickIcon">
-                    🕐
-                  </span>
+                  <span className="quickIcon">🕐</span>
 
                   <div>
-                    <span className="quickLabel">
-                      開催時間
-                    </span>
+                    <span className="quickLabel">開催時間</span>
 
                     <strong>
-                      {event.startTime ||
-                        "未定"}
-
-                      {event.endTime
-                        ? ` 〜 ${event.endTime}`
-                        : ""}
+                      {event.startTime || "未定"}
+                      {event.endTime ? ` 〜 ${event.endTime}` : ""}
                     </strong>
                   </div>
                 </div>
               )}
 
-              {event.location && (
+              {(event.location || event.venueAddress) && (
                 <div className="quickRow">
-                  <span className="quickIcon">
-                    📍
-                  </span>
+                  <span className="quickIcon">📍</span>
 
                   <div>
-                    <span className="quickLabel">
-                      会場
-                    </span>
+                    <span className="quickLabel">会場</span>
 
-                    <strong>
-                      {event.location}
-                    </strong>
+                    {event.location && (
+                      <strong>{event.location}</strong>
+                    )}
+
+                    {event.venueAddress && (
+                      <span className="quickAddress">
+                        {event.venueAddress}
+                      </span>
+                    )}
+
+                    {mapsUrl && (
+                      <a
+                        className="heroMapLink"
+                        href={mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Googleマップで確認
+                      </a>
+                    )}
                   </div>
                 </div>
               )}
@@ -181,8 +177,7 @@ export default async function EventDetailPage({
             </a>
 
             <p className="buttonNote">
-              LINEを開き、参加希望のイベント名を
-              お送りください。
+              LINEを開き、参加希望のイベント名をお送りください。
             </p>
           </div>
         </div>
@@ -201,31 +196,24 @@ export default async function EventDetailPage({
               <div className="informationList">
                 {event.date && (
                   <div className="informationRow">
-                    <div className="informationIcon">
-                      📅
-                    </div>
+                    <div className="informationIcon">📅</div>
 
                     <div>
                       <span>開催日</span>
-                      <strong>
-                        {event.date}
-                      </strong>
+                      <strong>{event.date}</strong>
                     </div>
                   </div>
                 )}
 
                 {hasTime && (
                   <div className="informationRow">
-                    <div className="informationIcon">
-                      🕐
-                    </div>
+                    <div className="informationIcon">🕐</div>
 
                     <div>
                       <span>開催時間</span>
-                      <strong>
-                        {event.startTime ||
-                          "未定"}
 
+                      <strong>
+                        {event.startTime || "未定"}
                         {event.endTime
                           ? ` 〜 ${event.endTime}`
                           : ""}
@@ -236,30 +224,22 @@ export default async function EventDetailPage({
 
                 {event.location && (
                   <div className="informationRow">
-                    <div className="informationIcon">
-                      📍
-                    </div>
+                    <div className="informationIcon">📍</div>
 
                     <div>
                       <span>会場名</span>
-                      <strong>
-                        {event.location}
-                      </strong>
+                      <strong>{event.location}</strong>
                     </div>
                   </div>
                 )}
 
                 {event.venueAddress && (
                   <div className="informationRow">
-                    <div className="informationIcon">
-                      🚃
-                    </div>
+                    <div className="informationIcon">🚃</div>
 
                     <div>
                       <span>会場住所</span>
-                      <strong>
-                        {event.venueAddress}
-                      </strong>
+                      <strong>{event.venueAddress}</strong>
 
                       {mapsUrl && (
                         <a
@@ -277,16 +257,12 @@ export default async function EventDetailPage({
 
                 {event.participationCondition && (
                   <div className="informationRow">
-                    <div className="informationIcon">
-                      👥
-                    </div>
+                    <div className="informationIcon">👥</div>
 
                     <div>
                       <span>参加条件</span>
                       <strong>
-                        {
-                          event.participationCondition
-                        }
+                        {event.participationCondition}
                       </strong>
                     </div>
                   </div>
@@ -294,15 +270,11 @@ export default async function EventDetailPage({
 
                 {event.organizer && (
                   <div className="informationRow">
-                    <div className="informationIcon">
-                      🎪
-                    </div>
+                    <div className="informationIcon">🎪</div>
 
                     <div>
                       <span>主催者</span>
-                      <strong>
-                        {event.organizer}
-                      </strong>
+                      <strong>{event.organizer}</strong>
                     </div>
                   </div>
                 )}
@@ -329,41 +301,27 @@ export default async function EventDetailPage({
             </section>
 
             <section className="recommendCard">
-              <div className="recommendIcon">
-                ✨
-              </div>
+              <div className="recommendIcon">✨</div>
 
               <div>
-                <p className="sectionEnglish">
-                  RECOMMENDED
-                </p>
+                <p className="sectionEnglish">INFORMATION</p>
 
-                <h2>
-                  気になった今が、
-                  参加を決めるタイミング
-                </h2>
+                <h2>参加をご検討中の方へ</h2>
 
                 <p>
-                  イベントは定員に達し次第、
-                  受付を終了する場合があります。
-                  参加を検討している方は、
-                  公式LINEから早めにご連絡ください。
+                  お申し込み状況や当日の詳細については、
+                  公式LINEからお気軽にお問い合わせください。
                 </p>
               </div>
             </section>
 
             <section className="ctaSection">
-              <p className="ctaSmall">
-                TOKYO EVENT NAVI
-              </p>
+              <p className="ctaSmall">TOKYO EVENT NAVI</p>
 
-              <h2>
-                このイベントに
-                参加してみませんか？
-              </h2>
+              <h2>このイベントに参加する</h2>
 
               <p>
-                お申し込み・空席確認・質問は、
+                お申し込み・空席確認・ご質問は、
                 公式LINEから受け付けています。
               </p>
 
@@ -377,10 +335,7 @@ export default async function EventDetailPage({
               </a>
             </section>
 
-            <Link
-              className="returnLink"
-              href="/"
-            >
+            <Link className="returnLink" href="/">
               ← その他のイベントを見る
             </Link>
           </div>
@@ -418,47 +373,53 @@ export default async function EventDetailPage({
           margin: 0 auto;
         }
 
-        .siteHeader {
+        .bannerHeader {
+          width: 100%;
+          overflow: hidden;
+          background: #000;
+        }
+
+        .bannerLink {
+          display: block;
+        }
+
+        .topBanner {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+
+        .navigation {
           position: relative;
           z-index: 10;
           background: #101010;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
           border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         }
 
-        .headerInner {
-          min-height: 82px;
+        .navigationInner {
+          min-height: 62px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           gap: 24px;
         }
 
-        .brand {
-          display: grid;
-          gap: 3px;
-          color: #fff;
+        .brandLink {
+          color: rgba(255, 255, 255, 0.72);
           text-decoration: none;
-        }
-
-        .brandEnglish {
-          font-size: 10px;
-          letter-spacing: 0.2em;
+          font-size: 11px;
           font-weight: 800;
-          opacity: 0.68;
-        }
-
-        .brandJapanese {
-          font-size: 18px;
-          font-weight: 800;
+          letter-spacing: 0.18em;
         }
 
         .backLink {
-          padding: 10px 16px;
+          padding: 9px 15px;
           border: 1px solid rgba(255, 255, 255, 0.3);
           border-radius: 999px;
           color: #fff;
           text-decoration: none;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 700;
         }
 
@@ -470,7 +431,9 @@ export default async function EventDetailPage({
 
         .heroGrid {
           display: grid;
-          grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+          grid-template-columns:
+            minmax(0, 1.08fr)
+            minmax(360px, 0.92fr);
           gap: 60px;
           align-items: center;
         }
@@ -561,6 +524,23 @@ export default async function EventDetailPage({
           line-height: 1.6;
         }
 
+        .quickAddress {
+          margin-top: 2px;
+          color: rgba(255, 255, 255, 0.72);
+          font-size: 13px;
+          line-height: 1.7;
+          white-space: pre-wrap;
+        }
+
+        .heroMapLink {
+          width: fit-content;
+          margin-top: 5px;
+          color: #fff;
+          font-size: 12px;
+          font-weight: 800;
+          text-underline-offset: 4px;
+        }
+
         .primaryButton {
           display: flex;
           justify-content: space-between;
@@ -573,7 +553,9 @@ export default async function EventDetailPage({
           text-decoration: none;
           font-size: 16px;
           font-weight: 900;
-          transition: transform 0.2s ease, opacity 0.2s ease;
+          transition:
+            transform 0.2s ease,
+            opacity 0.2s ease;
         }
 
         .primaryButton:hover {
@@ -654,6 +636,7 @@ export default async function EventDetailPage({
         .informationRow strong {
           font-size: 16px;
           line-height: 1.75;
+          white-space: pre-wrap;
           overflow-wrap: anywhere;
         }
 
@@ -771,12 +754,18 @@ export default async function EventDetailPage({
             width: min(100% - 24px, 1180px);
           }
 
-          .headerInner {
-            min-height: 68px;
+          .topBanner {
+            width: 150%;
+            max-width: none;
+            margin-left: -25%;
           }
 
-          .brandJapanese {
-            font-size: 15px;
+          .navigationInner {
+            min-height: 54px;
+          }
+
+          .brandLink {
+            font-size: 9px;
           }
 
           .backLink {
@@ -854,7 +843,9 @@ export default async function EventDetailPage({
             bottom: 0;
             left: 0;
             display: block;
-            padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+            padding:
+              10px 12px
+              calc(10px + env(safe-area-inset-bottom));
             background: rgba(255, 255, 255, 0.96);
             border-top: 1px solid #deded9;
             backdrop-filter: blur(10px);
