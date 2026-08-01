@@ -8,6 +8,8 @@ import {
 
 export const revalidate = 300;
 
+type CardSize = "large" | "medium" | "small";
+
 function getEventTimestamp(
   event: EventItem,
 ): number {
@@ -30,14 +32,16 @@ function getEventTimestamp(
 
 function EventCard({
   event,
+  size,
 }: {
   event: EventItem;
+  size: CardSize;
 }) {
   const hasTime =
     event.startTime || event.endTime;
 
   return (
-    <article className="card">
+    <article className={`card card-${size}`}>
       <Link
         href={`/events/${event.id}`}
         className="cardImageLink"
@@ -81,9 +85,7 @@ function EventCard({
                   開催日
                 </span>
 
-                <strong>
-                  {event.date}
-                </strong>
+                <strong>{event.date}</strong>
               </div>
             </div>
           )}
@@ -101,7 +103,6 @@ function EventCard({
 
                 <strong>
                   {event.startTime || "未定"}
-
                   {event.endTime
                     ? ` 〜 ${event.endTime}`
                     : ""}
@@ -144,13 +145,17 @@ function EventSection({
   title,
   events,
   emptyMessage,
+  size,
 }: {
   title: string;
   events: EventItem[];
   emptyMessage: string;
+  size: CardSize;
 }) {
   return (
-    <section className="eventSection">
+    <section
+      className={`eventSection section-${size}`}
+    >
       <div className="sectionHead">
         <h1>{title}</h1>
         <span>{events.length}件</span>
@@ -161,10 +166,11 @@ function EventSection({
           {emptyMessage}
         </div>
       ) : (
-        <div className="grid">
+        <div className={`grid grid-${size}`}>
           {events.map((event) => (
             <EventCard
               event={event}
+              size={size}
               key={`${title}-${event.id}`}
             />
           ))}
@@ -179,8 +185,8 @@ export default async function Home() {
 
   /*
    * 人気イベント
-   * NotionのF1にチェックがあるもの。
-   * 開催日時が近い順に表示します。
+   * F1にチェックがあるイベントを
+   * 開催日が近い順に表示
    */
   const featuredEvents = allEvents
     .filter((event) => event.featured)
@@ -192,21 +198,17 @@ export default async function Home() {
 
   /*
    * 新着イベント
-   * Notionでページが作成された日時が
-   * 新しい順に最大10件表示します。
+   * Notionへの追加日時が新しい順で
+   * 最大10件表示
    */
   const newEvents = [...allEvents]
     .sort((a, b) => {
       const aTime = a.createdTime
-        ? new Date(
-            a.createdTime,
-          ).getTime()
+        ? new Date(a.createdTime).getTime()
         : 0;
 
       const bTime = b.createdTime
-        ? new Date(
-            b.createdTime,
-          ).getTime()
+        ? new Date(b.createdTime).getTime()
         : 0;
 
       return bTime - aTime;
@@ -216,7 +218,7 @@ export default async function Home() {
   /*
    * 今週のイベント
    * 現在時刻から7日後までに
-   * 開催されるイベントだけを表示します。
+   * 開催されるイベントを表示
    */
   const now = Date.now();
 
@@ -256,18 +258,21 @@ export default async function Home() {
           title="人気イベント"
           events={featuredEvents}
           emptyMessage="現在、人気イベントはありません。Notionの「F1」にチェックを入れてください。"
+          size="large"
         />
 
         <EventSection
           title="新着イベント"
           events={newEvents}
           emptyMessage="現在、新着イベントはありません。"
+          size="medium"
         />
 
         <EventSection
           title="今週のイベント"
           events={weeklyEvents}
           emptyMessage="現在時刻から7日以内に開催されるイベントはありません。"
+          size="small"
         />
       </div>
 
@@ -296,7 +301,7 @@ export default async function Home() {
 
         .container {
           width: min(
-            1120px,
+            1180px,
             calc(100% - 40px)
           );
           margin: 0 auto;
@@ -304,9 +309,9 @@ export default async function Home() {
 
         .sections {
           display: grid;
-          gap: 80px;
-          padding-top: 58px;
-          padding-bottom: 110px;
+          gap: 96px;
+          padding-top: 64px;
+          padding-bottom: 120px;
         }
 
         .eventSection {
@@ -316,9 +321,11 @@ export default async function Home() {
         .sectionHead {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: end;
           gap: 24px;
           margin-bottom: 30px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid #deded9;
         }
 
         .sectionHead h1 {
@@ -329,9 +336,11 @@ export default async function Home() {
             38px
           );
           line-height: 1.3;
+          letter-spacing: -0.03em;
         }
 
         .sectionHead > span {
+          padding-bottom: 4px;
           color: #888;
           font-size: 14px;
           font-weight: 700;
@@ -339,73 +348,191 @@ export default async function Home() {
 
         .grid {
           display: grid;
-          grid-template-columns:
-            repeat(
-              3,
-              minmax(0, 1fr)
-            );
-          gap: 22px;
           align-items: stretch;
+        }
+
+        /*
+         * 人気イベント：大
+         * PCでは2列
+         */
+        .grid-large {
+          grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+          gap: 30px;
+        }
+
+        /*
+         * 新着イベント：中
+         * PCでは3列
+         */
+        .grid-medium {
+          grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+          gap: 22px;
+        }
+
+        /*
+         * 今週のイベント：小
+         * PCでは4列
+         */
+        .grid-small {
+          grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+          gap: 16px;
         }
 
         .card {
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          border:
-            1px solid #e8e8e4;
-          border-radius: 17px;
+          border: 1px solid #e7e7e2;
           background: #fff;
           box-shadow:
             0 10px 30px
             rgba(0, 0, 0, 0.045);
+          transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-3px);
+          box-shadow:
+            0 18px 42px
+            rgba(0, 0, 0, 0.075);
+        }
+
+        .card-large {
+          border-radius: 22px;
+        }
+
+        .card-medium {
+          border-radius: 17px;
+        }
+
+        .card-small {
+          border-radius: 14px;
         }
 
         .cardImageLink {
           display: block;
+          overflow: hidden;
           background: #eee;
         }
 
         .image {
           display: block;
           width: 100%;
-          aspect-ratio: 16 / 10;
           object-fit: cover;
+          transition: transform 0.25s ease;
+        }
+
+        .card:hover .image {
+          transform: scale(1.015);
+        }
+
+        /*
+         * 大カードはフライヤーを大きく表示
+         */
+        .card-large .image {
+          aspect-ratio: 16 / 10;
+        }
+
+        /*
+         * 中カードは現在に近いサイズ
+         */
+        .card-medium .image {
+          aspect-ratio: 16 / 10;
+        }
+
+        /*
+         * 小カードは少し横長にして
+         * 縦方向をコンパクトにする
+         */
+        .card-small .image {
+          aspect-ratio: 16 / 9;
         }
 
         .placeholder {
           display: grid;
           place-items: center;
           color: #888;
-          font-size: 12px;
           font-weight: 800;
           letter-spacing: 0.15em;
+        }
+
+        .card-large .placeholder {
+          font-size: 14px;
+        }
+
+        .card-medium .placeholder,
+        .card-small .placeholder {
+          font-size: 11px;
         }
 
         .cardBody {
           display: flex;
           flex: 1;
           flex-direction: column;
+        }
+
+        .card-large .cardBody {
+          padding: 28px;
+        }
+
+        .card-medium .cardBody {
           padding: 20px;
+        }
+
+        .card-small .cardBody {
+          padding: 15px;
         }
 
         .category {
           display: inline-flex;
           align-items: center;
           width: fit-content;
-          margin-bottom: 15px;
-          padding: 7px 13px;
           border-radius: 999px;
           background: #f1eee5;
           color: #5f5337;
-          font-size: 12px;
           line-height: 1;
           font-weight: 800;
         }
 
+        .card-large .category {
+          margin-bottom: 18px;
+          padding: 8px 14px;
+          font-size: 13px;
+        }
+
+        .card-medium .category {
+          margin-bottom: 15px;
+          padding: 7px 13px;
+          font-size: 12px;
+        }
+
+        .card-small .category {
+          margin-bottom: 11px;
+          padding: 6px 10px;
+          font-size: 10px;
+        }
+
         .eventTitle {
           margin: 0;
+        }
+
+        .card-large .eventTitle {
+          font-size: 27px;
+          line-height: 1.45;
+        }
+
+        .card-medium .eventTitle {
           font-size: 20px;
+          line-height: 1.5;
+        }
+
+        .card-small .eventTitle {
+          font-size: 16px;
           line-height: 1.5;
         }
 
@@ -416,54 +543,137 @@ export default async function Home() {
 
         .eventMeta {
           display: grid;
+        }
+
+        .card-large .eventMeta {
+          gap: 16px;
+          margin: 27px 0 30px;
+        }
+
+        .card-medium .eventMeta {
           gap: 14px;
           margin: 23px 0 25px;
         }
 
+        .card-small .eventMeta {
+          gap: 10px;
+          margin: 17px 0 19px;
+        }
+
         .metaRow {
           display: grid;
-          grid-template-columns:
-            27px 1fr;
           align-items: start;
+        }
+
+        .card-large .metaRow {
+          grid-template-columns: 30px 1fr;
+          gap: 11px;
+        }
+
+        .card-medium .metaRow {
+          grid-template-columns: 27px 1fr;
           gap: 9px;
+        }
+
+        .card-small .metaRow {
+          grid-template-columns: 21px 1fr;
+          gap: 7px;
         }
 
         .metaIcon {
           padding-top: 1px;
-          font-size: 16px;
           line-height: 1.4;
+        }
+
+        .card-large .metaIcon {
+          font-size: 18px;
+        }
+
+        .card-medium .metaIcon {
+          font-size: 16px;
+        }
+
+        .card-small .metaIcon {
+          font-size: 13px;
         }
 
         .metaRow > div {
           display: grid;
-          gap: 3px;
           min-width: 0;
+        }
+
+        .card-large .metaRow > div,
+        .card-medium .metaRow > div {
+          gap: 3px;
+        }
+
+        .card-small .metaRow > div {
+          gap: 2px;
         }
 
         .metaLabel {
           color: #999;
-          font-size: 10px;
           font-weight: 700;
+        }
+
+        .card-large .metaLabel {
+          font-size: 11px;
+        }
+
+        .card-medium .metaLabel {
+          font-size: 10px;
+        }
+
+        .card-small .metaLabel {
+          font-size: 9px;
         }
 
         .metaRow strong {
           color: #222;
+          overflow-wrap: anywhere;
+        }
+
+        .card-large .metaRow strong {
+          font-size: 15px;
+          line-height: 1.6;
+        }
+
+        .card-medium .metaRow strong {
           font-size: 14px;
           line-height: 1.55;
-          overflow-wrap: anywhere;
+        }
+
+        .card-small .metaRow strong {
+          font-size: 12px;
+          line-height: 1.45;
         }
 
         .detailButton {
           display: block;
           margin-top: auto;
-          padding: 15px;
-          border-radius: 10px;
           background: #111;
           color: #fff;
           text-align: center;
           text-decoration: none;
-          font-size: 14px;
           font-weight: 800;
+        }
+
+        .card-large .detailButton {
+          padding: 17px;
+          border-radius: 11px;
+          font-size: 15px;
+        }
+
+        .card-medium .detailButton {
+          padding: 15px;
+          border-radius: 10px;
+          font-size: 14px;
+        }
+
+        .card-small .detailButton {
+          padding: 11px;
+          border-radius: 8px;
+          font-size: 12px;
         }
 
         .empty {
@@ -475,25 +685,41 @@ export default async function Home() {
           line-height: 1.8;
         }
 
-        @media (
-          max-width: 900px
-        ) {
-          .grid {
+        /*
+         * タブレット
+         */
+        @media (max-width: 980px) {
+          .grid-large {
             grid-template-columns:
-              repeat(
-                2,
-                minmax(0, 1fr)
-              );
+              repeat(2, minmax(0, 1fr));
+          }
+
+          .grid-medium {
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr));
+          }
+
+          .grid-small {
+            grid-template-columns:
+              repeat(3, minmax(0, 1fr));
           }
         }
 
-        @media (
-          max-width: 640px
-        ) {
+        @media (max-width: 760px) {
+          .grid-small {
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        /*
+         * スマートフォン
+         */
+        @media (max-width: 640px) {
           .container {
             width: min(
               100% - 24px,
-              1120px
+              1180px
             );
           }
 
@@ -505,26 +731,107 @@ export default async function Home() {
           }
 
           .sections {
-            gap: 55px;
-            padding-top: 34px;
-            padding-bottom: 70px;
+            gap: 62px;
+            padding-top: 36px;
+            padding-bottom: 75px;
           }
 
           .sectionHead {
-            margin-bottom: 22px;
+            margin-bottom: 21px;
+            padding-bottom: 12px;
           }
 
           .sectionHead h1 {
             font-size: 26px;
           }
 
-          .grid {
+          .grid-large,
+          .grid-medium,
+          .grid-small {
             grid-template-columns: 1fr;
             gap: 18px;
           }
 
-          .cardBody {
+          /*
+           * スマホでは人気を一番大きく見せる
+           */
+          .card-large .cardBody {
+            padding: 22px;
+          }
+
+          .card-large .eventTitle {
+            font-size: 23px;
+          }
+
+          /*
+           * スマホの新着は標準サイズ
+           */
+          .card-medium .cardBody {
             padding: 18px;
+          }
+
+          /*
+           * スマホの今週は小さすぎないよう
+           * 最低限の読みやすさを確保
+           */
+          .card-small {
+            display: grid;
+            grid-template-columns:
+              minmax(125px, 40%)
+              minmax(0, 60%);
+          }
+
+          .card-small .cardImageLink {
+            height: 100%;
+          }
+
+          .card-small .image {
+            width: 100%;
+            height: 100%;
+            min-height: 210px;
+            aspect-ratio: auto;
+            object-fit: cover;
+          }
+
+          .card-small .cardBody {
+            padding: 14px;
+          }
+
+          .card-small .eventTitle {
+            font-size: 15px;
+          }
+
+          .card-small .category {
+            margin-bottom: 9px;
+          }
+
+          .card-small .eventMeta {
+            gap: 8px;
+            margin: 13px 0 15px;
+          }
+
+          .card-small .metaRow strong {
+            font-size: 11px;
+          }
+
+          .card-small .detailButton {
+            padding: 10px 7px;
+          }
+        }
+
+        /*
+         * かなり幅の狭いスマホでは
+         * 今週カードも通常の縦型に戻す
+         */
+        @media (max-width: 390px) {
+          .card-small {
+            display: flex;
+          }
+
+          .card-small .image {
+            height: auto;
+            min-height: 0;
+            aspect-ratio: 16 / 9;
           }
         }
       `}</style>
