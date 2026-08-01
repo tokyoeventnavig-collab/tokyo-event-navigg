@@ -103,6 +103,7 @@ function EventCard({
 
                 <strong>
                   {event.startTime || "未定"}
+
                   {event.endTime
                     ? ` 〜 ${event.endTime}`
                     : ""}
@@ -186,7 +187,7 @@ export default async function Home() {
   /*
    * 人気イベント
    * F1にチェックがあるイベントを
-   * 開催日が近い順に表示
+   * 開催日が近い順で最大3件表示
    */
   const featuredEvents = allEvents
     .filter((event) => event.featured)
@@ -194,7 +195,8 @@ export default async function Home() {
       (a, b) =>
         getEventTimestamp(a) -
         getEventTimestamp(b),
-    );
+    )
+    .slice(0, 3);
 
   /*
    * 新着イベント
@@ -217,8 +219,8 @@ export default async function Home() {
 
   /*
    * 今週のイベント
-   * 現在時刻から7日後までに
-   * 開催されるイベントを表示
+   * 現在時刻から7日後までに開催される
+   * イベントを開催日順で最大5件表示
    */
   const now = Date.now();
 
@@ -240,7 +242,8 @@ export default async function Home() {
       (a, b) =>
         getEventTimestamp(a) -
         getEventTimestamp(b),
-    );
+    )
+    .slice(0, 5);
 
   return (
     <main className="homePage">
@@ -431,24 +434,14 @@ export default async function Home() {
           transform: scale(1.015);
         }
 
-        /*
-         * 大カードはフライヤーを大きく表示
-         */
         .card-large .image {
           aspect-ratio: 16 / 10;
         }
 
-        /*
-         * 中カードは現在に近いサイズ
-         */
         .card-medium .image {
           aspect-ratio: 16 / 10;
         }
 
-        /*
-         * 小カードは少し横長にして
-         * 縦方向をコンパクトにする
-         */
         .card-small .image {
           aspect-ratio: 16 / 9;
         }
@@ -685,9 +678,6 @@ export default async function Home() {
           line-height: 1.8;
         }
 
-        /*
-         * タブレット
-         */
         @media (max-width: 980px) {
           .grid-large {
             grid-template-columns:
@@ -712,9 +702,6 @@ export default async function Home() {
           }
         }
 
-        /*
-         * スマートフォン
-         */
         @media (max-width: 640px) {
           .container {
             width: min(
@@ -752,9 +739,6 @@ export default async function Home() {
             gap: 18px;
           }
 
-          /*
-           * スマホでは人気を一番大きく見せる
-           */
           .card-large .cardBody {
             padding: 22px;
           }
@@ -763,17 +747,10 @@ export default async function Home() {
             font-size: 23px;
           }
 
-          /*
-           * スマホの新着は標準サイズ
-           */
           .card-medium .cardBody {
             padding: 18px;
           }
 
-          /*
-           * スマホの今週は小さすぎないよう
-           * 最低限の読みやすさを確保
-           */
           .card-small {
             display: grid;
             grid-template-columns:
@@ -819,10 +796,6 @@ export default async function Home() {
           }
         }
 
-        /*
-         * かなり幅の狭いスマホでは
-         * 今週カードも通常の縦型に戻す
-         */
         @media (max-width: 390px) {
           .card-small {
             display: flex;
