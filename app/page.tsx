@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import heroBanner from "../hero-banner.png";
 import { getEvents } from "../lib/notion";
 
 export const revalidate = 300;
@@ -7,25 +9,19 @@ export default async function Home() {
   const events = await getEvents();
 
   return (
-    <main>
-      <header className="hero">
-        <div className="container">
-          <p className="eyebrow">
-            TOKYO EVENT NAVI
-          </p>
-
-          <h1>東京イベントナビ</h1>
-
-          <p className="lead">
-            東京で開催される飲み会・交流会・
-            趣味イベントを掲載しています。
-          </p>
-        </div>
+    <main className="homePage">
+      <header className="bannerHeader">
+        <Image
+          src={heroBanner}
+          alt="東京イベントナビ"
+          className="topBanner"
+          priority
+        />
       </header>
 
       <section className="container section">
         <div className="sectionHead">
-          <h2>開催予定のイベント</h2>
+          <h1>開催予定のイベント</h1>
           <span>{events.length}件</span>
         </div>
 
@@ -40,10 +36,7 @@ export default async function Home() {
                 event.startTime || event.endTime;
 
               return (
-                <article
-                  className="card"
-                  key={event.id}
-                >
+                <article className="card" key={event.id}>
                   <Link
                     href={`/events/${event.id}`}
                     className="cardImageLink"
@@ -69,13 +62,11 @@ export default async function Home() {
                       </div>
                     )}
 
-                    <h3>
-                      <Link
-                        href={`/events/${event.id}`}
-                      >
+                    <h2 className="eventTitle">
+                      <Link href={`/events/${event.id}`}>
                         {event.title}
                       </Link>
-                    </h3>
+                    </h2>
 
                     <div className="eventMeta">
                       {event.date && (
@@ -108,9 +99,7 @@ export default async function Home() {
                             </span>
 
                             <strong>
-                              {event.startTime ||
-                                "未定"}
-
+                              {event.startTime || "未定"}
                               {event.endTime
                                 ? ` 〜 ${event.endTime}`
                                 : ""}
@@ -139,7 +128,7 @@ export default async function Home() {
                     </div>
 
                     <Link
-                      className="button"
+                      className="detailButton"
                       href={`/events/${event.id}`}
                     >
                       詳細を見る
@@ -153,20 +142,108 @@ export default async function Home() {
       </section>
 
       <style>{`
-        .cardImageLink {
-          display: block;
+        * {
+          box-sizing: border-box;
         }
 
-        .cardBody h3 a {
-          color: inherit;
-          text-decoration: none;
+        .homePage {
+          min-height: 100vh;
+          background: #f7f7f5;
+          color: #111;
+        }
+
+        .bannerHeader {
+          width: 100%;
+          overflow: hidden;
+          background: #000;
+        }
+
+        .topBanner {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+
+        .container {
+          width: min(1120px, calc(100% - 40px));
+          margin: 0 auto;
+        }
+
+        .section {
+          padding-top: 58px;
+          padding-bottom: 100px;
+        }
+
+        .sectionHead {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 24px;
+          margin-bottom: 30px;
+        }
+
+        .sectionHead h1 {
+          margin: 0;
+          font-size: clamp(27px, 4vw, 38px);
+          line-height: 1.3;
+        }
+
+        .sectionHead > span {
+          color: #888;
+          font-size: 14px;
+          font-weight: 700;
+        }
+
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 22px;
+          align-items: stretch;
+        }
+
+        .card {
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          border: 1px solid #e8e8e4;
+          border-radius: 17px;
+          background: #fff;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.045);
+        }
+
+        .cardImageLink {
+          display: block;
+          background: #eee;
+        }
+
+        .image {
+          display: block;
+          width: 100%;
+          aspect-ratio: 16 / 10;
+          object-fit: cover;
+        }
+
+        .placeholder {
+          display: grid;
+          place-items: center;
+          color: #888;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.15em;
+        }
+
+        .cardBody {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          padding: 20px;
         }
 
         .category {
           display: inline-flex;
           align-items: center;
           width: fit-content;
-          margin-bottom: 14px;
+          margin-bottom: 15px;
           padding: 7px 13px;
           border-radius: 999px;
           background: #f1eee5;
@@ -176,15 +253,26 @@ export default async function Home() {
           font-weight: 800;
         }
 
+        .eventTitle {
+          margin: 0;
+          font-size: 20px;
+          line-height: 1.5;
+        }
+
+        .eventTitle a {
+          color: inherit;
+          text-decoration: none;
+        }
+
         .eventMeta {
           display: grid;
-          gap: 13px;
-          margin: 20px 0 22px;
+          gap: 14px;
+          margin: 23px 0 25px;
         }
 
         .metaRow {
           display: grid;
-          grid-template-columns: 25px 1fr;
+          grid-template-columns: 27px 1fr;
           align-items: start;
           gap: 9px;
         }
@@ -197,14 +285,13 @@ export default async function Home() {
 
         .metaRow > div {
           display: grid;
-          gap: 2px;
+          gap: 3px;
           min-width: 0;
         }
 
         .metaLabel {
-          color: #969696;
-          font-size: 11px;
-          line-height: 1.4;
+          color: #999;
+          font-size: 10px;
           font-weight: 700;
         }
 
@@ -215,13 +302,61 @@ export default async function Home() {
           overflow-wrap: anywhere;
         }
 
+        .detailButton {
+          display: block;
+          margin-top: auto;
+          padding: 15px;
+          border-radius: 10px;
+          background: #111;
+          color: #fff;
+          text-align: center;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 800;
+        }
+
+        .empty {
+          padding: 50px 20px;
+          border-radius: 15px;
+          background: #fff;
+          color: #777;
+          text-align: center;
+        }
+
+        @media (max-width: 900px) {
+          .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
         @media (max-width: 640px) {
-          .eventMeta {
-            gap: 11px;
+          .container {
+            width: min(100% - 24px, 1120px);
           }
 
-          .metaRow strong {
-            font-size: 13px;
+          .topBanner {
+            width: 150%;
+            max-width: none;
+            height: auto;
+            margin-left: -25%;
+          }
+
+          .section {
+            padding-top: 34px;
+            padding-bottom: 70px;
+          }
+
+          .sectionHead {
+            margin-bottom: 22px;
+          }
+
+          .grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+          }
+
+          .cardBody {
+            padding: 18px;
           }
         }
       `}</style>
