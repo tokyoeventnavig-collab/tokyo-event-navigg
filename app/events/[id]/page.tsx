@@ -26,7 +26,7 @@ export async function generateMetadata({
     title: `${event.title}｜東京イベントナビ`,
     description:
       event.description ||
-      `${event.title}の開催情報・詳細・申し込みはこちら。`,
+      `${event.title}の開催情報・詳細はこちら。`,
   };
 }
 
@@ -39,6 +39,9 @@ export default async function EventDetailPage({
   if (!event) {
     notFound();
   }
+
+  const hasTime =
+    event.startTime || event.endTime;
 
   return (
     <main className="eventDetailPage">
@@ -73,32 +76,67 @@ export default async function EventDetailPage({
 
           <h1>{event.title}</h1>
 
-          <dl className="detailInformation">
+          <div className="detailInformation">
             {event.date && (
-              <div>
-                <dt>開催日時</dt>
-                <dd>{event.date}</dd>
+              <div className="detailRow">
+                <span className="detailIcon">
+                  📅
+                </span>
+
+                <div>
+                  <span className="detailLabel">
+                    開催日
+                  </span>
+
+                  <strong>{event.date}</strong>
+                </div>
+              </div>
+            )}
+
+            {hasTime && (
+              <div className="detailRow">
+                <span className="detailIcon">
+                  🕐
+                </span>
+
+                <div>
+                  <span className="detailLabel">
+                    開催時間
+                  </span>
+
+                  <strong>
+                    {event.startTime || "未定"}
+
+                    {event.endTime
+                      ? ` 〜 ${event.endTime}`
+                      : ""}
+                  </strong>
+                </div>
               </div>
             )}
 
             {event.location && (
-              <div>
-                <dt>会場</dt>
-                <dd>{event.location}</dd>
-              </div>
-            )}
+              <div className="detailRow">
+                <span className="detailIcon">
+                  📍
+                </span>
 
-            {event.price && (
-              <div>
-                <dt>参加料金</dt>
-                <dd>{event.price}</dd>
+                <div>
+                  <span className="detailLabel">
+                    会場
+                  </span>
+
+                  <strong>
+                    {event.location}
+                  </strong>
+                </div>
               </div>
             )}
-          </dl>
+          </div>
 
           {event.description && (
             <section className="detailDescription">
-              <h2>イベント詳細</h2>
+              <h2>イベント概要</h2>
               <p>{event.description}</p>
             </section>
           )}
@@ -152,7 +190,7 @@ export default async function EventDetailPage({
         .detailImage {
           display: block;
           width: 100%;
-          max-height: 560px;
+          max-height: 620px;
           object-fit: contain;
           background: #e9e9e6;
           border-radius: 20px;
@@ -168,20 +206,23 @@ export default async function EventDetailPage({
         }
 
         .detailContent {
-          background: #fff;
           margin-top: 28px;
           padding: 48px;
+          background: #fff;
           border-radius: 20px;
         }
 
         .detailCategory {
-          display: inline-block;
-          margin: 0 0 18px;
-          padding: 8px 14px;
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          margin: 0 0 20px;
+          padding: 8px 15px;
           border-radius: 999px;
-          background: #f0eee8;
+          background: #f1eee5;
+          color: #5f5337;
           font-size: 13px;
-          font-weight: 700;
+          font-weight: 800;
         }
 
         .detailContent h1 {
@@ -192,36 +233,48 @@ export default async function EventDetailPage({
         }
 
         .detailInformation {
-          margin: 36px 0 0;
-          border-top: 1px solid #e6e6e2;
-        }
-
-        .detailInformation > div {
           display: grid;
-          grid-template-columns: 130px 1fr;
-          gap: 20px;
+          gap: 0;
+          margin-top: 38px;
+          border-top: 1px solid #e7e7e3;
+        }
+
+        .detailRow {
+          display: grid;
+          grid-template-columns: 34px 1fr;
+          gap: 14px;
+          align-items: start;
           padding: 20px 0;
-          border-bottom: 1px solid #e6e6e2;
+          border-bottom: 1px solid #e7e7e3;
         }
 
-        .detailInformation dt {
-          font-size: 14px;
-          color: #777;
+        .detailIcon {
+          font-size: 21px;
+          line-height: 1.5;
+        }
+
+        .detailRow > div {
+          display: grid;
+          gap: 5px;
+        }
+
+        .detailLabel {
+          color: #888;
+          font-size: 12px;
           font-weight: 700;
         }
 
-        .detailInformation dd {
-          margin: 0;
-          font-weight: 700;
+        .detailRow strong {
+          font-size: 17px;
           line-height: 1.7;
         }
 
         .detailDescription {
-          margin-top: 42px;
+          margin-top: 44px;
         }
 
         .detailDescription h2 {
-          margin: 0 0 16px;
+          margin: 0 0 18px;
           font-size: 24px;
         }
 
@@ -253,8 +306,8 @@ export default async function EventDetailPage({
           padding: 18px;
           background: #f5f5f3;
           border-radius: 10px;
-          text-align: center;
           color: #666;
+          text-align: center;
         }
 
         @media (max-width: 640px) {
@@ -277,9 +330,8 @@ export default async function EventDetailPage({
             border-radius: 12px;
           }
 
-          .detailInformation > div {
-            grid-template-columns: 1fr;
-            gap: 8px;
+          .detailRow strong {
+            font-size: 15px;
           }
         }
       `}</style>
