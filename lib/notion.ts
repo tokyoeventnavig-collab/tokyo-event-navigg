@@ -16,9 +16,10 @@ export type EventItem = {
   title: string;
   published: boolean;
   date: string;
+  startTime: string;
+  endTime: string;
   location: string;
   image: string;
-  price: string;
   url: string;
   category: string;
   description: string;
@@ -31,11 +32,18 @@ const names = {
   title: process.env.NOTION_PROP_TITLE || "イベント名",
   published: process.env.NOTION_PROP_PUBLISHED || "公開",
   date: process.env.NOTION_PROP_DATE || "開催日",
-  location: process.env.NOTION_PROP_LOCATION || "会場名",
-  image: process.env.NOTION_PROP_IMAGE || "フライヤー",
-  price: process.env.NOTION_PROP_PRICE || "参加費",
-  url: process.env.NOTION_PROP_URL || "申込URL",
-  category: process.env.NOTION_PROP_CATEGORY || "カテゴリー",
+  startTime:
+    process.env.NOTION_PROP_START_TIME || "開始時間",
+  endTime:
+    process.env.NOTION_PROP_END_TIME || "終了時間",
+  location:
+    process.env.NOTION_PROP_LOCATION || "会場名",
+  image:
+    process.env.NOTION_PROP_IMAGE || "フライヤー",
+  url:
+    process.env.NOTION_PROP_URL || "申込URL",
+  category:
+    process.env.NOTION_PROP_CATEGORY || "カテゴリー",
   description:
     process.env.NOTION_PROP_DESCRIPTION || "イベント概要",
 };
@@ -59,7 +67,10 @@ function text(prop?: Property): string {
 function value(prop?: Property): string {
   if (!prop) return "";
 
-  if (prop.type === "title" || prop.type === "rich_text") {
+  if (
+    prop.type === "title" ||
+    prop.type === "rich_text"
+  ) {
     return text(prop);
   }
 
@@ -73,14 +84,18 @@ function value(prop?: Property): string {
 
   if (prop.type === "multi_select") {
     return (prop.multi_select || [])
-      .map((item: { name?: string }) => item.name || "")
+      .map(
+        (item: { name?: string }) =>
+          item.name || "",
+      )
       .filter(Boolean)
       .join("・");
   }
 
   if (prop.type === "number") {
-    if (prop.number == null) return "";
-    return String(prop.number);
+    return prop.number == null
+      ? ""
+      : String(prop.number);
   }
 
   if (prop.type === "url") {
@@ -104,16 +119,18 @@ function value(prop?: Property): string {
     );
   }
 
-  return "";
+  return text(prop);
 }
 
-function dateValue(prop?: Property): string {
+function formatDate(prop?: Property): string {
   const start =
     prop?.date?.start ||
     prop?.formula?.date?.start ||
     "";
 
-  if (!start) return "";
+  if (!start) {
+    return value(prop);
+  }
 
   const date = new Date(start);
 
@@ -126,10 +143,67 @@ function dateValue(prop?: Property): string {
     month: "long",
     day: "numeric",
     weekday: "short",
-    hour: start.includes("T") ? "2-digit" : undefined,
-    minute: start.includes("T") ? "2-digit" : undefined,
     timeZone: "Asia/Tokyo",
   }).format(date);
+}
+
+function formatTimeText(input: string): string {
+  const trimmed = input.trim();
+
+  if (!trimmed) return "";
+
+  /*
+   * 「18:30」「18：30」「18時30分」などを
+   * できるだけ統一して表示します。
+   */
+  const colonMatch = trimmed.match(
+    /(\d{1,2})[：:](\d{2})/,
+  );
+
+  if (colonMatch) {
+    const hour = colonMatch[1].padStart(2, "0");
+    const minute = colonMatch[2];
+
+    return `${hour}:${minute}`;
+  }
+
+  const japaneseMatch = trimmed.match(
+    /(\d{1,2})時(?:(\d{1,2})分)?/,
+  );
+
+  if (japaneseMatch) {
+    const hour = japaneseMatch[1].padStart(2, "0");
+    const minute = (
+      japaneseMatch[2] || "00"
+    ).padStart(2, "0");
+
+    return `${hour}:${minute}`;
+  }
+
+  return trimmed;
+}
+
+function timeValue(prop?: Property): string {
+  if (!prop) return "";
+
+  const dateStart =
+    prop?.date?.start ||
+    prop?.formula?.date?.start;
+
+  if (dateStart && dateStart.includes("T")) {
+    const date = new Date(dateStart);
+
+    if (!Number.isNaN(date.getTime())) {
+      return new Intl.DateTimeFormat("ja-JP", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Tokyo",
+      }).format(date);
+    }
+  }
+
+  return formatTimeText(value(prop));
 }
 
 function imageValue(
@@ -180,31 +254,52 @@ function convertPage(page: NotionPage): EventItem {
 
   return {
     id: page.id,
+
     title:
       text(properties[names.title]) ||
       "名称未設定",
+
     published: isPublished(
       properties[names.published],
     ),
-    date: dateValue(properties[names.date]),
-    location: value(properties[names.location]),
+
+    date: formatDate(properties[names.date]),
+
+    startTime: timeValue(
+      properties[names.startTime],
+    ),
+
+    endTime: timeValue(
+      properties[names.endTime],
+    ),
+
+    location: value(
+      properties[names.location],
+    ),
+
     image: imageValue(
       properties[names.image],
       page.cover,
     ),
-    price: value(properties[names.price]),
+
     url:
       value(properties[names.url]) ||
       page.url ||
       "",
-    category: value(properties[names.category]),
+
+    category: value(
+      properties[names.category],
+    ),
+
     description: value(
       properties[names.description],
     ),
   };
 }
 
-export async function getEvents(): Promise<EventItem[]> {
+export async function getEvents(): Promise<
+  EventItem[]
+> {
   if (!API_KEY || !DATABASE_ID) {
     return [];
   }
