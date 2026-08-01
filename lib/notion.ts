@@ -7,6 +7,8 @@ type Property = Record<string, any>;
 type NotionPage = {
   id: string;
   url?: string;
+  created_time?: string;
+  last_edited_time?: string;
   properties?: Record<string, Property>;
   cover?: Property | null;
 };
@@ -16,7 +18,25 @@ export type EventItem = {
   title: string;
   published: boolean;
   featured: boolean;
+
+  /*
+   * 画面表示用の開催日
+   * 例：2026年8月8日(土)
+   */
   date: string;
+
+  /*
+   * 並び替え・今週判定に使う
+   * Notionから取得した元の開催日時
+   */
+  dateStart: string;
+
+  /*
+   * Notionにページが作成された日時
+   * 新着イベントの並び替えに使用
+   */
+  createdTime: string;
+
   startTime: string;
   endTime: string;
   location: string;
@@ -162,7 +182,9 @@ function value(prop?: Property): string {
   }
 
   if (prop.type === "checkbox") {
-    return prop.checkbox ? "true" : "false";
+    return prop.checkbox
+      ? "true"
+      : "false";
   }
 
   if (prop.type === "formula") {
@@ -216,32 +238,51 @@ function checkboxValue(
   ].includes(currentValue);
 }
 
-function formatDate(prop?: Property): string {
-  const start =
+function rawDateValue(
+  prop?: Property,
+): string {
+  return (
     prop?.date?.start ||
     prop?.formula?.date?.start ||
-    "";
+    ""
+  );
+}
+
+function formatDate(prop?: Property): string {
+  const start = rawDateValue(prop);
 
   if (!start) {
     return value(prop);
   }
 
-  const date = new Date(start);
+  /*
+   * 日付だけの場合は日本時間の0時として扱います。
+   */
+  const date = new Date(
+    start.includes("T")
+      ? start
+      : `${start}T00:00:00+09:00`,
+  );
 
   if (Number.isNaN(date.getTime())) {
     return start;
   }
 
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-    timeZone: "Asia/Tokyo",
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    "ja-JP",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "short",
+      timeZone: "Asia/Tokyo",
+    },
+  ).format(date);
 }
 
-function formatTimeText(input: string): string {
+function formatTimeText(
+  input: string,
+): string {
   const trimmed = input.trim();
 
   if (!trimmed) {
@@ -277,7 +318,9 @@ function formatTimeText(input: string): string {
   return trimmed;
 }
 
-function timeValue(prop?: Property): string {
+function timeValue(
+  prop?: Property,
+): string {
   if (!prop) {
     return "";
   }
@@ -381,6 +424,13 @@ function convertPage(
       properties[names.date],
     ),
 
+    dateStart: rawDateValue(
+      properties[names.date],
+    ),
+
+    createdTime:
+      page.created_time || "",
+
     startTime: timeValue(
       properties[names.startTime],
     ),
@@ -439,15 +489,20 @@ export async function getEvents(): Promise<
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${API_KEY}`,
+          Authorization:
+            `Bearer ${API_KEY}`,
+
           "Notion-Version":
             "2022-06-28",
+
           "Content-Type":
             "application/json",
         },
+
         body: JSON.stringify({
           page_size: 100,
         }),
+
         next: {
           revalidate: 300,
         },
@@ -495,14 +550,20 @@ export async function getEventById(
 
   try {
     const response = await fetch(
-      `https://api.notion.com/v1/pages/${encodeURIComponent(id)}`,
+      `https://api.notion.com/v1/pages/${encodeURIComponent(
+        id,
+      )}`,
       {
         method: "GET",
+
         headers: {
-          Authorization: `Bearer ${API_KEY}`,
+          Authorization:
+            `Bearer ${API_KEY}`,
+
           "Notion-Version":
             "2022-06-28",
         },
+
         next: {
           revalidate: 300,
         },
