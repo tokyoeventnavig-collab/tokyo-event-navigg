@@ -10,6 +10,12 @@ export const revalidate = 300;
 
 type CardSize = "large" | "medium" | "small";
 
+type HomePageProps = {
+  searchParams: Promise<{
+    category?: string;
+  }>;
+};
+
 function getEventTimestamp(
   event: EventItem,
 ): number {
@@ -28,6 +34,66 @@ function getEventTimestamp(
   return Number.isNaN(timestamp)
     ? Number.POSITIVE_INFINITY
     : timestamp;
+}
+
+function getValidEventDate(
+  event: EventItem,
+): Date | null {
+  const timestamp = getEventTimestamp(event);
+
+  if (!Number.isFinite(timestamp)) {
+    return null;
+  }
+
+  return new Date(timestamp);
+}
+
+function formatCalendarDate(
+  event: EventItem,
+): {
+  month: string;
+  day: string;
+  weekday: string;
+} {
+  const eventDate = getValidEventDate(event);
+
+  if (!eventDate) {
+    return {
+      month: "未定",
+      day: "--",
+      weekday: "",
+    };
+  }
+
+  const month = new Intl.DateTimeFormat(
+    "ja-JP",
+    {
+      month: "short",
+      timeZone: "Asia/Tokyo",
+    },
+  ).format(eventDate);
+
+  const day = new Intl.DateTimeFormat(
+    "ja-JP",
+    {
+      day: "2-digit",
+      timeZone: "Asia/Tokyo",
+    },
+  ).format(eventDate);
+
+  const weekday = new Intl.DateTimeFormat(
+    "ja-JP",
+    {
+      weekday: "short",
+      timeZone: "Asia/Tokyo",
+    },
+  ).format(eventDate);
+
+  return {
+    month,
+    day,
+    weekday,
+  };
 }
 
 function EventCard({
@@ -85,7 +151,9 @@ function EventCard({
                   開催日
                 </span>
 
-                <strong>{event.date}</strong>
+                <strong>
+                  {event.date}
+                </strong>
               </div>
             </div>
           )}
@@ -103,7 +171,6 @@ function EventCard({
 
                 <strong>
                   {event.startTime || "未定"}
-
                   {event.endTime
                     ? ` 〜 ${event.endTime}`
                     : ""}
@@ -181,13 +248,217 @@ function EventSection({
   );
 }
 
-export default async function Home() {
+function CalendarSection({
+  events,
+}: {
+  events: EventItem[];
+}) {
+  const calendarEvents = [...events]
+    .filter(
+      (event) =>
+        Number.isFinite(
+          getEventTimestamp(event),
+        ),
+    )
+    .sort(
+      (a, b) =>
+        getEventTimestamp(a) -
+        getEventTimestamp(b),
+    );
+
+  return (
+    <section className="calendarSection">
+      <div className="sectionHead">
+        <div>
+          <p className="sectionSubTitle">
+            EVENT CALENDAR
+          </p>
+
+          <h1>イベントカレンダー</h1>
+        </div>
+
+        <span>{calendarEvents.length}件</span>
+      </div>
+
+      {calendarEvents.length === 0 ? (
+        <div className="empty">
+          現在、開催日が登録されたイベントはありません。
+        </div>
+      ) : (
+        <div className="calendarList">
+          {calendarEvents.map((event) => {
+            const calendarDate =
+              formatCalendarDate(event);
+
+            return (
+              <Link
+                className="calendarItem"
+                href={`/events/${event.id}`}
+                key={`calendar-${event.id}`}
+              >
+                <div className="calendarDate">
+                  <span className="calendarMonth">
+                    {calendarDate.month}
+                  </span>
+
+                  <strong>
+                    {calendarDate.day}
+                  </strong>
+
+                  <span className="calendarWeekday">
+                    {calendarDate.weekday}
+                  </span>
+                </div>
+
+                <div className="calendarContent">
+                  <div className="calendarTop">
+                    {event.category && (
+                      <span className="calendarCategory">
+                        {event.category}
+                      </span>
+                    )}
+
+                    {(event.startTime ||
+                      event.endTime) && (
+                      <span className="calendarTime">
+                        {event.startTime ||
+                          "未定"}
+
+                        {event.endTime
+                          ? ` 〜 ${event.endTime}`
+                          : ""}
+                      </span>
+                    )}
+                  </div>
+
+                  <h2>{event.title}</h2>
+
+                  {event.location && (
+                    <p>
+                      📍 {event.location}
+                    </p>
+                  )}
+                </div>
+
+                <span className="calendarArrow">
+                  →
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CategorySection({
+  categories,
+  selectedCategory,
+  events,
+}: {
+  categories: string[];
+  selectedCategory: string;
+  events: EventItem[];
+}) {
+  return (
+    <section
+      className="categorySearchSection"
+      id="category-search"
+    >
+      <div className="sectionHead">
+        <div>
+          <p className="sectionSubTitle">
+            SEARCH BY CATEGORY
+          </p>
+
+          <h1>カテゴリーから探す</h1>
+        </div>
+
+        <span>
+          {selectedCategory
+            ? `${events.length}件`
+            : `${categories.length}種類`}
+        </span>
+      </div>
+
+      <nav
+        className="categoryNavigation"
+        aria-label="イベントカテゴリー"
+      >
+        <Link
+          href="/#category-search"
+          className={
+            selectedCategory
+              ? "categoryFilter"
+              : "categoryFilter active"
+          }
+        >
+          すべて
+        </Link>
+
+        {categories.map((category) => (
+          <Link
+            href={`/?category=${encodeURIComponent(
+              category,
+            )}#category-search`}
+            className={
+              selectedCategory === category
+                ? "categoryFilter active"
+                : "categoryFilter"
+            }
+            key={category}
+          >
+            {category}
+          </Link>
+        ))}
+      </nav>
+
+      {selectedCategory && (
+        <div className="selectedCategoryHead">
+          <div>
+            <span>選択中のカテゴリー</span>
+            <h2>{selectedCategory}</h2>
+          </div>
+
+          <Link href="/#category-search">
+            絞り込みを解除
+          </Link>
+        </div>
+      )}
+
+      {events.length === 0 ? (
+        <div className="empty">
+          該当するイベントはありません。
+        </div>
+      ) : (
+        <div className="categoryResultGrid">
+          {events.map((event) => (
+            <EventCard
+              event={event}
+              size="medium"
+              key={`category-${event.id}`}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+export default async function Home({
+  searchParams,
+}: HomePageProps) {
+  const params = await searchParams;
+
+  const selectedCategory =
+    params.category?.trim() || "";
+
   const allEvents = await getEvents();
 
   /*
    * 人気イベント
-   * F1にチェックがあるイベントを
-   * 開催日が近い順で最大3件表示
+   * F1チェック・開催日が近い順・最大3件
    */
   const featuredEvents = allEvents
     .filter((event) => event.featured)
@@ -200,17 +471,20 @@ export default async function Home() {
 
   /*
    * 新着イベント
-   * Notionへの追加日時が新しい順で
-   * 最大10件表示
+   * Notionへの追加日時が新しい順・最大10件
    */
   const newEvents = [...allEvents]
     .sort((a, b) => {
       const aTime = a.createdTime
-        ? new Date(a.createdTime).getTime()
+        ? new Date(
+            a.createdTime,
+          ).getTime()
         : 0;
 
       const bTime = b.createdTime
-        ? new Date(b.createdTime).getTime()
+        ? new Date(
+            b.createdTime,
+          ).getTime()
         : 0;
 
       return bTime - aTime;
@@ -219,8 +493,7 @@ export default async function Home() {
 
   /*
    * 今週のイベント
-   * 現在時刻から7日後までに開催される
-   * イベントを開催日順で最大5件表示
+   * 現在から7日後まで・最大5件
    */
   const now = Date.now();
 
@@ -244,6 +517,39 @@ export default async function Home() {
         getEventTimestamp(b),
     )
     .slice(0, 5);
+
+  /*
+   * カテゴリー一覧
+   * 空欄を除外し、重複をなくします。
+   */
+  const categories = Array.from(
+    new Set(
+      allEvents
+        .map((event) =>
+          event.category.trim(),
+        )
+        .filter(Boolean),
+    ),
+  ).sort((a, b) =>
+    a.localeCompare(b, "ja"),
+  );
+
+  /*
+   * カテゴリー検索結果
+   */
+  const categoryEvents = (
+    selectedCategory
+      ? allEvents.filter(
+          (event) =>
+            event.category ===
+            selectedCategory,
+        )
+      : allEvents
+  ).sort(
+    (a, b) =>
+      getEventTimestamp(a) -
+      getEventTimestamp(b),
+  );
 
   return (
     <main className="homePage">
@@ -277,6 +583,18 @@ export default async function Home() {
           emptyMessage="現在時刻から7日以内に開催されるイベントはありません。"
           size="small"
         />
+
+        <CalendarSection
+          events={allEvents}
+        />
+
+        <CategorySection
+          categories={categories}
+          selectedCategory={
+            selectedCategory
+          }
+          events={categoryEvents}
+        />
       </div>
 
       <style>{`
@@ -304,7 +622,7 @@ export default async function Home() {
 
         .container {
           width: min(
-            1180px,
+            1240px,
             calc(100% - 40px)
           );
           margin: 0 auto;
@@ -312,12 +630,14 @@ export default async function Home() {
 
         .sections {
           display: grid;
-          gap: 96px;
+          gap: 100px;
           padding-top: 64px;
           padding-bottom: 120px;
         }
 
-        .eventSection {
+        .eventSection,
+        .calendarSection,
+        .categorySearchSection {
           min-width: 0;
         }
 
@@ -328,7 +648,16 @@ export default async function Home() {
           gap: 24px;
           margin-bottom: 30px;
           padding-bottom: 16px;
-          border-bottom: 1px solid #deded9;
+          border-bottom:
+            1px solid #deded9;
+        }
+
+        .sectionSubTitle {
+          margin: 0 0 7px;
+          color: #999;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.18em;
         }
 
         .sectionHead h1 {
@@ -356,39 +685,49 @@ export default async function Home() {
 
         /*
          * 人気イベント：大
-         * PCでは2列
+         * 最大3件なのでPCでは3列
          */
         .grid-large {
           grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-          gap: 30px;
+            repeat(
+              3,
+              minmax(0, 1fr)
+            );
+          gap: 26px;
         }
 
         /*
          * 新着イベント：中
-         * PCでは3列
+         * 5列×2段で最大10件
          */
         .grid-medium {
           grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-          gap: 22px;
+            repeat(
+              5,
+              minmax(0, 1fr)
+            );
+          gap: 18px;
         }
 
         /*
          * 今週のイベント：小
-         * PCでは4列
+         * 最大5件を横一列
          */
         .grid-small {
           grid-template-columns:
-            repeat(4, minmax(0, 1fr));
-          gap: 16px;
+            repeat(
+              5,
+              minmax(0, 1fr)
+            );
+          gap: 14px;
         }
 
         .card {
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          border: 1px solid #e7e7e2;
+          border:
+            1px solid #e7e7e2;
           background: #fff;
           box-shadow:
             0 10px 30px
@@ -399,7 +738,8 @@ export default async function Home() {
         }
 
         .card:hover {
-          transform: translateY(-3px);
+          transform:
+            translateY(-3px);
           box-shadow:
             0 18px 42px
             rgba(0, 0, 0, 0.075);
@@ -410,11 +750,11 @@ export default async function Home() {
         }
 
         .card-medium {
-          border-radius: 17px;
+          border-radius: 15px;
         }
 
         .card-small {
-          border-radius: 14px;
+          border-radius: 13px;
         }
 
         .cardImageLink {
@@ -427,7 +767,8 @@ export default async function Home() {
           display: block;
           width: 100%;
           object-fit: cover;
-          transition: transform 0.25s ease;
+          transition:
+            transform 0.25s ease;
         }
 
         .card:hover .image {
@@ -451,16 +792,16 @@ export default async function Home() {
           place-items: center;
           color: #888;
           font-weight: 800;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.12em;
         }
 
         .card-large .placeholder {
-          font-size: 14px;
+          font-size: 13px;
         }
 
         .card-medium .placeholder,
         .card-small .placeholder {
-          font-size: 11px;
+          font-size: 9px;
         }
 
         .cardBody {
@@ -470,15 +811,15 @@ export default async function Home() {
         }
 
         .card-large .cardBody {
-          padding: 28px;
+          padding: 25px;
         }
 
         .card-medium .cardBody {
-          padding: 20px;
+          padding: 15px;
         }
 
         .card-small .cardBody {
-          padding: 15px;
+          padding: 13px;
         }
 
         .category {
@@ -493,21 +834,21 @@ export default async function Home() {
         }
 
         .card-large .category {
-          margin-bottom: 18px;
+          margin-bottom: 16px;
           padding: 8px 14px;
-          font-size: 13px;
-        }
-
-        .card-medium .category {
-          margin-bottom: 15px;
-          padding: 7px 13px;
           font-size: 12px;
         }
 
-        .card-small .category {
+        .card-medium .category {
           margin-bottom: 11px;
           padding: 6px 10px;
           font-size: 10px;
+        }
+
+        .card-small .category {
+          margin-bottom: 9px;
+          padding: 5px 9px;
+          font-size: 9px;
         }
 
         .eventTitle {
@@ -515,18 +856,18 @@ export default async function Home() {
         }
 
         .card-large .eventTitle {
-          font-size: 27px;
+          font-size: 23px;
           line-height: 1.45;
         }
 
         .card-medium .eventTitle {
-          font-size: 20px;
+          font-size: 15px;
           line-height: 1.5;
         }
 
         .card-small .eventTitle {
-          font-size: 16px;
-          line-height: 1.5;
+          font-size: 14px;
+          line-height: 1.45;
         }
 
         .eventTitle a {
@@ -539,18 +880,18 @@ export default async function Home() {
         }
 
         .card-large .eventMeta {
-          gap: 16px;
-          margin: 27px 0 30px;
+          gap: 15px;
+          margin: 25px 0 27px;
         }
 
         .card-medium .eventMeta {
-          gap: 14px;
-          margin: 23px 0 25px;
+          gap: 9px;
+          margin: 15px 0 17px;
         }
 
         .card-small .eventMeta {
-          gap: 10px;
-          margin: 17px 0 19px;
+          gap: 8px;
+          margin: 13px 0 15px;
         }
 
         .metaRow {
@@ -559,18 +900,16 @@ export default async function Home() {
         }
 
         .card-large .metaRow {
-          grid-template-columns: 30px 1fr;
-          gap: 11px;
+          grid-template-columns:
+            29px 1fr;
+          gap: 10px;
         }
 
-        .card-medium .metaRow {
-          grid-template-columns: 27px 1fr;
-          gap: 9px;
-        }
-
+        .card-medium .metaRow,
         .card-small .metaRow {
-          grid-template-columns: 21px 1fr;
-          gap: 7px;
+          grid-template-columns:
+            20px 1fr;
+          gap: 6px;
         }
 
         .metaIcon {
@@ -579,28 +918,17 @@ export default async function Home() {
         }
 
         .card-large .metaIcon {
-          font-size: 18px;
+          font-size: 17px;
         }
 
-        .card-medium .metaIcon {
-          font-size: 16px;
-        }
-
+        .card-medium .metaIcon,
         .card-small .metaIcon {
-          font-size: 13px;
+          font-size: 12px;
         }
 
         .metaRow > div {
           display: grid;
           min-width: 0;
-        }
-
-        .card-large .metaRow > div,
-        .card-medium .metaRow > div {
-          gap: 3px;
-        }
-
-        .card-small .metaRow > div {
           gap: 2px;
         }
 
@@ -610,15 +938,12 @@ export default async function Home() {
         }
 
         .card-large .metaLabel {
-          font-size: 11px;
-        }
-
-        .card-medium .metaLabel {
           font-size: 10px;
         }
 
+        .card-medium .metaLabel,
         .card-small .metaLabel {
-          font-size: 9px;
+          font-size: 8px;
         }
 
         .metaRow strong {
@@ -627,17 +952,13 @@ export default async function Home() {
         }
 
         .card-large .metaRow strong {
-          font-size: 15px;
-          line-height: 1.6;
-        }
-
-        .card-medium .metaRow strong {
           font-size: 14px;
           line-height: 1.55;
         }
 
+        .card-medium .metaRow strong,
         .card-small .metaRow strong {
-          font-size: 12px;
+          font-size: 11px;
           line-height: 1.45;
         }
 
@@ -652,21 +973,21 @@ export default async function Home() {
         }
 
         .card-large .detailButton {
-          padding: 17px;
+          padding: 16px;
           border-radius: 11px;
-          font-size: 15px;
-        }
-
-        .card-medium .detailButton {
-          padding: 15px;
-          border-radius: 10px;
           font-size: 14px;
         }
 
-        .card-small .detailButton {
+        .card-medium .detailButton {
           padding: 11px;
           border-radius: 8px;
-          font-size: 12px;
+          font-size: 11px;
+        }
+
+        .card-small .detailButton {
+          padding: 10px;
+          border-radius: 7px;
+          font-size: 10px;
         }
 
         .empty {
@@ -678,35 +999,258 @@ export default async function Home() {
           line-height: 1.8;
         }
 
-        @media (max-width: 980px) {
+        /*
+         * カレンダー
+         */
+        .calendarList {
+          display: grid;
+          gap: 12px;
+        }
+
+        .calendarItem {
+          display: grid;
+          grid-template-columns:
+            92px minmax(0, 1fr) 30px;
+          gap: 22px;
+          align-items: center;
+          padding: 19px 22px;
+          border:
+            1px solid #e6e6e1;
+          border-radius: 16px;
+          background: #fff;
+          color: inherit;
+          text-decoration: none;
+          transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+        }
+
+        .calendarItem:hover {
+          transform:
+            translateX(3px);
+          box-shadow:
+            0 12px 30px
+            rgba(0, 0, 0, 0.055);
+        }
+
+        .calendarDate {
+          display: grid;
+          justify-items: center;
+          padding: 10px;
+          border-radius: 12px;
+          background: #111;
+          color: #fff;
+        }
+
+        .calendarMonth {
+          font-size: 10px;
+          font-weight: 700;
+        }
+
+        .calendarDate strong {
+          font-size: 29px;
+          line-height: 1.1;
+        }
+
+        .calendarWeekday {
+          margin-top: 2px;
+          color:
+            rgba(255, 255, 255, 0.65);
+          font-size: 10px;
+        }
+
+        .calendarContent {
+          min-width: 0;
+        }
+
+        .calendarTop {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          align-items: center;
+          margin-bottom: 7px;
+        }
+
+        .calendarCategory {
+          padding: 5px 9px;
+          border-radius: 999px;
+          background: #f1eee5;
+          color: #5f5337;
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .calendarTime {
+          color: #777;
+          font-size: 11px;
+          font-weight: 700;
+        }
+
+        .calendarContent h2 {
+          margin: 0;
+          font-size: 18px;
+          line-height: 1.45;
+        }
+
+        .calendarContent p {
+          margin: 7px 0 0;
+          color: #777;
+          font-size: 12px;
+        }
+
+        .calendarArrow {
+          color: #777;
+          font-size: 22px;
+        }
+
+        /*
+         * カテゴリー検索
+         */
+        .categoryNavigation {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-bottom: 30px;
+        }
+
+        .categoryFilter {
+          padding: 11px 17px;
+          border:
+            1px solid #dcdcd7;
+          border-radius: 999px;
+          background: #fff;
+          color: #333;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 800;
+          transition:
+            background 0.2s ease,
+            color 0.2s ease;
+        }
+
+        .categoryFilter:hover,
+        .categoryFilter.active {
+          border-color: #111;
+          background: #111;
+          color: #fff;
+        }
+
+        .selectedCategoryHead {
+          display: flex;
+          justify-content:
+            space-between;
+          align-items: center;
+          gap: 20px;
+          margin-bottom: 22px;
+          padding: 20px 22px;
+          border-radius: 14px;
+          background: #eee9dc;
+        }
+
+        .selectedCategoryHead span {
+          color: #777;
+          font-size: 10px;
+          font-weight: 700;
+        }
+
+        .selectedCategoryHead h2 {
+          margin: 4px 0 0;
+          font-size: 22px;
+        }
+
+        .selectedCategoryHead a {
+          color: #111;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .categoryResultGrid {
+          display: grid;
+          grid-template-columns:
+            repeat(
+              4,
+              minmax(0, 1fr)
+            );
+          gap: 18px;
+        }
+
+        /*
+         * タブレット
+         */
+        @media (
+          max-width: 1050px
+        ) {
+          .grid-medium {
+            grid-template-columns:
+              repeat(
+                3,
+                minmax(0, 1fr)
+              );
+          }
+
+          .grid-small {
+            grid-template-columns:
+              repeat(
+                3,
+                minmax(0, 1fr)
+              );
+          }
+
+          .categoryResultGrid {
+            grid-template-columns:
+              repeat(
+                3,
+                minmax(0, 1fr)
+              );
+          }
+        }
+
+        @media (
+          max-width: 800px
+        ) {
           .grid-large {
             grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
 
           .grid-medium {
             grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
 
           .grid-small {
             grid-template-columns:
-              repeat(3, minmax(0, 1fr));
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
-        }
 
-        @media (max-width: 760px) {
-          .grid-small {
+          .categoryResultGrid {
             grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
         }
 
-        @media (max-width: 640px) {
+        /*
+         * スマートフォン
+         */
+        @media (
+          max-width: 640px
+        ) {
           .container {
             width: min(
               100% - 24px,
-              1180px
+              1240px
             );
           }
 
@@ -718,7 +1262,7 @@ export default async function Home() {
           }
 
           .sections {
-            gap: 62px;
+            gap: 66px;
             padding-top: 36px;
             padding-bottom: 75px;
           }
@@ -734,21 +1278,30 @@ export default async function Home() {
 
           .grid-large,
           .grid-medium,
-          .grid-small {
+          .grid-small,
+          .categoryResultGrid {
             grid-template-columns: 1fr;
             gap: 18px;
           }
 
           .card-large .cardBody {
-            padding: 22px;
+            padding: 21px;
           }
 
           .card-large .eventTitle {
-            font-size: 23px;
+            font-size: 22px;
           }
 
           .card-medium .cardBody {
             padding: 18px;
+          }
+
+          .card-medium .eventTitle {
+            font-size: 18px;
+          }
+
+          .card-medium .metaRow strong {
+            font-size: 13px;
           }
 
           .card-small {
@@ -767,36 +1320,45 @@ export default async function Home() {
             height: 100%;
             min-height: 210px;
             aspect-ratio: auto;
-            object-fit: cover;
           }
 
-          .card-small .cardBody {
+          .calendarItem {
+            grid-template-columns:
+              68px minmax(0, 1fr);
+            gap: 14px;
             padding: 14px;
           }
 
-          .card-small .eventTitle {
+          .calendarDate strong {
+            font-size: 23px;
+          }
+
+          .calendarContent h2 {
             font-size: 15px;
           }
 
-          .card-small .category {
-            margin-bottom: 9px;
+          .calendarArrow {
+            display: none;
           }
 
-          .card-small .eventMeta {
+          .categoryNavigation {
             gap: 8px;
-            margin: 13px 0 15px;
           }
 
-          .card-small .metaRow strong {
-            font-size: 11px;
+          .categoryFilter {
+            padding: 10px 13px;
+            font-size: 12px;
           }
 
-          .card-small .detailButton {
-            padding: 10px 7px;
+          .selectedCategoryHead {
+            align-items: flex-start;
+            padding: 17px;
           }
         }
 
-        @media (max-width: 390px) {
+        @media (
+          max-width: 390px
+        ) {
           .card-small {
             display: flex;
           }
