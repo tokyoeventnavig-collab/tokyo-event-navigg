@@ -13,7 +13,13 @@ type CardSize = "large" | "medium" | "small";
 type HomePageProps = {
   searchParams: Promise<{
     category?: string;
+    month?: string;
   }>;
+};
+
+type CalendarCell = {
+  day: number | null;
+  events: EventItem[];
 };
 
 function getEventTimestamp(
@@ -36,64 +42,251 @@ function getEventTimestamp(
     : timestamp;
 }
 
-function getValidEventDate(
+function getJstDateParts(date: Date): {
+  year: number;
+  month: number;
+  day: number;
+} {
+  const parts = new Intl.DateTimeFormat(
+    "ja-JP",
+    {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      timeZone: "Asia/Tokyo",
+    },
+  ).formatToParts(date);
+
+  const year = Number(
+    parts.find(
+      (part) => part.type === "year",
+    )?.value || 0,
+  );
+
+  const month = Number(
+    parts.find(
+      (part) => part.type === "month",
+    )?.value || 0,
+  );
+
+  const day = Number(
+    parts.find(
+      (part) => part.type === "day",
+    )?.value || 0,
+  );
+
+  return {
+    year,
+    month,
+    day,
+  };
+}
+
+function getEventDateParts(
   event: EventItem,
-): Date | null {
-  const timestamp = getEventTimestamp(event);
+): {
+  year: number;
+  month: number;
+  day: number;
+} | null {
+  const timestamp =
+    getEventTimestamp(event);
 
   if (!Number.isFinite(timestamp)) {
     return null;
   }
 
-  return new Date(timestamp);
+  return getJstDateParts(
+    new Date(timestamp),
+  );
 }
 
-function formatCalendarDate(
-  event: EventItem,
+function parseSelectedMonth(
+  monthValue?: string,
 ): {
-  month: string;
-  day: string;
-  weekday: string;
+  year: number;
+  month: number;
 } {
-  const eventDate = getValidEventDate(event);
+  if (
+    monthValue &&
+    /^\d{4}-\d{2}$/.test(monthValue)
+  ) {
+    const [yearText, monthText] =
+      monthValue.split("-");
 
-  if (!eventDate) {
-    return {
-      month: "未定",
-      day: "--",
-      weekday: "",
-    };
+    const year = Number(yearText);
+    const month = Number(monthText);
+
+    if (
+      year >= 2000 &&
+      year <= 2100 &&
+      month >= 1 &&
+      month <= 12
+    ) {
+      return {
+        year,
+        month,
+      };
+    }
   }
 
-  const month = new Intl.DateTimeFormat(
-    "ja-JP",
-    {
-      month: "short",
-      timeZone: "Asia/Tokyo",
-    },
-  ).format(eventDate);
-
-  const day = new Intl.DateTimeFormat(
-    "ja-JP",
-    {
-      day: "2-digit",
-      timeZone: "Asia/Tokyo",
-    },
-  ).format(eventDate);
-
-  const weekday = new Intl.DateTimeFormat(
-    "ja-JP",
-    {
-      weekday: "short",
-      timeZone: "Asia/Tokyo",
-    },
-  ).format(eventDate);
+  const nowParts = getJstDateParts(
+    new Date(),
+  );
 
   return {
-    month,
-    day,
-    weekday,
+    year: nowParts.year,
+    month: nowParts.month,
   };
+}
+
+function formatMonthParameter(
+  year: number,
+  month: number,
+): string {
+  return `${year}-${String(
+    month,
+  ).padStart(2, "0")}`;
+}
+
+function moveMonth(
+  year: number,
+  month: number,
+  amount: number,
+): {
+  year: number;
+  month: number;
+} {
+  const date = new Date(
+    Date.UTC(
+      year,
+      month - 1 + amount,
+      1,
+    ),
+  );
+
+  return {
+    year: date.getUTCFullYear(),
+    month: date.getUTCMonth() + 1,
+  };
+}
+
+function createHomeUrl({
+  category,
+  month,
+  hash,
+}: {
+  category?: string;
+  month?: string;
+  hash?: string;
+}): string {
+  const params =
+    new URLSearchParams();
+
+  if (category) {
+    params.set("category", category);
+  }
+
+  if (month) {
+    params.set("month", month);
+  }
+
+  const query = params.toString();
+
+  return `/${query ? `?${query}` : ""}${
+    hash ? `#${hash}` : ""
+  }`;
+}
+
+function buildCalendarCells({
+  events,
+  year,
+  month,
+}: {
+  events: EventItem[];
+  year: number;
+  month: number;
+}): CalendarCell[] {
+  const firstWeekday =
+    new Date(
+      Date.UTC(year, month - 1, 1),
+    ).getUTCDay();
+
+  const daysInMonth =
+    new Date(
+      Date.UTC(year, month, 0),
+    ).getUTCDate();
+
+  const eventsByDay =
+    new Map<number, EventItem[]>();
+
+  events.forEach((event) => {
+    const dateParts =
+      getEventDateParts(event);
+
+    if (
+      !dateParts ||
+      dateParts.year !== year ||
+      dateParts.month !== month
+    ) {
+      return;
+    }
+
+    const currentEvents =
+      eventsByDay.get(dateParts.day) ||
+      [];
+
+    currentEvents.push(event);
+
+    eventsByDay.set(
+      dateParts.day,
+      currentEvents,
+    );
+  });
+
+  eventsByDay.forEach(
+    (dayEvents) => {
+      dayEvents.sort(
+        (a, b) =>
+          getEventTimestamp(a) -
+          getEventTimestamp(b),
+      );
+    },
+  );
+
+  const cells: CalendarCell[] = [];
+
+  for (
+    let index = 0;
+    index < firstWeekday;
+    index += 1
+  ) {
+    cells.push({
+      day: null,
+      events: [],
+    });
+  }
+
+  for (
+    let day = 1;
+    day <= daysInMonth;
+    day += 1
+  ) {
+    cells.push({
+      day,
+      events:
+        eventsByDay.get(day) || [],
+    });
+  }
+
+  while (cells.length % 7 !== 0) {
+    cells.push({
+      day: null,
+      events: [],
+    });
+  }
+
+  return cells;
 }
 
 function EventCard({
@@ -107,7 +300,9 @@ function EventCard({
     event.startTime || event.endTime;
 
   return (
-    <article className={`card card-${size}`}>
+    <article
+      className={`card card-${size}`}
+    >
       <Link
         href={`/events/${event.id}`}
         className="cardImageLink"
@@ -134,7 +329,9 @@ function EventCard({
         )}
 
         <h2 className="eventTitle">
-          <Link href={`/events/${event.id}`}>
+          <Link
+            href={`/events/${event.id}`}
+          >
             {event.title}
           </Link>
         </h2>
@@ -170,7 +367,9 @@ function EventCard({
                 </span>
 
                 <strong>
-                  {event.startTime || "未定"}
+                  {event.startTime ||
+                    "未定"}
+
                   {event.endTime
                     ? ` 〜 ${event.endTime}`
                     : ""}
@@ -221,9 +420,7 @@ function EventSection({
   size: CardSize;
 }) {
   return (
-    <section
-      className={`eventSection section-${size}`}
-    >
+    <section className="eventSection">
       <div className="sectionHead">
         <h1>{title}</h1>
         <span>{events.length}件</span>
@@ -234,7 +431,9 @@ function EventSection({
           {emptyMessage}
         </div>
       ) : (
-        <div className={`grid grid-${size}`}>
+        <div
+          className={`grid grid-${size}`}
+        >
           {events.map((event) => (
             <EventCard
               event={event}
@@ -250,104 +449,201 @@ function EventSection({
 
 function CalendarSection({
   events,
+  year,
+  month,
+  selectedCategory,
 }: {
   events: EventItem[];
+  year: number;
+  month: number;
+  selectedCategory: string;
 }) {
-  const calendarEvents = [...events]
-    .filter(
-      (event) =>
-        Number.isFinite(
-          getEventTimestamp(event),
-        ),
-    )
-    .sort(
-      (a, b) =>
-        getEventTimestamp(a) -
-        getEventTimestamp(b),
-    );
+  const calendarCells =
+    buildCalendarCells({
+      events,
+      year,
+      month,
+    });
+
+  const previousMonth =
+    moveMonth(year, month, -1);
+
+  const nextMonth =
+    moveMonth(year, month, 1);
+
+  const previousUrl =
+    createHomeUrl({
+      category:
+        selectedCategory || undefined,
+      month: formatMonthParameter(
+        previousMonth.year,
+        previousMonth.month,
+      ),
+      hash: "event-calendar",
+    });
+
+  const nextUrl =
+    createHomeUrl({
+      category:
+        selectedCategory || undefined,
+      month: formatMonthParameter(
+        nextMonth.year,
+        nextMonth.month,
+      ),
+      hash: "event-calendar",
+    });
+
+  const todayParts =
+    getJstDateParts(new Date());
 
   return (
-    <section className="calendarSection">
+    <section
+      className="calendarSection"
+      id="event-calendar"
+    >
       <div className="sectionHead">
         <div>
           <p className="sectionSubTitle">
             EVENT CALENDAR
           </p>
 
-          <h1>イベントカレンダー</h1>
+          <h1>
+            イベントカレンダー
+          </h1>
         </div>
-
-        <span>{calendarEvents.length}件</span>
       </div>
 
-      {calendarEvents.length === 0 ? (
-        <div className="empty">
-          現在、開催日が登録されたイベントはありません。
+      <div className="calendarCard">
+        <div className="calendarHeader">
+          <Link
+            href={previousUrl}
+            className="calendarMoveButton"
+            aria-label="前月を見る"
+          >
+            ←
+          </Link>
+
+          <h2>
+            {year}年{month}月
+          </h2>
+
+          <Link
+            href={nextUrl}
+            className="calendarMoveButton"
+            aria-label="次月を見る"
+          >
+            →
+          </Link>
         </div>
-      ) : (
-        <div className="calendarList">
-          {calendarEvents.map((event) => {
-            const calendarDate =
-              formatCalendarDate(event);
 
-            return (
-              <Link
-                className="calendarItem"
-                href={`/events/${event.id}`}
-                key={`calendar-${event.id}`}
-              >
-                <div className="calendarDate">
-                  <span className="calendarMonth">
-                    {calendarDate.month}
-                  </span>
+        <div className="calendarWeekdays">
+          {[
+            "日",
+            "月",
+            "火",
+            "水",
+            "木",
+            "金",
+            "土",
+          ].map((weekday, index) => (
+            <div
+              className={
+                index === 0
+                  ? "sunday"
+                  : index === 6
+                    ? "saturday"
+                    : ""
+              }
+              key={weekday}
+            >
+              {weekday}
+            </div>
+          ))}
+        </div>
 
-                  <strong>
-                    {calendarDate.day}
-                  </strong>
+        <div className="calendarGrid">
+          {calendarCells.map(
+            (cell, index) => {
+              const isToday =
+                cell.day !== null &&
+                todayParts.year === year &&
+                todayParts.month ===
+                  month &&
+                todayParts.day ===
+                  cell.day;
 
-                  <span className="calendarWeekday">
-                    {calendarDate.weekday}
-                  </span>
-                </div>
+              const weekday =
+                index % 7;
 
-                <div className="calendarContent">
-                  <div className="calendarTop">
-                    {event.category && (
-                      <span className="calendarCategory">
-                        {event.category}
-                      </span>
-                    )}
+              return (
+                <div
+                  className={[
+                    "calendarCell",
+                    cell.day === null
+                      ? "calendarCellEmpty"
+                      : "",
+                    isToday
+                      ? "calendarCellToday"
+                      : "",
+                    weekday === 0
+                      ? "calendarCellSunday"
+                      : "",
+                    weekday === 6
+                      ? "calendarCellSaturday"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  key={`calendar-cell-${index}`}
+                >
+                  {cell.day !== null && (
+                    <>
+                      <div className="calendarDayNumber">
+                        <span>
+                          {cell.day}
+                        </span>
 
-                    {(event.startTime ||
-                      event.endTime) && (
-                      <span className="calendarTime">
-                        {event.startTime ||
-                          "未定"}
+                        {isToday && (
+                          <small>
+                            今日
+                          </small>
+                        )}
+                      </div>
 
-                        {event.endTime
-                          ? ` 〜 ${event.endTime}`
-                          : ""}
-                      </span>
-                    )}
-                  </div>
+                      <div className="calendarEvents">
+                        {cell.events.map(
+                          (event) => (
+                            <Link
+                              href={`/events/${event.id}`}
+                              className="calendarEvent"
+                              title={
+                                event.title
+                              }
+                              key={`calendar-event-${event.id}`}
+                            >
+                              {event.startTime && (
+                                <span>
+                                  {
+                                    event.startTime
+                                  }
+                                </span>
+                              )}
 
-                  <h2>{event.title}</h2>
-
-                  {event.location && (
-                    <p>
-                      📍 {event.location}
-                    </p>
+                              <strong>
+                                {event.title}
+                              </strong>
+                            </Link>
+                          ),
+                        )}
+                      </div>
+                    </>
                   )}
                 </div>
-
-                <span className="calendarArrow">
-                  →
-                </span>
-              </Link>
-            );
-          })}
+              );
+            },
+          )}
         </div>
-      )}
+      </div>
     </section>
   );
 }
@@ -356,10 +652,12 @@ function CategorySection({
   categories,
   selectedCategory,
   events,
+  selectedMonth,
 }: {
   categories: string[];
   selectedCategory: string;
   events: EventItem[];
+  selectedMonth: string;
 }) {
   return (
     <section
@@ -387,7 +685,10 @@ function CategorySection({
         aria-label="イベントカテゴリー"
       >
         <Link
-          href="/#category-search"
+          href={createHomeUrl({
+            month: selectedMonth,
+            hash: "category-search",
+          })}
           className={
             selectedCategory
               ? "categoryFilter"
@@ -397,31 +698,46 @@ function CategorySection({
           すべて
         </Link>
 
-        {categories.map((category) => (
-          <Link
-            href={`/?category=${encodeURIComponent(
-              category,
-            )}#category-search`}
-            className={
-              selectedCategory === category
-                ? "categoryFilter active"
-                : "categoryFilter"
-            }
-            key={category}
-          >
-            {category}
-          </Link>
-        ))}
+        {categories.map(
+          (category) => (
+            <Link
+              href={createHomeUrl({
+                category,
+                month: selectedMonth,
+                hash: "category-search",
+              })}
+              className={
+                selectedCategory ===
+                category
+                  ? "categoryFilter active"
+                  : "categoryFilter"
+              }
+              key={category}
+            >
+              {category}
+            </Link>
+          ),
+        )}
       </nav>
 
       {selectedCategory && (
         <div className="selectedCategoryHead">
           <div>
-            <span>選択中のカテゴリー</span>
-            <h2>{selectedCategory}</h2>
+            <span>
+              選択中のカテゴリー
+            </span>
+
+            <h2>
+              {selectedCategory}
+            </h2>
           </div>
 
-          <Link href="/#category-search">
+          <Link
+            href={createHomeUrl({
+              month: selectedMonth,
+              hash: "category-search",
+            })}
+          >
             絞り込みを解除
           </Link>
         </div>
@@ -432,11 +748,11 @@ function CategorySection({
           該当するイベントはありません。
         </div>
       ) : (
-        <div className="categoryResultGrid">
+        <div className="grid grid-small">
           {events.map((event) => (
             <EventCard
               event={event}
-              size="medium"
+              size="small"
               key={`category-${event.id}`}
             />
           ))}
@@ -454,14 +770,22 @@ export default async function Home({
   const selectedCategory =
     params.category?.trim() || "";
 
-  const allEvents = await getEvents();
+  const selectedMonth =
+    parseSelectedMonth(params.month);
 
-  /*
-   * 人気イベント
-   * F1チェック・開催日が近い順・最大3件
-   */
+  const selectedMonthParameter =
+    formatMonthParameter(
+      selectedMonth.year,
+      selectedMonth.month,
+    );
+
+  const allEvents =
+    await getEvents();
+
   const featuredEvents = allEvents
-    .filter((event) => event.featured)
+    .filter(
+      (event) => event.featured,
+    )
     .sort(
       (a, b) =>
         getEventTimestamp(a) -
@@ -469,10 +793,6 @@ export default async function Home({
     )
     .slice(0, 3);
 
-  /*
-   * 新着イベント
-   * Notionへの追加日時が新しい順・最大10件
-   */
   const newEvents = [...allEvents]
     .sort((a, b) => {
       const aTime = a.createdTime
@@ -491,14 +811,11 @@ export default async function Home({
     })
     .slice(0, 10);
 
-  /*
-   * 今週のイベント
-   * 現在から7日後まで・最大5件
-   */
   const now = Date.now();
 
   const sevenDaysLater =
-    now + 7 * 24 * 60 * 60 * 1000;
+    now +
+    7 * 24 * 60 * 60 * 1000;
 
   const weeklyEvents = allEvents
     .filter((event) => {
@@ -506,9 +823,12 @@ export default async function Home({
         getEventTimestamp(event);
 
       return (
-        Number.isFinite(eventTime) &&
+        Number.isFinite(
+          eventTime,
+        ) &&
         eventTime >= now &&
-        eventTime <= sevenDaysLater
+        eventTime <=
+          sevenDaysLater
       );
     })
     .sort(
@@ -518,25 +838,19 @@ export default async function Home({
     )
     .slice(0, 5);
 
-  /*
-   * カテゴリー一覧
-   * 空欄を除外し、重複をなくします。
-   */
-  const categories = Array.from(
-    new Set(
-      allEvents
-        .map((event) =>
-          event.category.trim(),
-        )
-        .filter(Boolean),
-    ),
-  ).sort((a, b) =>
-    a.localeCompare(b, "ja"),
-  );
+  const categories =
+    Array.from(
+      new Set(
+        allEvents
+          .map((event) =>
+            event.category.trim(),
+          )
+          .filter(Boolean),
+      ),
+    ).sort((a, b) =>
+      a.localeCompare(b, "ja"),
+    );
 
-  /*
-   * カテゴリー検索結果
-   */
   const categoryEvents = (
     selectedCategory
       ? allEvents.filter(
@@ -586,6 +900,11 @@ export default async function Home({
 
         <CalendarSection
           events={allEvents}
+          year={selectedMonth.year}
+          month={selectedMonth.month}
+          selectedCategory={
+            selectedCategory
+          }
         />
 
         <CategorySection
@@ -594,6 +913,9 @@ export default async function Home({
             selectedCategory
           }
           events={categoryEvents}
+          selectedMonth={
+            selectedMonthParameter
+          }
         />
       </div>
 
@@ -633,12 +955,6 @@ export default async function Home({
           gap: 100px;
           padding-top: 64px;
           padding-bottom: 120px;
-        }
-
-        .eventSection,
-        .calendarSection,
-        .categorySearchSection {
-          min-width: 0;
         }
 
         .sectionHead {
@@ -683,10 +999,6 @@ export default async function Home({
           align-items: stretch;
         }
 
-        /*
-         * 人気イベント：大
-         * 最大3件なのでPCでは3列
-         */
         .grid-large {
           grid-template-columns:
             repeat(
@@ -696,10 +1008,6 @@ export default async function Home({
           gap: 26px;
         }
 
-        /*
-         * 新着イベント：中
-         * 5列×2段で最大10件
-         */
         .grid-medium {
           grid-template-columns:
             repeat(
@@ -709,10 +1017,6 @@ export default async function Home({
           gap: 18px;
         }
 
-        /*
-         * 今週のイベント：小
-         * 最大5件を横一列
-         */
         .grid-small {
           grid-template-columns:
             repeat(
@@ -775,10 +1079,7 @@ export default async function Home({
           transform: scale(1.015);
         }
 
-        .card-large .image {
-          aspect-ratio: 16 / 10;
-        }
-
+        .card-large .image,
         .card-medium .image {
           aspect-ratio: 16 / 10;
         }
@@ -824,7 +1125,6 @@ export default async function Home({
 
         .category {
           display: inline-flex;
-          align-items: center;
           width: fit-content;
           border-radius: 999px;
           background: #f1eee5;
@@ -999,113 +1299,178 @@ export default async function Home({
           line-height: 1.8;
         }
 
-        /*
-         * カレンダー
-         */
-        .calendarList {
-          display: grid;
-          gap: 12px;
+        .calendarCard {
+          overflow: hidden;
+          border:
+            1px solid #deded9;
+          border-radius: 20px;
+          background: #fff;
+          box-shadow:
+            0 12px 36px
+            rgba(0, 0, 0, 0.045);
         }
 
-        .calendarItem {
+        .calendarHeader {
           display: grid;
           grid-template-columns:
-            92px minmax(0, 1fr) 30px;
-          gap: 22px;
+            52px 1fr 52px;
           align-items: center;
-          padding: 19px 22px;
-          border:
+          padding: 20px;
+          border-bottom:
             1px solid #e6e6e1;
-          border-radius: 16px;
-          background: #fff;
-          color: inherit;
-          text-decoration: none;
-          transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
         }
 
-        .calendarItem:hover {
-          transform:
-            translateX(3px);
-          box-shadow:
-            0 12px 30px
-            rgba(0, 0, 0, 0.055);
+        .calendarHeader h2 {
+          margin: 0;
+          text-align: center;
+          font-size: 25px;
         }
 
-        .calendarDate {
+        .calendarMoveButton {
+          width: 42px;
+          height: 42px;
           display: grid;
-          justify-items: center;
+          place-items: center;
+          border-radius: 50%;
+          background: #111;
+          color: #fff;
+          text-decoration: none;
+          font-size: 17px;
+          font-weight: 800;
+        }
+
+        .calendarWeekdays {
+          display: grid;
+          grid-template-columns:
+            repeat(7, 1fr);
+          border-bottom:
+            1px solid #e6e6e1;
+          background: #f3f3ef;
+        }
+
+        .calendarWeekdays > div {
+          padding: 12px 5px;
+          text-align: center;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .calendarWeekdays .sunday {
+          color: #c95d5d;
+        }
+
+        .calendarWeekdays .saturday {
+          color: #4e77ac;
+        }
+
+        .calendarGrid {
+          display: grid;
+          grid-template-columns:
+            repeat(7, minmax(0, 1fr));
+        }
+
+        .calendarCell {
+          min-height: 145px;
           padding: 10px;
-          border-radius: 12px;
+          border-right:
+            1px solid #ecece7;
+          border-bottom:
+            1px solid #ecece7;
+          background: #fff;
+        }
+
+        .calendarCell:nth-child(
+          7n
+        ) {
+          border-right: 0;
+        }
+
+        .calendarCellEmpty {
+          background: #fafaf8;
+        }
+
+        .calendarCellToday {
+          background: #fff9df;
+          box-shadow:
+            inset 0 0 0 2px #d8b84a;
+        }
+
+        .calendarDayNumber {
+          display: flex;
+          justify-content:
+            space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+
+        .calendarDayNumber > span {
+          width: 27px;
+          height: 27px;
+          display: grid;
+          place-items: center;
+          border-radius: 50%;
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .calendarCellSunday
+          .calendarDayNumber
+          > span {
+          color: #c95d5d;
+        }
+
+        .calendarCellSaturday
+          .calendarDayNumber
+          > span {
+          color: #4e77ac;
+        }
+
+        .calendarCellToday
+          .calendarDayNumber
+          > span {
           background: #111;
           color: #fff;
         }
 
-        .calendarMonth {
-          font-size: 10px;
-          font-weight: 700;
-        }
-
-        .calendarDate strong {
-          font-size: 29px;
-          line-height: 1.1;
-        }
-
-        .calendarWeekday {
-          margin-top: 2px;
-          color:
-            rgba(255, 255, 255, 0.65);
-          font-size: 10px;
-        }
-
-        .calendarContent {
-          min-width: 0;
-        }
-
-        .calendarTop {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          align-items: center;
-          margin-bottom: 7px;
-        }
-
-        .calendarCategory {
-          padding: 5px 9px;
-          border-radius: 999px;
-          background: #f1eee5;
-          color: #5f5337;
-          font-size: 10px;
+        .calendarDayNumber small {
+          color: #917817;
+          font-size: 9px;
           font-weight: 800;
         }
 
-        .calendarTime {
-          color: #777;
-          font-size: 11px;
+        .calendarEvents {
+          display: grid;
+          gap: 5px;
+        }
+
+        .calendarEvent {
+          display: grid;
+          gap: 2px;
+          padding: 6px 7px;
+          overflow: hidden;
+          border-radius: 7px;
+          background: #eee9dc;
+          color: #26231d;
+          text-decoration: none;
+        }
+
+        .calendarEvent:hover {
+          background: #ddd4bd;
+        }
+
+        .calendarEvent span {
+          font-size: 8px;
           font-weight: 700;
+          opacity: 0.68;
         }
 
-        .calendarContent h2 {
-          margin: 0;
-          font-size: 18px;
-          line-height: 1.45;
+        .calendarEvent strong {
+          overflow: hidden;
+          font-size: 10px;
+          line-height: 1.35;
+          text-overflow: ellipsis;
         }
 
-        .calendarContent p {
-          margin: 7px 0 0;
-          color: #777;
-          font-size: 12px;
-        }
-
-        .calendarArrow {
-          color: #777;
-          font-size: 22px;
-        }
-
-        /*
-         * カテゴリー検索
-         */
         .categoryNavigation {
           display: flex;
           flex-wrap: wrap;
@@ -1123,9 +1488,6 @@ export default async function Home({
           text-decoration: none;
           font-size: 13px;
           font-weight: 800;
-          transition:
-            background 0.2s ease,
-            color 0.2s ease;
         }
 
         .categoryFilter:hover,
@@ -1164,30 +1526,10 @@ export default async function Home({
           font-weight: 800;
         }
 
-        .categoryResultGrid {
-          display: grid;
-          grid-template-columns:
-            repeat(
-              4,
-              minmax(0, 1fr)
-            );
-          gap: 18px;
-        }
-
-        /*
-         * タブレット
-         */
         @media (
           max-width: 1050px
         ) {
-          .grid-medium {
-            grid-template-columns:
-              repeat(
-                3,
-                minmax(0, 1fr)
-              );
-          }
-
+          .grid-medium,
           .grid-small {
             grid-template-columns:
               repeat(
@@ -1196,34 +1538,21 @@ export default async function Home({
               );
           }
 
-          .categoryResultGrid {
-            grid-template-columns:
-              repeat(
-                3,
-                minmax(0, 1fr)
-              );
+          .calendarCell {
+            min-height: 125px;
+            padding: 7px;
+          }
+
+          .calendarEvent {
+            padding: 5px;
           }
         }
 
         @media (
           max-width: 800px
         ) {
-          .grid-large {
-            grid-template-columns:
-              repeat(
-                2,
-                minmax(0, 1fr)
-              );
-          }
-
-          .grid-medium {
-            grid-template-columns:
-              repeat(
-                2,
-                minmax(0, 1fr)
-              );
-          }
-
+          .grid-large,
+          .grid-medium,
           .grid-small {
             grid-template-columns:
               repeat(
@@ -1232,18 +1561,16 @@ export default async function Home({
               );
           }
 
-          .categoryResultGrid {
-            grid-template-columns:
-              repeat(
-                2,
-                minmax(0, 1fr)
-              );
+          .calendarCard {
+            overflow-x: auto;
+          }
+
+          .calendarWeekdays,
+          .calendarGrid {
+            min-width: 800px;
           }
         }
 
-        /*
-         * スマートフォン
-         */
         @media (
           max-width: 640px
         ) {
@@ -1278,8 +1605,7 @@ export default async function Home({
 
           .grid-large,
           .grid-medium,
-          .grid-small,
-          .categoryResultGrid {
+          .grid-small {
             grid-template-columns: 1fr;
             gap: 18px;
           }
@@ -1288,20 +1614,8 @@ export default async function Home({
             padding: 21px;
           }
 
-          .card-large .eventTitle {
-            font-size: 22px;
-          }
-
           .card-medium .cardBody {
             padding: 18px;
-          }
-
-          .card-medium .eventTitle {
-            font-size: 18px;
-          }
-
-          .card-medium .metaRow strong {
-            font-size: 13px;
           }
 
           .card-small {
@@ -1311,7 +1625,8 @@ export default async function Home({
               minmax(0, 60%);
           }
 
-          .card-small .cardImageLink {
+          .card-small
+            .cardImageLink {
             height: 100%;
           }
 
@@ -1322,23 +1637,19 @@ export default async function Home({
             aspect-ratio: auto;
           }
 
-          .calendarItem {
+          .calendarHeader {
             grid-template-columns:
-              68px minmax(0, 1fr);
-            gap: 14px;
+              44px 1fr 44px;
             padding: 14px;
           }
 
-          .calendarDate strong {
-            font-size: 23px;
+          .calendarHeader h2 {
+            font-size: 20px;
           }
 
-          .calendarContent h2 {
-            font-size: 15px;
-          }
-
-          .calendarArrow {
-            display: none;
+          .calendarMoveButton {
+            width: 36px;
+            height: 36px;
           }
 
           .categoryNavigation {
@@ -1351,7 +1662,8 @@ export default async function Home({
           }
 
           .selectedCategoryHead {
-            align-items: flex-start;
+            align-items:
+              flex-start;
             padding: 17px;
           }
         }
