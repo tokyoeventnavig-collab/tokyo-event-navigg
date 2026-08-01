@@ -1,15 +1,5 @@
-type NotionText = {
-  plain_text?: string;
-};
-
+type NotionText = { plain_text?: string };
 type Property = Record<string, any>;
-
-type NotionPage = {
-  id: string;
-  url?: string;
-  properties?: Record<string, Property>;
-  cover?: Property | null;
-};
 
 export type EventItem = {
   id: string;
@@ -30,97 +20,53 @@ const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 const names = {
   title: process.env.NOTION_PROP_TITLE || "イベント名",
   published: process.env.NOTION_PROP_PUBLISHED || "公開",
-  date: process.env.NOTION_PROP_DATE || "開催日",
+  date: process.env.NOTION_PROP_DATE || "日時",
   location: process.env.NOTION_PROP_LOCATION || "会場名",
   image: process.env.NOTION_PROP_IMAGE || "フライヤー",
-  price: process.env.NOTION_PROP_PRICE || "料金",
+  price: process.env.NOTION_PROP_PRICE || "参加費",
   url: process.env.NOTION_PROP_URL || "申込URL",
-  category: process.env.NOTION_PROP_CATEGORY || "カテゴリー",
-  description: process.env.NOTION_PROP_DESCRIPTION || "説明",
+  category: process.env.NOTION_PROP_CATEGORY || "カテゴリ",
+  description: process.env.NOTION_PROP_DESCRIPTION || "イベント概要",
 };
 
 function text(prop?: Property): string {
-  if (!prop) return "";
-
   const items: NotionText[] =
-    prop.title ||
-    prop.rich_text ||
-    (prop.formula?.type === "string"
-      ? [{ plain_text: prop.formula.string || "" }]
-      : []);
-
-  return items
-    .map((item) => item.plain_text || "")
-    .join("")
-    .trim();
+    prop?.title || prop?.rich_text || prop?.formula?.string
+      ? prop.title || prop.rich_text || [{ plain_text: prop.formula.string }]
+      : [];
+  return items.map((x) => x.plain_text || "").join("").trim();
 }
 
 function value(prop?: Property): string {
   if (!prop) return "";
-
-  if (prop.type === "title" || prop.type === "rich_text") {
-    return text(prop);
-  }
-
-  if (prop.type === "select") {
-    return prop.select?.name || "";
-  }
-
-  if (prop.type === "status") {
-    return prop.status?.name || "";
-  }
-
-  if (prop.type === "multi_select") {
-    return (prop.multi_select || [])
-      .map((item: any) => item.name || "")
-      .filter(Boolean)
-      .join("・");
-  }
-
-  if (prop.type === "number") {
-    return prop.number == null
-      ? ""
-      : `${Number(prop.number).toLocaleString("ja-JP")}円`;
-  }
-
-  if (prop.type === "url") {
-    return prop.url || "";
-  }
-
-  if (prop.type === "email") {
-    return prop.email || "";
-  }
-
-  if (prop.type === "phone_number") {
-    return prop.phone_number || "";
-  }
-
+  if (prop.type === "title" || prop.type === "rich_text") return text(prop);
+  if (prop.type === "select") return prop.select?.name || "";
+  if (prop.type === "status") return prop.status?.name || "";
+  if (prop.type === "multi_select")
+    return (prop.multi_select || []).map((x: any) => x.name).join("・");
+  if (prop.type === "number")
+    return prop.number == null ? "" : String(prop.number);
+  if (prop.type === "url") return prop.url || "";
+  if (prop.type === "email") return prop.email || "";
+  if (prop.type === "phone_number") return prop.phone_number || "";
   if (prop.type === "formula") {
-    const formulaValue =
+    return String(
       prop.formula?.string ??
-      prop.formula?.number ??
-      prop.formula?.boolean ??
-      "";
-
-    return String(formulaValue);
+        prop.formula?.number ??
+        prop.formula?.boolean ??
+        ""
+    );
   }
-
   return "";
 }
 
 function dateValue(prop?: Property): string {
-  const start =
-    prop?.date?.start ||
-    prop?.formula?.date?.start ||
-    "";
-
+  const start = prop?.date?.start;
   if (!start) return "";
 
-  const date = new Date(start);
+  const d = new Date(start);
 
-  if (Number.isNaN(date.getTime())) {
-    return start;
-  }
+  if (Number.isNaN(d.getTime())) return start;
 
   return new Intl.DateTimeFormat("ja-JP", {
     year: "numeric",
@@ -130,30 +76,17 @@ function dateValue(prop?: Property): string {
     hour: start.includes("T") ? "2-digit" : undefined,
     minute: start.includes("T") ? "2-digit" : undefined,
     timeZone: "Asia/Tokyo",
-  }).format(date);
+  }).format(d);
 }
 
-function imageValue(
-  prop?: Property,
-  cover?: Property | null,
-): string {
+function imageValue(prop?: Property, cover?: Property): string {
   const file = prop?.files?.[0];
 
-  if (file?.type === "external") {
-    return file.external?.url || "";
-  }
+  if (file?.type === "external") return file.external.url;
+  if (file?.type === "file") return file.file.url;
 
-  if (file?.type === "file") {
-    return file.file?.url || "";
-  }
-
-  if (cover?.type === "external") {
-    return cover.external?.url || "";
-  }
-
-  if (cover?.type === "file") {
-    return cover.file?.url || "";
-  }
+  if (cover?.type === "external") return cover.external.url;
+  if (cover?.type ==="file") return cover.file.url;
 
   return "";
 }
@@ -161,11 +94,9 @@ function imageValue(
 function isPublished(prop?: Property): boolean {
   if (!prop) return true;
 
-  if (prop.type === "checkbox") {
-    return Boolean(prop.checkbox);
-  }
+  if (prop.type === "checkbox") return Boolean(prop.checkbox);
 
-  const currentValue = value(prop).toLowerCase();
+  const v = value(prop).toLowerCase();
 
   return [
     "公開",
@@ -173,124 +104,54 @@ function isPublished(prop?: Property): boolean {
     "publish",
     "yes",
     "true",
-  ].includes(currentValue);
-}
-
-function convertPage(page: NotionPage): EventItem {
-  const properties = page.properties || {};
-
-  return {
-    id: page.id,
-    title: text(properties[names.title]) || "名称未設定",
-    published: isPublished(properties[names.published]),
-    date: dateValue(properties[names.date]),
-    location: value(properties[names.location]),
-    image: imageValue(
-      properties[names.image],
-      page.cover,
-    ),
-    price: value(properties[names.price]),
-    url: value(properties[names.url]),
-    category: value(properties[names.category]),
-    description: value(properties[names.description]),
-  };
+  ].includes(v);
 }
 
 export async function getEvents(): Promise<EventItem[]> {
-  if (!API_KEY || !DATABASE_ID) {
+  if (!API_KEY || !DATABASE_ID) return [];
+
+  const response = await fetch(
+    `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        page_size: 100,
+      }),
+      next: {
+        revalidate: 300,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    console.error(await response.text());
     return [];
   }
 
-  try {
-    const response = await fetch(
-      `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Notion-Version": "2022-06-28",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          page_size: 100,
-        }),
-        next: {
-          revalidate: 300,
-        },
-      },
-    );
+  const data = await response.json();
 
-    if (!response.ok) {
-      const body = await response.text();
+  return (data.results || [])
+    .map((page: any): EventItem => {
+      const p = page.properties || {};
 
-      console.error(
-        `Notion API error ${response.status}: ${body}`,
-      );
-
-      return [];
-    }
-
-    const data = await response.json();
-
-    return (data.results || [])
-      .map((page: NotionPage) => convertPage(page))
-      .filter((event: EventItem) => event.published);
-  } catch (error) {
-    console.error(
-      "Notionイベント一覧の取得に失敗しました。",
-      error,
-    );
-
-    return [];
-  }
-}
-
-export async function getEventById(
-  id: string,
-): Promise<EventItem | null> {
-  if (!API_KEY || !id) {
-    return null;
-  }
-
-  try {
-    const response = await fetch(
-      `https://api.notion.com/v1/pages/${encodeURIComponent(id)}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Notion-Version": "2022-06-28",
-        },
-        next: {
-          revalidate: 300,
-        },
-      },
-    );
-
-    if (!response.ok) {
-      const body = await response.text();
-
-      console.error(
-        `Notion page error ${response.status}: ${body}`,
-      );
-
-      return null;
-    }
-
-    const page = (await response.json()) as NotionPage;
-    const event = convertPage(page);
-
-    if (!event.published) {
-      return null;
-    }
-
-    return event;
-  } catch (error) {
-    console.error(
-      "Notionイベント詳細の取得に失敗しました。",
-      error,
-    );
-
-    return null;
-  }
+      return {
+        id: page.id,
+        title: text(p[names.title]) || "名称未設定",
+        published: isPublished(p[names.published]),
+        date: dateValue(p[names.date]),
+        location: value(p[names.location]),
+        image: imageValue(p[names.image], page.cover),
+        price: value(p[names.price]),
+        url: value(p[names.url]),
+        category: value(p[names.category]),
+        description: value(p[names.description]),
+      };
+    })
+    .filter((event: EventItem) => event.published)
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
