@@ -23,6 +23,9 @@ const FAVORITES_KEY =
 const HISTORY_KEY =
   "tokyo-event-navi:history";
 
+const REMINDERS_KEY =
+  "tokyo-event-navi:reminders";
+
 const HISTORY_LIMIT = 10;
 
 function readSavedIds(
@@ -111,6 +114,124 @@ function getEventTime(
     event.endTime ||
     "時間未定"
   );
+}
+
+
+function getEventStartDate(
+  event: EventItem,
+): Date | null {
+  const source =
+    event.dateStart ||
+    event.dateISO ||
+    "";
+
+  if (!source) {
+    return null;
+  }
+
+  const dateOnly =
+    source.split("T")[0];
+
+  const timeMatch =
+    event.startTime.match(
+      /(\d{1,2}):(\d{2})/,
+    );
+
+  const hour =
+    timeMatch
+      ? Number(timeMatch[1])
+      : 12;
+
+  const minute =
+    timeMatch
+      ? Number(timeMatch[2])
+      : 0;
+
+  const date =
+    new Date(
+      `${dateOnly}T${String(
+        hour,
+      ).padStart(
+        2,
+        "0",
+      )}:${String(
+        minute,
+      ).padStart(
+        2,
+        "0",
+      )}:00+09:00`,
+    );
+
+  return Number.isNaN(
+    date.getTime(),
+  )
+    ? null
+    : date;
+}
+
+function getEventEndDate(
+  event: EventItem,
+): Date | null {
+  const startDate =
+    getEventStartDate(event);
+
+  if (!startDate) {
+    return null;
+  }
+
+  const timeMatch =
+    event.endTime.match(
+      /(\d{1,2}):(\d{2})/,
+    );
+
+  if (!timeMatch) {
+    return new Date(
+      startDate.getTime() +
+        2 * 60 * 60 * 1000,
+    );
+  }
+
+  const endDate =
+    new Date(startDate);
+
+  endDate.setHours(
+    Number(timeMatch[1]),
+    Number(timeMatch[2]),
+    0,
+    0,
+  );
+
+  if (
+    endDate.getTime() <=
+    startDate.getTime()
+  ) {
+    endDate.setDate(
+      endDate.getDate() + 1,
+    );
+  }
+
+  return endDate;
+}
+
+function formatCalendarDate(
+  date: Date,
+): string {
+  return date
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}Z$/, "Z");
+}
+
+function createCalendarDescription(
+  event: EventItem,
+): string {
+  return [
+    event.description,
+    event.participationCondition,
+    `申込み：${event.url}`,
+  ]
+    .filter(Boolean)
+    .join("\\n\\n");
 }
 
 function EventSmallCard({
@@ -202,12 +323,20 @@ export default function EventDetailClient({
     setCopied,
   ] = useState(false);
 
+  const [
+    reminderIds,
+    setReminderIds,
+  ] = useState<string[]>([]);
+
   useEffect(() => {
     const savedFavorites =
       readSavedIds(FAVORITES_KEY);
 
     const savedHistory =
       readSavedIds(HISTORY_KEY);
+
+    const savedReminders =
+      readSavedIds(REMINDERS_KEY);
 
     const nextHistory = [
       event.id,
@@ -218,6 +347,7 @@ export default function EventDetailClient({
 
     setFavoriteIds(savedFavorites);
     setHistoryIds(nextHistory);
+    setReminderIds(savedReminders);
 
     saveIds(
       HISTORY_KEY,
@@ -227,6 +357,9 @@ export default function EventDetailClient({
 
   const isFavorite =
     favoriteIds.includes(event.id);
+
+  const hasReminder =
+    reminderIds.includes(event.id);
 
   const recentEvents =
     useMemo(() => {
@@ -296,6 +429,189 @@ export default function EventDetailClient({
     }
   }
 
+
+  function toggleReminder() {
+    const nextReminders =
+      hasReminder
+        ? reminderIds.filter(
+            (id) =>
+              id !== event.id,
+          )
+        : [
+            event.id,
+            ...reminderIds,
+          ];
+
+    setReminderIds(
+      nextReminders,
+    );
+
+    saveIds(
+      REMINDERS_KEY,
+      nextReminders,
+    );
+
+    if (
+      !hasReminder &&
+      "Notification" in window &&
+      Notification.permission ===
+        "default"
+    ) {
+      void Notification.requestPermission();
+    }
+  }
+
+  function openGoogleCalendar() {
+    const startDate =
+      getEventStartDate(event);
+
+    const endDate =
+      getEventEndDate(event);
+
+    if (
+      !startDate ||
+      !endDate
+    ) {
+      return;
+    }
+
+    const parameters =
+      new URLSearchParams({
+        action: "TEMPLATE",
+        text: event.title,
+        dates:
+          `${formatCalendarDate(
+            startDate,
+          )}/` +
+          `${formatCalendarDate(
+            endDate,
+          )}`,
+        details:
+          createCalendarDescription(
+            event,
+          ),
+        location:
+          [
+            event.location,
+            event.venueAddress,
+          ]
+            .filter(Boolean)
+            .join(" "),
+      });
+
+    window.open(
+      `https://calendar.google.com/calendar/render?${parameters.toString()}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  }
+
+  function downloadCalendarFile() {
+    const startDate =
+      getEventStartDate(event);
+
+    const endDate =
+      getEventEndDate(event);
+
+    if (
+      !startDate ||
+      !endDate
+    ) {
+      return;
+    }
+
+    const escapeText = (
+      value: string,
+    ) =>
+      value
+        .replace(/\\/g, "\\\\")
+        .replace(/\n/g, "\\n")
+        .replace(/,/g, "\\,")
+        .replace(/;/g, "\\;");
+
+    const calendarContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Tokyo Event Navi//JP",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `UID:${event.id}@tokyo-event-navi`,
+      `DTSTAMP:${formatCalendarDate(
+        new Date(),
+      )}`,
+      `DTSTART:${formatCalendarDate(
+        startDate,
+      )}`,
+      `DTEND:${formatCalendarDate(
+        endDate,
+      )}`,
+      `SUMMARY:${escapeText(
+        event.title,
+      )}`,
+      `DESCRIPTION:${escapeText(
+        createCalendarDescription(
+          event,
+        ),
+      )}`,
+      `LOCATION:${escapeText(
+        [
+          event.location,
+          event.venueAddress,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      )}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob =
+      new Blob(
+        [calendarContent],
+        {
+          type:
+            "text/calendar;charset=utf-8",
+        },
+      );
+
+    const objectUrl =
+      URL.createObjectURL(blob);
+
+    const link =
+      document.createElement("a");
+
+    link.href = objectUrl;
+    link.download =
+      `${event.title}.ics`;
+
+    document.body.appendChild(
+      link,
+    );
+
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(
+      objectUrl,
+    );
+  }
+
+  function shareToLine() {
+    const text =
+      `${event.title}\n` +
+      `${event.date} ` +
+      `${getEventTime(event)}\n` +
+      `${window.location.href}`;
+
+    window.open(
+      `https://line.me/R/msg/text/?${encodeURIComponent(
+        text,
+      )}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  }
+
   async function shareEvent() {
     if (navigator.share) {
       try {
@@ -339,12 +655,26 @@ export default function EventDetailClient({
             </strong>
           </Link>
 
-          <Link
-            href="/"
-            className="backButton"
-          >
-            イベント一覧
-          </Link>
+          <nav className="headerNavigation">
+            <Link
+              href="/favorites"
+            >
+              ♡ お気に入り
+            </Link>
+
+            <Link
+              href="/recent"
+            >
+              ◷ 最近見た
+            </Link>
+
+            <Link
+              href="/"
+              className="backButton"
+            >
+              イベント一覧
+            </Link>
+          </nav>
         </div>
       </header>
 
@@ -427,9 +757,44 @@ export default function EventDetailClient({
 
               <button
                 type="button"
+                className={
+                  hasReminder
+                    ? "reminderButton active"
+                    : "reminderButton"
+                }
+                onClick={toggleReminder}
+              >
+                {hasReminder
+                  ? "🔔 通知登録済み"
+                  : "🔔 開催通知"}
+              </button>
+
+              <button
+                type="button"
+                onClick={openGoogleCalendar}
+              >
+                📅 Google
+              </button>
+
+              <button
+                type="button"
+                onClick={downloadCalendarFile}
+              >
+                ＋ カレンダー
+              </button>
+
+              <button
+                type="button"
+                onClick={shareToLine}
+              >
+                LINEで送る
+              </button>
+
+              <button
+                type="button"
                 onClick={shareEvent}
               >
-                ↗ 共有
+                ↗ その他へ共有
               </button>
 
               <button
@@ -441,6 +806,13 @@ export default function EventDetailClient({
                   : "リンクコピー"}
               </button>
             </div>
+
+            {hasReminder && (
+              <p className="reminderNote">
+                開催通知を保存しました。
+                現在はこのブラウザ内への保存です。
+              </p>
+            )}
 
             <div className="eventFacts">
               <div className="factRow">
@@ -717,6 +1089,23 @@ export default function EventDetailClient({
           font-weight: 900;
         }
 
+        .headerNavigation {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .headerNavigation > a {
+          padding: 10px 13px;
+          border:
+            1px solid #363636;
+          border-radius: 999px;
+          color: #d7d7d7;
+          font-size: 9px;
+          font-weight: 800;
+          text-decoration: none;
+        }
+
         .backButton {
           padding: 10px 17px;
           border:
@@ -899,10 +1288,19 @@ export default function EventDetailClient({
         }
 
         .quickActions
-          .favoriteButton.active {
+          .favoriteButton.active,
+        .quickActions
+          .reminderButton.active {
           border-color: #ffffff;
           background: #ffffff;
           color: #111111;
+        }
+
+        .reminderNote {
+          margin: -12px 0 20px;
+          color: #8f8f8f;
+          font-size: 8px;
+          line-height: 1.6;
         }
 
         .quickActions span {
@@ -1351,6 +1749,15 @@ export default function EventDetailClient({
               calc(100% - 24px);
           }
 
+          .headerNavigation {
+            gap: 5px;
+          }
+
+          .headerNavigation > a {
+            padding: 8px 9px;
+            font-size: 7px;
+          }
+
           .heroSection {
             padding: 28px 0 40px;
           }
@@ -1398,12 +1805,24 @@ export default function EventDetailClient({
           }
 
           .smallCardGrid {
-            grid-template-columns:
-              repeat(
-                2,
-                minmax(0, 1fr)
-              );
+            display: flex;
             gap: 9px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scroll-snap-type:
+              x mandatory;
+            scrollbar-width: thin;
+          }
+
+          .smallCard {
+            flex:
+              0 0
+              min(
+                72vw,
+                245px
+              );
+            scroll-snap-align:
+              start;
           }
 
           .relatedSection,
