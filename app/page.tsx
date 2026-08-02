@@ -66,8 +66,7 @@ function getJstDateParts(
         year: "numeric",
         month: "numeric",
         day: "numeric",
-        timeZone:
-          "Asia/Tokyo",
+        timeZone: "Asia/Tokyo",
       },
     ).formatToParts(date);
 
@@ -584,10 +583,6 @@ function EventSection({
     <section className="eventSection">
       <div className="sectionHead">
         <h1>{title}</h1>
-
-        <span>
-          {events.length}件
-        </span>
       </div>
 
       {events.length === 0 ? (
@@ -1002,12 +997,6 @@ function CategorySection({
             カテゴリーから探す
           </h1>
         </div>
-
-        <span>
-          {selectedCategory
-            ? `${events.length}件`
-            : `${categories.length}種類`}
-        </span>
       </div>
 
       <nav className="categoryNavigation">
@@ -1122,11 +1111,6 @@ export default async function Home({
       selectedMonth.month,
     );
 
-  /*
-   * イベント一覧と、
-   * Notionに登録されたカテゴリー選択肢を
-   * 同時に取得します。
-   */
   const [
     allEvents,
     notionCategories,
@@ -1203,11 +1187,6 @@ export default async function Home({
       )
       .slice(0, 5);
 
-  /*
-   * Notionの選択肢をそのまま使用。
-   * 万一取得できなかった場合のみ、
-   * イベントからカテゴリーを抽出します。
-   */
   const categories =
     notionCategories.length > 0
       ? notionCategories
@@ -1325,7 +1304,10 @@ export default async function Home({
         }
 
         .container {
-          width: min(1240px, calc(100% - 40px));
+          width: min(
+            1240px,
+            calc(100% - 40px)
+          );
           margin: 0 auto;
         }
 
@@ -1355,14 +1337,12 @@ export default async function Home({
 
         .sectionHead h1 {
           margin: 0;
-          font-size: clamp(27px, 4vw, 38px);
+          font-size: clamp(
+            27px,
+            4vw,
+            38px
+          );
           line-height: 1.3;
-        }
-
-        .sectionHead > span {
-          color: #888;
-          font-size: 14px;
-          font-weight: 700;
         }
 
         .grid {
@@ -1371,17 +1351,26 @@ export default async function Home({
         }
 
         .grid-large {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(
+            3,
+            minmax(0, 1fr)
+          );
           gap: 26px;
         }
 
         .grid-medium {
-          grid-template-columns: repeat(5, minmax(0, 1fr));
+          grid-template-columns: repeat(
+            5,
+            minmax(0, 1fr)
+          );
           gap: 18px;
         }
 
         .grid-small {
-          grid-template-columns: repeat(5, minmax(0, 1fr));
+          grid-template-columns: repeat(
+            5,
+            minmax(0, 1fr)
+          );
           gap: 14px;
         }
 
@@ -1391,7 +1380,9 @@ export default async function Home({
           overflow: hidden;
           border: 1px solid #e7e7e2;
           background: #fff;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.045);
+          box-shadow:
+            0 10px 30px
+            rgba(0, 0, 0, 0.045);
         }
 
         .card-large {
@@ -1406,25 +1397,67 @@ export default async function Home({
           border-radius: 13px;
         }
 
+        /*
+         * フライヤー表示
+         */
         .cardImageLink {
+          position: relative;
           display: block;
           overflow: hidden;
-          background: #eee;
+          background: #efefeb;
         }
 
         .image {
           display: block;
           width: 100%;
-          object-fit: cover;
         }
 
-        .card-large .image,
-        .card-medium .image {
+        /*
+         * 人気イベント
+         * フライヤー全体をなるべく切らずに表示
+         */
+        .card-large .cardImageLink {
+          display: grid;
+          place-items: center;
+          aspect-ratio: 16 / 10;
+          padding: 7px;
+          background: #e9e9e5;
+        }
+
+        .card-large .image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          object-position: center;
+        }
+
+        /*
+         * 新着イベント
+         * 枠を統一し、上側を残して切り抜く
+         */
+        .card-medium .cardImageLink {
           aspect-ratio: 16 / 10;
         }
 
-        .card-small .image {
+        .card-medium .image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 35%;
+        }
+
+        /*
+         * 今週・カテゴリー検索
+         */
+        .card-small .cardImageLink {
           aspect-ratio: 16 / 9;
+        }
+
+        .card-small .image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 35%;
         }
 
         .placeholder {
@@ -1490,14 +1523,17 @@ export default async function Home({
 
         .card-large .eventTitle {
           font-size: 23px;
+          line-height: 1.45;
         }
 
         .card-medium .eventTitle {
           font-size: 15px;
+          line-height: 1.5;
         }
 
         .card-small .eventTitle {
           font-size: 14px;
+          line-height: 1.45;
         }
 
         .eventMeta {
@@ -1506,10 +1542,16 @@ export default async function Home({
           margin: 15px 0 17px;
         }
 
+        .card-large .eventMeta {
+          gap: 15px;
+          margin: 25px 0 27px;
+        }
+
         .metaRow {
           display: grid;
           grid-template-columns: 22px 1fr;
           gap: 7px;
+          align-items: start;
         }
 
         .metaIcon {
@@ -1519,6 +1561,7 @@ export default async function Home({
         .metaRow > div {
           display: grid;
           gap: 2px;
+          min-width: 0;
         }
 
         .metaLabel {
@@ -1528,8 +1571,14 @@ export default async function Home({
         }
 
         .metaRow strong {
+          color: #222;
           font-size: 12px;
           line-height: 1.45;
+          overflow-wrap: anywhere;
+        }
+
+        .card-large .metaRow strong {
+          font-size: 14px;
         }
 
         .detailButton {
@@ -1545,6 +1594,12 @@ export default async function Home({
           font-weight: 800;
         }
 
+        .card-large .detailButton {
+          padding: 16px;
+          border-radius: 11px;
+          font-size: 14px;
+        }
+
         .empty {
           padding: 50px 20px;
           border-radius: 15px;
@@ -1553,6 +1608,9 @@ export default async function Home({
           text-align: center;
         }
 
+        /*
+         * カレンダー
+         */
         .calendarCard {
           overflow: hidden;
           border: 1px solid #deded9;
@@ -1562,7 +1620,8 @@ export default async function Home({
 
         .calendarHeader {
           display: grid;
-          grid-template-columns: 52px 1fr 52px;
+          grid-template-columns:
+            52px 1fr 52px;
           align-items: center;
           padding: 20px;
           border-bottom: 1px solid #e6e6e1;
@@ -1587,7 +1646,10 @@ export default async function Home({
         .calendarWeekdays,
         .calendarGrid {
           display: grid;
-          grid-template-columns: repeat(7, minmax(0, 1fr));
+          grid-template-columns: repeat(
+            7,
+            minmax(0, 1fr)
+          );
         }
 
         .calendarWeekdays {
@@ -1630,6 +1692,16 @@ export default async function Home({
           font-weight: 800;
         }
 
+        .calendarCellSaturday
+          .calendarDayNumber {
+          color: #4e77ac;
+        }
+
+        .calendarCellSunday
+          .calendarDayNumber {
+          color: #c95d5d;
+        }
+
         .calendarEvents {
           display: grid;
           gap: 5px;
@@ -1637,7 +1709,8 @@ export default async function Home({
 
         .calendarEvent {
           display: grid;
-          grid-template-columns: 32px minmax(0, 1fr);
+          grid-template-columns:
+            32px minmax(0, 1fr);
           gap: 5px;
           padding: 6px 7px;
           overflow: hidden;
@@ -1693,14 +1766,24 @@ export default async function Home({
         .modalBackdrop {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.55);
+          background: rgba(
+            0,
+            0,
+            0,
+            0.55
+          );
         }
 
         .moreEventsModal {
           position: relative;
           z-index: 1;
-          width: min(560px, 100%);
-          max-height: calc(100vh - 40px);
+          width: min(
+            560px,
+            100%
+          );
+          max-height: calc(
+            100vh - 40px
+          );
           overflow-y: auto;
           padding: 25px;
           border-radius: 18px;
@@ -1730,7 +1813,8 @@ export default async function Home({
         }
 
         .calendarEventModal {
-          grid-template-columns: 48px minmax(0, 1fr);
+          grid-template-columns:
+            48px minmax(0, 1fr);
           padding: 11px 13px;
         }
 
@@ -1739,6 +1823,9 @@ export default async function Home({
           white-space: normal;
         }
 
+        /*
+         * カテゴリー検索
+         */
         .categoryNavigation {
           display: flex;
           flex-wrap: wrap;
@@ -1772,18 +1859,28 @@ export default async function Home({
           background: #eee9dc;
         }
 
-        @media (max-width: 1050px) {
+        @media (
+          max-width: 1050px
+        ) {
           .grid-medium,
           .grid-small {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(
+              3,
+              minmax(0, 1fr)
+            );
           }
         }
 
-        @media (max-width: 800px) {
+        @media (
+          max-width: 800px
+        ) {
           .grid-large,
           .grid-medium,
           .grid-small {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(
+              2,
+              minmax(0, 1fr)
+            );
           }
 
           .calendarCard {
@@ -1796,9 +1893,13 @@ export default async function Home({
           }
         }
 
-        @media (max-width: 640px) {
+        @media (
+          max-width: 640px
+        ) {
           .container {
-            width: calc(100% - 24px);
+            width: calc(
+              100% - 24px
+            );
           }
 
           .topBanner {
@@ -1816,6 +1917,44 @@ export default async function Home({
           .grid-medium,
           .grid-small {
             grid-template-columns: 1fr;
+          }
+
+          .card-small {
+            display: grid;
+            grid-template-columns:
+              minmax(125px, 40%)
+              minmax(0, 60%);
+          }
+
+          .card-small
+            .cardImageLink {
+            height: 100%;
+            aspect-ratio: auto;
+          }
+
+          .card-small .image {
+            width: 100%;
+            height: 100%;
+            min-height: 210px;
+            object-fit: cover;
+            object-position: center 35%;
+          }
+        }
+
+        @media (
+          max-width: 390px
+        ) {
+          .card-small {
+            display: flex;
+          }
+
+          .card-small
+            .cardImageLink {
+            aspect-ratio: 16 / 9;
+          }
+
+          .card-small .image {
+            min-height: 0;
           }
         }
       `}</style>
