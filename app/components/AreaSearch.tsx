@@ -38,8 +38,9 @@ function getEventTimestamp(
     return Number.POSITIVE_INFINITY;
   }
 
-  const timestamp =
-    new Date(source).getTime();
+  const timestamp = new Date(
+    source,
+  ).getTime();
 
   return Number.isNaN(timestamp)
     ? Number.POSITIVE_INFINITY
@@ -53,13 +54,13 @@ function getTimeText(
     event.startTime &&
     event.endTime
   ) {
-    return `${event.startTime} 〜 ${event.endTime}`;
+    return `${event.startTime}〜${event.endTime}`;
   }
 
   return (
     event.startTime ||
     event.endTime ||
-    "時間未定"
+    ""
   );
 }
 
@@ -91,17 +92,13 @@ export default function AreaSearch({
     setVisibleCount,
   ] = useState(10);
 
-  /*
-   * 検索条件が変わったら、
-   * 表示件数を最初の10件に戻します。
-   */
   useEffect(() => {
     setVisibleCount(10);
   }, [searchedKeyword]);
 
   /*
-   * 現在掲載されているイベントから、
-   * エリア候補を自動生成します。
+   * Notionの会場住所・会場名から判定された
+   * エリア情報を検索候補として使用します。
    */
   const areaOptions =
     useMemo(() => {
@@ -125,8 +122,8 @@ export default function AreaSearch({
     }, [events]);
 
   /*
-   * 入力文字に一致する候補だけを表示します。
-   * 検索候補には件数を表示しません。
+   * 入力中の候補です。
+   * 件数は表示しません。
    */
   const suggestions =
     useMemo(() => {
@@ -150,11 +147,12 @@ export default function AreaSearch({
     ]);
 
   /*
-   * 検索ボタンを押した後だけ、
-   * 該当イベントを表示します。
+   * 検索ボタンを押した後に表示するイベントです。
    *
-   * エリアだけでなく、
-   * 会場名と会場住所も検索対象です。
+   * 検索対象：
+   * ・自動判定されたエリア
+   * ・会場名
+   * ・会場住所
    */
   const filteredEvents =
     useMemo(() => {
@@ -169,7 +167,7 @@ export default function AreaSearch({
 
       return events
         .filter((event) => {
-          const searchTarget =
+          const target =
             normalizeText(
               [
                 event.area,
@@ -180,7 +178,7 @@ export default function AreaSearch({
                 .join(" "),
             );
 
-          return searchTarget.includes(
+          return target.includes(
             keyword,
           );
         })
@@ -209,11 +207,10 @@ export default function AreaSearch({
   ) {
     event.preventDefault();
 
-    const keyword =
-      (
-        selectedArea ||
-        inputValue
-      ).trim();
+    const keyword = (
+      selectedArea ||
+      inputValue
+    ).trim();
 
     if (!keyword) {
       setSearchedKeyword("");
@@ -226,20 +223,20 @@ export default function AreaSearch({
     setShowSuggestions(false);
   }
 
-  function selectSuggestion(
-    area: string,
-  ) {
-    setInputValue(area);
-    setSelectedArea(area);
-    setShowSuggestions(false);
-  }
-
   function handleInputChange(
     value: string,
   ) {
     setInputValue(value);
     setSelectedArea("");
     setShowSuggestions(true);
+  }
+
+  function selectSuggestion(
+    area: string,
+  ) {
+    setInputValue(area);
+    setSelectedArea(area);
+    setShowSuggestions(false);
   }
 
   function searchArea(
@@ -271,12 +268,12 @@ export default function AreaSearch({
           参加しやすいイベントを探せます。
         </p>
 
-        <div className="searchArea">
+        <div className="searchPanel">
           <form
             className="searchForm"
             onSubmit={handleSubmit}
           >
-            <div className="inputArea">
+            <div className="inputWrap">
               <span className="searchIcon">
                 📍
               </span>
@@ -329,7 +326,7 @@ export default function AreaSearch({
                         <button
                           key={area}
                           type="button"
-                          className="suggestionItem"
+                          className="suggestion"
                           onMouseDown={(
                             event,
                           ) => {
@@ -341,7 +338,6 @@ export default function AreaSearch({
                           }}
                         >
                           <span>📍</span>
-
                           <strong>
                             {area}
                           </strong>
@@ -390,17 +386,16 @@ export default function AreaSearch({
           <div className="results">
             <div className="resultHead">
               <div>
-                <span>
+                <span className="searchedArea">
                   📍 {searchedKeyword}
                 </span>
 
-                <h3>
-                  エリア検索結果
-                </h3>
+                <h3>検索結果</h3>
               </div>
 
               <button
                 type="button"
+                className="resetButton"
                 onClick={clearSearch}
               >
                 検索をリセット
@@ -426,67 +421,63 @@ export default function AreaSearch({
               <>
                 <div className="eventGrid">
                   {visibleEvents.map(
-                    (event) => (
-                      <article
-                        className="eventCard"
-                        key={event.id}
-                      >
-                        <Link
-                          href={`/events/${event.id}`}
-                          className="imageLink"
+                    (event) => {
+                      const timeText =
+                        getTimeText(
+                          event,
+                        );
+
+                      return (
+                        <article
+                          className="eventCard"
+                          key={event.id}
                         >
-                          {event.image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={
-                                event.image
-                              }
-                              alt={
-                                event.title
-                              }
-                            />
-                          ) : (
-                            <div className="placeholder">
-                              TOKYO EVENT NAVI
-                            </div>
-                          )}
+                          <Link
+                            href={`/events/${event.id}`}
+                            className="imageLink"
+                          >
+                            {event.image ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={
+                                  event.image
+                                }
+                                alt={
+                                  event.title
+                                }
+                              />
+                            ) : (
+                              <div className="placeholder">
+                                TOKYO EVENT NAVI
+                              </div>
+                            )}
+                          </Link>
 
-                          {event.area && (
-                            <span className="areaLabel">
-                              📍
-                              {event.area}
-                            </span>
-                          )}
-                        </Link>
+                          <div className="cardBody">
+                            {event.category && (
+                              <span className="category">
+                                {
+                                  event.category
+                                }
+                              </span>
+                            )}
 
-                        <div className="cardBody">
-                          {event.category && (
-                            <span className="category">
-                              {
-                                event.category
-                              }
-                            </span>
-                          )}
+                            <h3 className="eventTitle">
+                              <Link
+                                href={`/events/${event.id}`}
+                              >
+                                {
+                                  event.title
+                                }
+                              </Link>
+                            </h3>
 
-                          <h3 className="eventTitle">
-                            <Link
-                              href={`/events/${event.id}`}
-                            >
-                              {event.title}
-                            </Link>
-                          </h3>
-
-                          <div className="eventInformation">
-                            {event.date && (
-                              <div className="infoRow">
-                                <span>
-                                  📅
-                                </span>
-
-                                <div>
-                                  <small>
-                                    開催日
-                                  </small>
+                            <div className="eventMeta">
+                              {event.date && (
+                                <div className="metaRow">
+                                  <span>
+                                    📅
+                                  </span>
 
                                   <strong>
                                     {
@@ -494,37 +485,27 @@ export default function AreaSearch({
                                     }
                                   </strong>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            <div className="infoRow">
-                              <span>
-                                🕐
-                              </span>
+                              {timeText && (
+                                <div className="metaRow">
+                                  <span>
+                                    🕐
+                                  </span>
 
-                              <div>
-                                <small>
-                                  開催時間
-                                </small>
+                                  <strong>
+                                    {
+                                      timeText
+                                    }
+                                  </strong>
+                                </div>
+                              )}
 
-                                <strong>
-                                  {getTimeText(
-                                    event,
-                                  )}
-                                </strong>
-                              </div>
-                            </div>
-
-                            {event.location && (
-                              <div className="infoRow">
-                                <span>
-                                  📍
-                                </span>
-
-                                <div>
-                                  <small>
-                                    会場
-                                  </small>
+                              {event.location && (
+                                <div className="metaRow">
+                                  <span>
+                                    📍
+                                  </span>
 
                                   <strong>
                                     {
@@ -532,30 +513,24 @@ export default function AreaSearch({
                                     }
                                   </strong>
                                 </div>
-                              </div>
-                            )}
-                          </div>
+                              )}
+                            </div>
 
-                          <Link
-                            href={`/events/${event.id}`}
-                            className="detailButton"
-                          >
-                            <span>
+                            <Link
+                              href={`/events/${event.id}`}
+                              className="detailButton"
+                            >
                               詳細を見る
-                            </span>
-
-                            <strong>
-                              →
-                            </strong>
-                          </Link>
-                        </div>
-                      </article>
-                    ),
+                            </Link>
+                          </div>
+                        </article>
+                      );
+                    },
                   )}
                 </div>
 
                 {hasMoreEvents && (
-                  <div className="loadMoreArea">
+                  <div className="loadMore">
                     <button
                       type="button"
                       onClick={() =>
@@ -591,7 +566,7 @@ export default function AreaSearch({
 
       <style jsx>{`
         .areaSection {
-          padding: 80px 0 100px;
+          padding: 58px 0 82px;
           background: #f7f7f5;
         }
 
@@ -604,9 +579,7 @@ export default function AreaSearch({
         }
 
         .sectionHead {
-          display: flex;
-          align-items: center;
-          margin-bottom: 10px;
+          margin-bottom: 8px;
         }
 
         .sectionHead h2 {
@@ -622,86 +595,82 @@ export default function AreaSearch({
         }
 
         .sectionDescription {
-          margin: 0 0 28px;
+          margin: 0 0 24px;
           color: #7d7d7d;
           font-size: 13px;
           line-height: 1.7;
         }
 
-        .searchArea {
+        .searchPanel {
           position: relative;
           z-index: 10;
-          padding: 22px;
+          padding: 18px;
           border: 1px solid #e7e5df;
-          border-radius: 17px;
+          border-radius: 16px;
           background: #fff;
           box-shadow:
-            0 10px 30px
-            rgba(0, 0, 0, 0.045);
+            0 8px 25px
+            rgba(0, 0, 0, 0.04);
         }
 
         .searchForm {
           display: grid;
           grid-template-columns:
             minmax(0, 1fr)
-            145px;
-          gap: 12px;
+            138px;
+          gap: 10px;
         }
 
-        .inputArea {
+        .inputWrap {
           position: relative;
           display: grid;
           grid-template-columns:
-            46px minmax(0, 1fr)
-            38px;
+            42px minmax(0, 1fr)
+            34px;
           align-items: center;
-          min-height: 62px;
-          padding: 0 12px;
-          border: 2px solid #ebe9e4;
-          border-radius: 12px;
+          min-height: 56px;
+          padding: 0 11px;
+          border: 1px solid #e5e3de;
+          border-radius: 11px;
           background: #fafaf8;
-          transition:
-            border-color 0.2s ease,
-            box-shadow 0.2s ease,
-            background 0.2s ease;
         }
 
-        .inputArea:focus-within {
+        .inputWrap:focus-within {
           border-color: #171717;
           background: #fff;
           box-shadow:
-            0 0 0 4px
-            rgba(0, 0, 0, 0.055);
+            0 0 0 3px
+            rgba(0, 0, 0, 0.045);
         }
 
         .searchIcon {
           text-align: center;
-          font-size: 21px;
+          font-size: 19px;
         }
 
-        .inputArea input {
+        .inputWrap input {
           width: 100%;
           border: 0;
           outline: 0;
           background: transparent;
           color: #222;
           font-family: inherit;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 700;
         }
 
-        .inputArea input::placeholder {
+        .inputWrap input::placeholder {
           color: #aaa;
           font-weight: 500;
         }
 
-        .inputArea input::-webkit-search-cancel-button {
+        .inputWrap input::-webkit-search-cancel-button {
           display: none;
         }
 
         .clearButton {
-          width: 31px;
-          height: 31px;
+          width: 29px;
+          height: 29px;
           display: grid;
           place-items: center;
           border: 0;
@@ -709,32 +678,32 @@ export default function AreaSearch({
           background: #eceae6;
           color: #777;
           cursor: pointer;
-          font-size: 18px;
+          font-size: 17px;
         }
 
         .suggestions {
           position: absolute;
           z-index: 30;
-          top: calc(100% + 8px);
+          top: calc(100% + 7px);
           right: 0;
           left: 0;
           overflow: hidden;
           border: 1px solid #e5e3de;
-          border-radius: 12px;
+          border-radius: 11px;
           background: #fff;
           box-shadow:
-            0 18px 42px
-            rgba(0, 0, 0, 0.14);
+            0 16px 38px
+            rgba(0, 0, 0, 0.13);
         }
 
-        .suggestionItem {
+        .suggestion {
           width: 100%;
           display: grid;
           grid-template-columns:
-            35px minmax(0, 1fr);
+            32px minmax(0, 1fr);
           align-items: center;
-          gap: 9px;
-          padding: 13px 15px;
+          gap: 8px;
+          padding: 12px 14px;
           border: 0;
           border-bottom:
             1px solid #efede9;
@@ -744,56 +713,50 @@ export default function AreaSearch({
           text-align: left;
         }
 
-        .suggestionItem:last-child {
+        .suggestion:last-child {
           border-bottom: 0;
         }
 
-        .suggestionItem:hover {
+        .suggestion:hover {
           background: #f7f7f4;
         }
 
-        .suggestionItem > span {
-          font-size: 17px;
+        .suggestion span {
+          font-size: 16px;
         }
 
-        .suggestionItem strong {
+        .suggestion strong {
           font-size: 13px;
         }
 
         .searchButton {
           display: flex;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           align-items: center;
-          padding: 0 20px;
+          padding: 0 18px;
           border: 0;
-          border-radius: 12px;
+          border-radius: 11px;
           background: #171717;
           color: #fff;
           cursor: pointer;
           font-family: inherit;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 900;
-          transition:
-            transform 0.2s ease,
-            background 0.2s ease;
         }
 
         .searchButton:hover {
           background: #303030;
-          transform:
-            translateY(-2px);
         }
 
         .searchButton strong {
-          font-size: 19px;
+          font-size: 17px;
         }
 
         .quickAreas {
           display: flex;
           align-items: center;
-          gap: 13px;
-          margin-top: 15px;
+          gap: 12px;
+          margin-top: 13px;
         }
 
         .quickAreas > span {
@@ -806,11 +769,11 @@ export default function AreaSearch({
         .quickAreas > div {
           display: flex;
           flex-wrap: wrap;
-          gap: 7px;
+          gap: 6px;
         }
 
         .quickAreas button {
-          padding: 7px 11px;
+          padding: 6px 10px;
           border: 1px solid #e7e4df;
           border-radius: 999px;
           background: #faf9f7;
@@ -828,40 +791,39 @@ export default function AreaSearch({
         }
 
         .results {
-          margin-top: 45px;
+          margin-top: 37px;
         }
 
         .resultHead {
           display: flex;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           align-items: flex-end;
           gap: 20px;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
         }
 
         .resultHead > div {
           display: grid;
-          gap: 7px;
+          gap: 6px;
         }
 
-        .resultHead > div > span {
+        .searchedArea {
           width: fit-content;
-          padding: 7px 11px;
+          padding: 6px 10px;
           border-radius: 999px;
           background: #eeeae1;
           color: #655d4e;
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 800;
         }
 
         .resultHead h3 {
           margin: 0;
           color: #171717;
-          font-size: 25px;
+          font-size: 23px;
         }
 
-        .resultHead > button {
+        .resetButton {
           border: 0;
           background: transparent;
           color: #888;
@@ -873,14 +835,14 @@ export default function AreaSearch({
         }
 
         /*
-         * PCでは5列×2段で、
-         * 最初に最大10件表示します。
+         * 新着イベントと同程度の
+         * コンパクトな5列カードです。
          */
         .eventGrid {
           display: grid;
           grid-template-columns:
             repeat(5, minmax(0, 1fr));
-          gap: 14px;
+          gap: 13px;
           align-items: stretch;
         }
 
@@ -890,26 +852,24 @@ export default function AreaSearch({
           min-width: 0;
           overflow: hidden;
           border: 1px solid #e8e8e4;
-          border-radius: 14px;
+          border-radius: 13px;
           background: #fff;
           box-shadow:
-            0 8px 22px
-            rgba(0, 0, 0, 0.045);
+            0 6px 18px
+            rgba(0, 0, 0, 0.04);
           transition:
             transform 0.2s ease,
             box-shadow 0.2s ease;
         }
 
         .eventCard:hover {
-          transform:
-            translateY(-4px);
+          transform: translateY(-3px);
           box-shadow:
-            0 14px 32px
-            rgba(0, 0, 0, 0.08);
+            0 11px 27px
+            rgba(0, 0, 0, 0.075);
         }
 
         .imageLink {
-          position: relative;
           display: block;
           overflow: hidden;
           background: #eee;
@@ -919,73 +879,49 @@ export default function AreaSearch({
         .placeholder {
           display: block;
           width: 100%;
-          aspect-ratio: 16 / 10;
+          aspect-ratio: 16 / 9;
         }
 
         .imageLink img {
           object-fit: cover;
           transition:
-            transform 0.35s ease;
+            transform 0.3s ease;
         }
 
         .eventCard:hover
           .imageLink img {
-          transform: scale(1.04);
+          transform: scale(1.035);
         }
 
         .placeholder {
           display: grid;
           place-items: center;
+          padding: 8px;
           color: #999;
-          font-size: 8px;
-          font-weight: 900;
-          letter-spacing: 0.1em;
-          text-align: center;
-        }
-
-        .areaLabel {
-          position: absolute;
-          right: 8px;
-          bottom: 8px;
-          max-width:
-            calc(100% - 16px);
-          padding: 5px 7px;
-          overflow: hidden;
-          border-radius: 999px;
-          background:
-            rgba(
-              23,
-              23,
-              23,
-              0.85
-            );
-          color: #fff;
           font-size: 7px;
-          font-weight: 800;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          backdrop-filter:
-            blur(7px);
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-align: center;
         }
 
         .cardBody {
           flex: 1;
           display: flex;
           flex-direction: column;
-          padding: 13px;
+          padding: 11px;
         }
 
         .category {
           display: inline-flex;
           width: fit-content;
           max-width: 100%;
-          margin-bottom: 9px;
-          padding: 5px 8px;
+          margin-bottom: 7px;
+          padding: 4px 7px;
           overflow: hidden;
           border-radius: 999px;
           background: #f1eee5;
           color: #5f5337;
-          font-size: 8px;
+          font-size: 7px;
           line-height: 1;
           font-weight: 800;
           white-space: nowrap;
@@ -994,10 +930,10 @@ export default function AreaSearch({
 
         .eventTitle {
           display: -webkit-box;
-          min-height: 42px;
+          min-height: 36px;
           margin: 0;
           overflow: hidden;
-          font-size: 13px;
+          font-size: 11px;
           line-height: 1.55;
           -webkit-box-orient:
             vertical;
@@ -1009,140 +945,125 @@ export default function AreaSearch({
           text-decoration: none;
         }
 
-        .eventInformation {
+        .eventMeta {
           display: grid;
-          gap: 8px;
-          margin: 13px 0 15px;
+          gap: 6px;
+          margin: 10px 0 11px;
         }
 
-        .infoRow {
+        .metaRow {
           display: grid;
           grid-template-columns:
-            19px minmax(0, 1fr);
+            16px minmax(0, 1fr);
           align-items: start;
-          gap: 6px;
-        }
-
-        .infoRow > span {
-          padding-top: 1px;
-          font-size: 11px;
-        }
-
-        .infoRow > div {
+          gap: 4px;
           min-width: 0;
-          display: grid;
-          gap: 2px;
         }
 
-        .infoRow small {
-          color: #999;
-          font-size: 7px;
-          font-weight: 700;
-        }
-
-        .infoRow strong {
-          display: -webkit-box;
-          overflow: hidden;
-          color: #333;
+        .metaRow > span {
+          padding-top: 1px;
           font-size: 9px;
-          line-height: 1.5;
+        }
+
+        .metaRow strong {
+          display: -webkit-box;
+          min-width: 0;
+          overflow: hidden;
+          color: #454545;
+          font-size: 8px;
+          line-height: 1.45;
+          font-weight: 700;
           overflow-wrap: anywhere;
           -webkit-box-orient:
             vertical;
-          -webkit-line-clamp: 2;
+          -webkit-line-clamp: 1;
         }
 
         .detailButton {
-          display: flex;
-          justify-content:
-            space-between;
-          align-items: center;
+          display: block;
           margin-top: auto;
-          padding: 10px 11px;
-          border-radius: 8px;
+          padding: 8px;
+          border-radius: 7px;
           background: #171717;
           color: #fff;
+          text-align: center;
           text-decoration: none;
-          font-size: 9px;
+          font-size: 8px;
           font-weight: 800;
         }
 
-        .detailButton strong {
-          font-size: 13px;
-        }
-
-        .loadMoreArea {
+        .loadMore {
           display: flex;
           justify-content: center;
-          margin-top: 28px;
+          margin-top: 25px;
         }
 
-        .loadMoreArea button {
-          min-width: 220px;
+        .loadMore button {
+          min-width: 210px;
           display: grid;
           grid-template-columns:
             minmax(0, 1fr)
             auto
-            22px;
+            20px;
           align-items: center;
-          gap: 10px;
-          padding: 14px 18px;
+          gap: 9px;
+          padding: 13px 17px;
           border: 1px solid #dedbd5;
-          border-radius: 12px;
+          border-radius: 11px;
           background: #fff;
           box-shadow:
-            0 8px 22px
-            rgba(0, 0, 0, 0.05);
+            0 7px 20px
+            rgba(0, 0, 0, 0.045);
           color: #222;
           cursor: pointer;
           font-family: inherit;
           text-align: left;
         }
 
-        .loadMoreArea button:hover {
+        .loadMore button:hover {
           border-color: #171717;
         }
 
-        .loadMoreArea span {
-          font-size: 12px;
+        .loadMore span {
+          font-size: 11px;
           font-weight: 900;
         }
 
-        .loadMoreArea small {
+        .loadMore small {
           color: #999;
           font-size: 8px;
         }
 
-        .loadMoreArea strong {
-          font-size: 15px;
+        .loadMore strong {
+          font-size: 14px;
           text-align: right;
         }
 
         .emptyResult {
           display: grid;
           justify-items: center;
-          padding: 65px 20px;
-          border-radius: 17px;
+          padding: 55px 20px;
+          border-radius: 16px;
           background: #fff;
           box-shadow:
-            0 10px 30px
-            rgba(0, 0, 0, 0.045);
+            0 8px 25px
+            rgba(0, 0, 0, 0.04);
           text-align: center;
         }
 
         .emptyResult > span {
-          font-size: 40px;
+          font-size: 36px;
         }
 
         .emptyResult h3 {
-          margin: 17px 0 8px;
-          font-size: 21px;
+          margin: 15px 0 7px;
+          font-size: 19px;
         }
 
         .emptyResult p {
           margin: 0;
           color: #888;
-          font-size: 12px;
+          font-size: 11px;
           line-height: 1.7;
         }
 
@@ -1162,7 +1083,7 @@ export default function AreaSearch({
           max-width: 640px
         ) {
           .areaSection {
-            padding: 60px 0 75px;
+            padding: 50px 0 68px;
           }
 
           .areaContainer {
@@ -1170,31 +1091,26 @@ export default function AreaSearch({
               calc(100% - 24px);
           }
 
-          .searchArea {
-            padding: 14px;
+          .searchPanel {
+            padding: 13px;
           }
 
           .searchForm {
-            grid-template-columns:
-              1fr;
+            grid-template-columns: 1fr;
           }
 
           .searchButton {
-            min-height: 54px;
+            min-height: 50px;
           }
 
           .quickAreas {
-            align-items:
-              flex-start;
-            flex-direction:
-              column;
+            align-items: flex-start;
+            flex-direction: column;
           }
 
           .resultHead {
-            align-items:
-              flex-start;
-            flex-direction:
-              column;
+            align-items: flex-start;
+            flex-direction: column;
           }
 
           .eventGrid {
@@ -1203,35 +1119,29 @@ export default function AreaSearch({
                 2,
                 minmax(0, 1fr)
               );
-            gap: 10px;
+            gap: 9px;
           }
 
           .cardBody {
-            padding: 11px;
+            padding: 10px;
           }
 
           .eventTitle {
-            min-height: 39px;
-            font-size: 12px;
+            min-height: 34px;
+            font-size: 10px;
           }
 
-          .eventInformation {
-            gap: 7px;
-            margin: 11px 0 13px;
-          }
-
-          .loadMoreArea button {
+          .loadMore button {
             width: 100%;
             min-width: 0;
           }
         }
 
         @media (
-          max-width: 430px
+          max-width: 370px
         ) {
           .eventGrid {
-            grid-template-columns:
-              1fr;
+            grid-template-columns: 1fr;
           }
         }
       `}</style>
