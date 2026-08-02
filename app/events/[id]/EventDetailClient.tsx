@@ -762,7 +762,7 @@ export default function EventDetailClient({
         }
 
         .siteLogo span {
-          color: #f26419;
+          color: #111111;
         }
 
         .backButton {
@@ -777,57 +777,35 @@ export default function EventDetailClient({
 
         .heroSection {
           overflow: hidden;
-          padding: 55px 0 65px;
-          background:
-            radial-gradient(
-              circle at 10% 10%,
-              rgba(
-                242,
-                100,
-                25,
-                0.13
-              ),
-              transparent 27%
-            ),
-            linear-gradient(
-              135deg,
-              #fff6e8,
-              #fff,
-              #ffead4
-            );
+          padding: 42px 0 52px;
+          background: #ffffff;
+          border-bottom: 1px solid #ececea;
         }
 
         .heroGrid {
           display: grid;
           grid-template-columns:
-            minmax(0, 1.05fr)
-            minmax(0, 0.95fr);
-          align-items: center;
-          gap: 50px;
+            minmax(0, 0.92fr)
+            minmax(0, 1.08fr);
+          align-items: start;
+          gap: 42px;
         }
 
         .flyerCard {
-          padding: 10px;
-          border-radius: 24px;
+          padding: 8px;
+          border: 1px solid #e8e8e5;
+          border-radius: 18px;
           background: #fff;
-          box-shadow:
-            0 22px 60px
-            rgba(
-              44,
-              35,
-              25,
-              0.16
-            );
-          transform:
-            rotate(-1deg);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+          transform: none;
         }
 
         .flyerImage {
           position: relative;
           width: 100%;
-          aspect-ratio: 16 / 11;
+          aspect-ratio: 4 / 3;
           overflow: hidden;
-          border-radius: 17px;
+          border-radius: 12px;
           background: #eee;
         }
 
@@ -871,8 +849,8 @@ export default function EventDetailClient({
         }
 
         .categoryBadge {
-          background: #fff0df;
-          color: #a84c18;
+          background: #f1f1ef;
+          color: #222222;
         }
 
         .verifiedBadge {
@@ -936,25 +914,12 @@ export default function EventDetailClient({
 
         .summaryCard {
           display: grid;
-          gap: 13px;
-          padding: 20px;
-          border: 1px solid #e4ded4;
-          border-radius: 17px;
-          background:
-            rgba(
-              255,
-              255,
-              255,
-              0.9
-            );
-          box-shadow:
-            0 15px 35px
-            rgba(
-              51,
-              43,
-              35,
-              0.07
-            );
+          gap: 12px;
+          padding: 18px;
+          border: 1px solid #e5e5e2;
+          border-radius: 14px;
+          background: #fafaf8;
+          box-shadow: none;
         }
 
         .summaryRow {
@@ -1001,14 +966,14 @@ export default function EventDetailClient({
         }
 
         .contentSection {
-          padding: 70px 0;
+          padding: 54px 0;
         }
 
         .contentGrid {
           display: grid;
           grid-template-columns:
             minmax(0, 1fr)
-            330px;
+            300px;
           align-items: start;
           gap: 28px;
         }
@@ -1040,7 +1005,7 @@ export default function EventDetailClient({
         .eyebrow,
         .sectionHead p {
           margin: 0 0 7px;
-          color: #f26419;
+          color: #111111;
           font-size: 8px;
           font-weight: 900;
           letter-spacing: 0.18em;
@@ -1094,7 +1059,7 @@ export default function EventDetailClient({
           gap: 10px;
           padding: 16px;
           border-radius: 11px;
-          background: #f26419;
+          background: #111111;
           color: #fff;
           font-size: 12px;
           font-weight: 900;
@@ -1128,7 +1093,7 @@ export default function EventDetailClient({
 
         .relatedSection,
         .recentSection {
-          padding: 60px 0 75px;
+          padding: 42px 0 54px;
         }
 
         .relatedSection {
@@ -1137,43 +1102,46 @@ export default function EventDetailClient({
 
         .recentSection {
           background: #f7f7f5;
+          border-top: 1px solid #ececea;
+        }
+
+        .recentSection .smallCardGrid {
+          align-items: stretch;
+        }
+
+        .recentSection .smallCard {
+          height: 100%;
         }
 
         .sectionHead {
-          margin-bottom: 22px;
+          margin-bottom: 16px;
         }
 
         .sectionHead h2 {
-          color: #17243b;
-          font-size: 29px;
+          color: #171717;
+          font-size: 20px;
+          line-height: 1.4;
+          letter-spacing: -0.02em;
         }
 
         .smallCardGrid {
           display: grid;
           grid-template-columns:
-            repeat(
-              5,
-              minmax(0, 1fr)
-            );
-          gap: 14px;
+            repeat(5, minmax(0, 1fr));
+          gap: 10px;
+          align-items: stretch;
         }
 
         .smallCard {
           min-width: 0;
+          height: 100%;
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          border: 1px solid #e5e3de;
-          border-radius: 14px;
+          border: 1px solid #e5e5e2;
+          border-radius: 10px;
           background: #fff;
-          box-shadow:
-            0 7px 20px
-            rgba(
-              0,
-              0,
-              0,
-              0.04
-            );
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.035);
         }
 
         .smallImageLink {
@@ -1184,8 +1152,9 @@ export default function EventDetailClient({
         .smallImageWrap {
           position: relative;
           width: 100%;
-          aspect-ratio: 16 / 10;
+          height: 104px;
           overflow: hidden;
+          background: #eeeeec;
         }
 
         .smallImageWrap :global(img) {
@@ -1211,20 +1180,20 @@ export default function EventDetailClient({
           display: flex;
           flex-direction: column;
           min-width: 0;
-          padding: 12px;
+          padding: 9px;
         }
 
         .smallCategory {
           display: inline-flex;
           width: fit-content;
           max-width: 100%;
-          margin-bottom: 7px;
-          padding: 5px 8px;
+          margin-bottom: 6px;
+          padding: 4px 7px;
           overflow: hidden;
           border-radius: 999px;
           background: #f1eee5;
           color: #5f5337;
-          font-size: 8px;
+          font-size: 7px;
           font-weight: 800;
           white-space: nowrap;
           text-overflow: ellipsis;
@@ -1232,14 +1201,13 @@ export default function EventDetailClient({
 
         .smallTitle {
           display: -webkit-box;
-          min-height: 38px;
-          margin: 0 0 8px;
+          min-height: 33px;
+          margin: 0 0 6px;
           overflow: hidden;
-          color: #17243b;
-          font-size: 12px;
-          line-height: 1.6;
-          -webkit-box-orient:
-            vertical;
+          color: #171717;
+          font-size: 10px;
+          line-height: 1.55;
+          -webkit-box-orient: vertical;
           -webkit-line-clamp: 2;
         }
 
@@ -1250,16 +1218,17 @@ export default function EventDetailClient({
 
         .smallMeta {
           display: grid;
-          gap: 5px;
-          margin-bottom: 10px;
+          gap: 3px;
+          min-height: 28px;
+          margin-bottom: 7px;
         }
 
         .smallMeta p {
           margin: 0;
           overflow: hidden;
           color: #626a76;
-          font-size: 8px;
-          line-height: 1.5;
+          font-size: 7px;
+          line-height: 1.45;
           white-space: nowrap;
           text-overflow: ellipsis;
         }
@@ -1267,12 +1236,12 @@ export default function EventDetailClient({
         .smallDetailButton {
           display: block;
           margin-top: auto;
-          padding: 9px;
-          border-radius: 8px;
+          padding: 7px;
+          border-radius: 7px;
           background: #17243b;
           color: #fff;
           text-align: center;
-          font-size: 8px;
+          font-size: 7px;
           font-weight: 800;
           text-decoration: none;
         }
@@ -1372,12 +1341,12 @@ export default function EventDetailClient({
           }
 
           .smallCardGrid {
-            grid-template-columns:
-              repeat(
-                2,
-                minmax(0, 1fr)
-              );
-            gap: 10px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+          }
+
+          .smallImageWrap {
+            height: 92px;
           }
 
           .relatedSection,
@@ -1435,12 +1404,12 @@ export default function EventDetailClient({
           .mobileStickyBar button {
             border: 1px solid #dedbd5;
             background: #fff;
-            color: #d64255;
+            color: #111111;
             font-size: 24px;
           }
 
           .mobileStickyBar a {
-            background: #f26419;
+            background: #111111;
             color: #fff;
             font-size: 13px;
             font-weight: 900;
