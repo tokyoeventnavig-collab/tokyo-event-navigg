@@ -9,10 +9,7 @@ import {
 
 export const revalidate = 300;
 
-type CardSize =
-  | "large"
-  | "medium"
-  | "small";
+type CardSize = "large" | "medium" | "small";
 
 type HomePageProps = {
   searchParams: Promise<{
@@ -32,64 +29,43 @@ type CategoryColor = {
   color: string;
 };
 
-function getEventTimestamp(
-  event: EventItem,
-): number {
+function getEventTimestamp(event: EventItem): number {
   if (!event.dateStart) {
     return Number.POSITIVE_INFINITY;
   }
 
-  const value =
-    event.dateStart.includes("T")
-      ? event.dateStart
-      : `${event.dateStart}T00:00:00+09:00`;
+  const value = event.dateStart.includes("T")
+    ? event.dateStart
+    : `${event.dateStart}T00:00:00+09:00`;
 
-  const timestamp =
-    new Date(value).getTime();
+  const timestamp = new Date(value).getTime();
 
   return Number.isNaN(timestamp)
     ? Number.POSITIVE_INFINITY
     : timestamp;
 }
 
-function getJstDateParts(
-  date: Date,
-): {
+function getJstDateParts(date: Date): {
   year: number;
   month: number;
   day: number;
 } {
-  const parts =
-    new Intl.DateTimeFormat(
-      "ja-JP",
-      {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        timeZone: "Asia/Tokyo",
-      },
-    ).formatToParts(date);
+  const parts = new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    timeZone: "Asia/Tokyo",
+  }).formatToParts(date);
 
   return {
     year: Number(
-      parts.find(
-        (part) =>
-          part.type === "year",
-      )?.value || 0,
+      parts.find((part) => part.type === "year")?.value || 0,
     ),
-
     month: Number(
-      parts.find(
-        (part) =>
-          part.type === "month",
-      )?.value || 0,
+      parts.find((part) => part.type === "month")?.value || 0,
     ),
-
     day: Number(
-      parts.find(
-        (part) =>
-          part.type === "day",
-      )?.value || 0,
+      parts.find((part) => part.type === "day")?.value || 0,
     ),
   };
 }
@@ -101,20 +77,13 @@ function getEventDateParts(
   month: number;
   day: number;
 } | null {
-  const timestamp =
-    getEventTimestamp(event);
+  const timestamp = getEventTimestamp(event);
 
-  if (
-    !Number.isFinite(
-      timestamp,
-    )
-  ) {
+  if (!Number.isFinite(timestamp)) {
     return null;
   }
 
-  return getJstDateParts(
-    new Date(timestamp),
-  );
+  return getJstDateParts(new Date(timestamp));
 }
 
 function parseSelectedMonth(
@@ -125,20 +94,12 @@ function parseSelectedMonth(
 } {
   if (
     monthValue &&
-    /^\d{4}-\d{2}$/.test(
-      monthValue,
-    )
+    /^\d{4}-\d{2}$/.test(monthValue)
   ) {
-    const [
-      yearText,
-      monthText,
-    ] = monthValue.split("-");
+    const [yearText, monthText] = monthValue.split("-");
 
-    const year =
-      Number(yearText);
-
-    const month =
-      Number(monthText);
+    const year = Number(yearText);
+    const month = Number(monthText);
 
     if (
       year >= 2000 &&
@@ -153,10 +114,7 @@ function parseSelectedMonth(
     }
   }
 
-  const now =
-    getJstDateParts(
-      new Date(),
-    );
+  const now = getJstDateParts(new Date());
 
   return {
     year: now.year,
@@ -168,9 +126,7 @@ function formatMonthParameter(
   year: number,
   month: number,
 ): string {
-  return `${year}-${String(
-    month,
-  ).padStart(2, "0")}`;
+  return `${year}-${String(month).padStart(2, "0")}`;
 }
 
 function moveMonth(
@@ -182,19 +138,12 @@ function moveMonth(
   month: number;
 } {
   const date = new Date(
-    Date.UTC(
-      year,
-      month - 1 + amount,
-      1,
-    ),
+    Date.UTC(year, month - 1 + amount, 1),
   );
 
   return {
-    year:
-      date.getUTCFullYear(),
-
-    month:
-      date.getUTCMonth() + 1,
+    year: date.getUTCFullYear(),
+    month: date.getUTCMonth() + 1,
   };
 }
 
@@ -207,29 +156,19 @@ function createHomeUrl({
   month?: string;
   hash?: string;
 }): string {
-  const params =
-    new URLSearchParams();
+  const params = new URLSearchParams();
 
   if (category) {
-    params.set(
-      "category",
-      category,
-    );
+    params.set("category", category);
   }
 
   if (month) {
-    params.set(
-      "month",
-      month,
-    );
+    params.set("month", month);
   }
 
-  const query =
-    params.toString();
+  const query = params.toString();
 
-  return `/${
-    query ? `?${query}` : ""
-  }${
+  return `/${query ? `?${query}` : ""}${
     hash ? `#${hash}` : ""
   }`;
 }
@@ -237,91 +176,56 @@ function createHomeUrl({
 function getCategoryColor(
   category: string,
 ): CategoryColor {
-  const palette: CategoryColor[] =
-    [
-      {
-        backgroundColor:
-          "#fff1f1",
-        borderColor:
-          "#e7aaaa",
-        color: "#7d3030",
-      },
-
-      {
-        backgroundColor:
-          "#eef5ff",
-        borderColor:
-          "#abc6e8",
-        color: "#28517c",
-      },
-
-      {
-        backgroundColor:
-          "#eff8f0",
-        borderColor:
-          "#abd0af",
-        color: "#306238",
-      },
-
-      {
-        backgroundColor:
-          "#fff6e8",
-        borderColor:
-          "#e1c08c",
-        color: "#74501e",
-      },
-
-      {
-        backgroundColor:
-          "#f4efff",
-        borderColor:
-          "#c7b4e7",
-        color: "#563d7c",
-      },
-
-      {
-        backgroundColor:
-          "#eaf8f7",
-        borderColor:
-          "#9dccca",
-        color: "#265e59",
-      },
-
-      {
-        backgroundColor:
-          "#fff0f7",
-        borderColor:
-          "#e2a7c4",
-        color: "#793255",
-      },
-
-      {
-        backgroundColor:
-          "#f2f2ec",
-        borderColor:
-          "#ccccbb",
-        color: "#555541",
-      },
-    ];
-
-  const hash =
-    Array.from(
-      category,
-    ).reduce(
-      (
-        total,
-        character,
-      ) =>
-        total +
-        character.charCodeAt(
-          0,
-        ),
-      0,
-    );
-
-  return palette[
-    hash % palette.length
+  const palette: CategoryColor[] = [
+    {
+      backgroundColor: "#fff1f1",
+      borderColor: "#e7aaaa",
+      color: "#7d3030",
+    },
+    {
+      backgroundColor: "#eef5ff",
+      borderColor: "#abc6e8",
+      color: "#28517c",
+    },
+    {
+      backgroundColor: "#eff8f0",
+      borderColor: "#abd0af",
+      color: "#306238",
+    },
+    {
+      backgroundColor: "#fff6e8",
+      borderColor: "#e1c08c",
+      color: "#74501e",
+    },
+    {
+      backgroundColor: "#f4efff",
+      borderColor: "#c7b4e7",
+      color: "#563d7c",
+    },
+    {
+      backgroundColor: "#eaf8f7",
+      borderColor: "#9dccca",
+      color: "#265e59",
+    },
+    {
+      backgroundColor: "#fff0f7",
+      borderColor: "#e2a7c4",
+      color: "#793255",
+    },
+    {
+      backgroundColor: "#f2f2ec",
+      borderColor: "#ccccbb",
+      color: "#555541",
+    },
   ];
+
+  const hash = Array.from(category).reduce(
+    (total, character) =>
+      total + character.charCodeAt(0),
+    0,
+  );
+
+  return palette[hash % palette.length];
 }
 
 function buildCalendarCells({
@@ -336,83 +240,54 @@ function buildCalendarCells({
   const firstWeekday =
     (
       new Date(
-        Date.UTC(
-          year,
-          month - 1,
-          1,
-        ),
+        Date.UTC(year, month - 1, 1),
       ).getUTCDay() + 6
     ) % 7;
 
-  const daysInMonth =
-    new Date(
-      Date.UTC(
-        year,
-        month,
-        0,
-      ),
-    ).getUTCDate();
+  const daysInMonth = new Date(
+    Date.UTC(year, month, 0),
+  ).getUTCDate();
 
   const eventsByDay =
-    new Map<
-      number,
-      EventItem[]
-    >();
+    new Map<number, EventItem[]>();
 
-  events.forEach(
-    (event) => {
-      const dateParts =
-        getEventDateParts(
-          event,
-        );
+  events.forEach((event) => {
+    const dateParts =
+      getEventDateParts(event);
 
-      if (
-        !dateParts ||
-        dateParts.year !==
-          year ||
-        dateParts.month !==
-          month
-      ) {
-        return;
-      }
+    if (
+      !dateParts ||
+      dateParts.year !== year ||
+      dateParts.month !== month
+    ) {
+      return;
+    }
 
-      const dayEvents =
-        eventsByDay.get(
-          dateParts.day,
-        ) || [];
+    const dayEvents =
+      eventsByDay.get(dateParts.day) || [];
 
-      dayEvents.push(event);
+    dayEvents.push(event);
 
-      eventsByDay.set(
-        dateParts.day,
-        dayEvents,
-      );
-    },
-  );
+    eventsByDay.set(
+      dateParts.day,
+      dayEvents,
+    );
+  });
 
-  eventsByDay.forEach(
-    (dayEvents) => {
-      dayEvents.sort(
-        (a, b) =>
-          (
-            a.startTime ||
-            "99:99"
-          ).localeCompare(
-            b.startTime ||
-              "99:99",
-            "ja",
-          ),
-      );
-    },
-  );
+  eventsByDay.forEach((dayEvents) => {
+    dayEvents.sort((a, b) =>
+      (a.startTime || "99:99").localeCompare(
+        b.startTime || "99:99",
+        "ja",
+      ),
+    );
+  });
 
-  const cells:
-    CalendarCell[] = [];
+  const cells: CalendarCell[] = [];
 
   for (
     let index = 0;
-    index <
-    firstWeekday;
+    index < firstWeekday;
     index += 1
   ) {
     cells.push({
@@ -428,17 +303,12 @@ function buildCalendarCells({
   ) {
     cells.push({
       day,
-
       events:
-        eventsByDay.get(day) ||
-        [],
+        eventsByDay.get(day) || [],
     });
   }
 
-  while (
-    cells.length % 7 !==
-    0
-  ) {
+  while (cells.length % 7 !== 0) {
     cells.push({
       day: null,
       events: [],
@@ -456,13 +326,10 @@ function EventCard({
   size: CardSize;
 }) {
   const hasTime =
-    event.startTime ||
-    event.endTime;
+    event.startTime || event.endTime;
 
   return (
-    <article
-      className={`card card-${size}`}
-    >
+    <article className={`card card-${size}`}>
       <Link
         href={`/events/${event.id}`}
         className="cardImageLink"
@@ -489,9 +356,7 @@ function EventCard({
         )}
 
         <h2 className="eventTitle">
-          <Link
-            href={`/events/${event.id}`}
-          >
+          <Link href={`/events/${event.id}`}>
             {event.title}
           </Link>
         </h2>
@@ -527,9 +392,7 @@ function EventCard({
                 </span>
 
                 <strong>
-                  {event.startTime ||
-                    "未定"}
-
+                  {event.startTime || "未定"}
                   {event.endTime
                     ? ` 〜 ${event.endTime}`
                     : ""}
@@ -590,18 +453,14 @@ function EventSection({
           {emptyMessage}
         </div>
       ) : (
-        <div
-          className={`grid grid-${size}`}
-        >
-          {events.map(
-            (event) => (
-              <EventCard
-                event={event}
-                size={size}
-                key={`${title}-${event.id}`}
-              />
-            ),
-          )}
+        <div className={`grid grid-${size}`}>
+          {events.map((event) => (
+            <EventCard
+              event={event}
+              size={size}
+              key={`${title}-${event.id}`}
+            />
+          ))}
         </div>
       )}
     </section>
@@ -617,8 +476,7 @@ function CalendarEventLink({
 }) {
   const categoryColor =
     getCategoryColor(
-      event.category ||
-        "その他",
+      event.category || "その他",
     );
 
   return (
@@ -631,13 +489,11 @@ function CalendarEventLink({
       }
       style={categoryColor}
       title={`${
-        event.startTime ||
-        "時間未定"
+        event.startTime || "時間未定"
       } ${event.title}`}
     >
       <span>
-        {event.startTime ||
-          "未定"}
+        {event.startTime || "未定"}
       </span>
 
       <strong>
@@ -666,54 +522,36 @@ function CalendarSection({
     });
 
   const previousMonth =
-    moveMonth(
-      year,
-      month,
-      -1,
-    );
+    moveMonth(year, month, -1);
 
   const nextMonth =
-    moveMonth(
-      year,
-      month,
-      1,
-    );
+    moveMonth(year, month, 1);
 
   const today =
-    getJstDateParts(
-      new Date(),
-    );
+    getJstDateParts(new Date());
 
   const previousUrl =
     createHomeUrl({
       category:
-        selectedCategory ||
-        undefined,
-
+        selectedCategory || undefined,
       month:
         formatMonthParameter(
           previousMonth.year,
           previousMonth.month,
         ),
-
-      hash:
-        "event-calendar",
+      hash: "event-calendar",
     });
 
   const nextUrl =
     createHomeUrl({
       category:
-        selectedCategory ||
-        undefined,
-
+        selectedCategory || undefined,
       month:
         formatMonthParameter(
           nextMonth.year,
           nextMonth.month,
         ),
-
-      hash:
-        "event-calendar",
+      hash: "event-calendar",
     });
 
   return (
@@ -763,208 +601,153 @@ function CalendarSection({
             "金",
             "土",
             "日",
-          ].map(
-            (
-              weekday,
-              index,
-            ) => (
-              <div
-                className={
-                  index === 5
-                    ? "saturday"
-                    : index === 6
-                      ? "sunday"
-                      : ""
-                }
-                key={weekday}
-              >
-                {weekday}
-              </div>
-            ),
-          )}
+          ].map((weekday, index) => (
+            <div
+              className={
+                index === 5
+                  ? "saturday"
+                  : index === 6
+                    ? "sunday"
+                    : ""
+              }
+              key={weekday}
+            >
+              {weekday}
+            </div>
+          ))}
         </div>
 
         <div className="calendarGrid">
-          {cells.map(
-            (
-              cell,
-              index,
-            ) => {
-              const weekdayIndex =
-                index % 7;
+          {cells.map((cell, index) => {
+            const weekdayIndex =
+              index % 7;
 
-              const isToday =
-                cell.day !==
-                  null &&
-                today.year ===
-                  year &&
-                today.month ===
-                  month &&
-                today.day ===
-                  cell.day;
+            const isToday =
+              cell.day !== null &&
+              today.year === year &&
+              today.month === month &&
+              today.day === cell.day;
 
-              const visibleEvents =
-                cell.events.slice(
-                  0,
-                  3,
-                );
+            const visibleEvents =
+              cell.events.slice(0, 3);
 
-              const hiddenEvents =
-                cell.events.slice(
-                  3,
-                );
+            const hiddenEvents =
+              cell.events.slice(3);
 
-              const modalId =
-                `calendar-modal-${year}-${month}-${cell.day}-${index}`;
+            const modalId =
+              `calendar-modal-${year}-${month}-${cell.day}-${index}`;
 
-              return (
-                <div
-                  className={[
-                    "calendarCell",
+            return (
+              <div
+                className={[
+                  "calendarCell",
+                  cell.day === null
+                    ? "calendarCellEmpty"
+                    : "",
+                  isToday
+                    ? "calendarCellToday"
+                    : "",
+                  weekdayIndex === 5
+                    ? "calendarCellSaturday"
+                    : "",
+                  weekdayIndex === 6
+                    ? "calendarCellSunday"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                key={`calendar-cell-${index}`}
+              >
+                {cell.day !== null && (
+                  <>
+                    <div className="calendarDayNumber">
+                      <span>
+                        {cell.day}
+                      </span>
 
-                    cell.day ===
-                    null
-                      ? "calendarCellEmpty"
-                      : "",
+                      {isToday && (
+                        <small>
+                          今日
+                        </small>
+                      )}
+                    </div>
 
-                    isToday
-                      ? "calendarCellToday"
-                      : "",
+                    <div className="calendarEvents">
+                      {visibleEvents.map(
+                        (event) => (
+                          <CalendarEventLink
+                            event={event}
+                            key={`calendar-event-${event.id}`}
+                          />
+                        ),
+                      )}
 
-                    weekdayIndex ===
-                    5
-                      ? "calendarCellSaturday"
-                      : "",
+                      {hiddenEvents.length > 0 && (
+                        <>
+                          <input
+                            type="checkbox"
+                            id={modalId}
+                            className="modalToggle"
+                          />
 
-                    weekdayIndex ===
-                    6
-                      ? "calendarCellSunday"
-                      : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  key={`calendar-cell-${index}`}
-                >
-                  {cell.day !==
-                    null && (
-                    <>
-                      <div className="calendarDayNumber">
-                        <span>
-                          {cell.day}
-                        </span>
+                          <label
+                            htmlFor={modalId}
+                            className="moreEventsButton"
+                          >
+                            ＋他
+                            {hiddenEvents.length}
+                            件
+                          </label>
 
-                        {isToday && (
-                          <small>
-                            今日
-                          </small>
-                        )}
-                      </div>
-
-                      <div className="calendarEvents">
-                        {visibleEvents.map(
-                          (
-                            event,
-                          ) => (
-                            <CalendarEventLink
-                              event={
-                                event
-                              }
-                              key={`calendar-event-${event.id}`}
-                            />
-                          ),
-                        )}
-
-                        {hiddenEvents.length >
-                          0 && (
-                          <>
-                            <input
-                              type="checkbox"
-                              id={
-                                modalId
-                              }
-                              className="modalToggle"
-                            />
-
+                          <div className="moreEventsOverlay">
                             <label
-                              htmlFor={
-                                modalId
-                              }
-                              className="moreEventsButton"
-                            >
-                              ＋他
-                              {
-                                hiddenEvents.length
-                              }
-                              件
-                            </label>
+                              htmlFor={modalId}
+                              className="modalBackdrop"
+                            />
 
-                            <div className="moreEventsOverlay">
-                              <label
-                                htmlFor={
-                                  modalId
-                                }
-                                className="modalBackdrop"
-                              />
+                            <div className="moreEventsModal">
+                              <div className="moreEventsHeader">
+                                <div>
+                                  <span>
+                                    {year}年
+                                    {month}月
+                                    {cell.day}日
+                                  </span>
 
-                              <div className="moreEventsModal">
-                                <div className="moreEventsHeader">
-                                  <div>
-                                    <span>
-                                      {
-                                        year
-                                      }
-                                      年
-                                      {
-                                        month
-                                      }
-                                      月
-                                      {
-                                        cell.day
-                                      }
-                                      日
-                                    </span>
-
-                                    <h3>
-                                      この日のイベント
-                                    </h3>
-                                  </div>
-
-                                  <label
-                                    htmlFor={
-                                      modalId
-                                    }
-                                    className="modalCloseButton"
-                                  >
-                                    ×
-                                  </label>
+                                  <h3>
+                                    この日のイベント
+                                  </h3>
                                 </div>
 
-                                <div className="moreEventsList">
-                                  {cell.events.map(
-                                    (
-                                      event,
-                                    ) => (
-                                      <CalendarEventLink
-                                        event={
-                                          event
-                                        }
-                                        modal
-                                        key={`modal-event-${event.id}`}
-                                      />
-                                    ),
-                                  )}
-                                </div>
+                                <label
+                                  htmlFor={modalId}
+                                  className="modalCloseButton"
+                                >
+                                  ×
+                                </label>
+                              </div>
+
+                              <div className="moreEventsList">
+                                {cell.events.map(
+                                  (event) => (
+                                    <CalendarEventLink
+                                      event={event}
+                                      modal
+                                      key={`modal-event-${event.id}`}
+                                    />
+                                  ),
+                                )}
                               </div>
                             </div>
-                          </>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            },
-          )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -1002,11 +785,8 @@ function CategorySection({
       <nav className="categoryNavigation">
         <Link
           href={createHomeUrl({
-            month:
-              selectedMonth,
-
-            hash:
-              "category-search",
+            month: selectedMonth,
+            hash: "category-search",
           })}
           className={
             selectedCategory
@@ -1017,30 +797,23 @@ function CategorySection({
           すべて
         </Link>
 
-        {categories.map(
-          (category) => (
-            <Link
-              href={createHomeUrl({
-                category,
-
-                month:
-                  selectedMonth,
-
-                hash:
-                  "category-search",
-              })}
-              className={
-                selectedCategory ===
-                category
-                  ? "categoryFilter active"
-                  : "categoryFilter"
-              }
-              key={category}
-            >
-              {category}
-            </Link>
-          ),
-        )}
+        {categories.map((category) => (
+          <Link
+            href={createHomeUrl({
+              category,
+              month: selectedMonth,
+              hash: "category-search",
+            })}
+            className={
+              selectedCategory === category
+                ? "categoryFilter active"
+                : "categoryFilter"
+            }
+            key={category}
+          >
+            {category}
+          </Link>
+        ))}
       </nav>
 
       {selectedCategory && (
@@ -1057,11 +830,8 @@ function CategorySection({
 
           <Link
             href={createHomeUrl({
-              month:
-                selectedMonth,
-
-              hash:
-                "category-search",
+              month: selectedMonth,
+              hash: "category-search",
             })}
           >
             絞り込みを解除
@@ -1075,15 +845,13 @@ function CategorySection({
         </div>
       ) : (
         <div className="grid grid-small">
-          {events.map(
-            (event) => (
-              <EventCard
-                event={event}
-                size="small"
-                key={`category-${event.id}`}
-              />
-            ),
-          )}
+          {events.map((event) => (
+            <EventCard
+              event={event}
+              size="small"
+              key={`category-${event.id}`}
+            />
+          ))}
         </div>
       )}
     </section>
@@ -1097,8 +865,7 @@ export default async function Home({
     await searchParams;
 
   const selectedCategory =
-    params.category?.trim() ||
-    "";
+    params.category?.trim() || "";
 
   const selectedMonth =
     parseSelectedMonth(
@@ -1167,17 +934,12 @@ export default async function Home({
     allEvents
       .filter((event) => {
         const eventTime =
-          getEventTimestamp(
-            event,
-          );
+          getEventTimestamp(event);
 
         return (
-          Number.isFinite(
-            eventTime,
-          ) &&
+          Number.isFinite(eventTime) &&
           eventTime >= now &&
-          eventTime <=
-            sevenDaysLater
+          eventTime <= sevenDaysLater
         );
       })
       .sort(
@@ -1230,9 +992,7 @@ export default async function Home({
       <div className="container sections">
         <EventSection
           title="人気イベント"
-          events={
-            featuredEvents
-          }
+          events={featuredEvents}
           emptyMessage="現在、人気イベントはありません。"
           size="large"
         />
@@ -1253,27 +1013,19 @@ export default async function Home({
 
         <CalendarSection
           events={allEvents}
-          year={
-            selectedMonth.year
-          }
-          month={
-            selectedMonth.month
-          }
+          year={selectedMonth.year}
+          month={selectedMonth.month}
           selectedCategory={
             selectedCategory
           }
         />
 
         <CategorySection
-          categories={
-            categories
-          }
+          categories={categories}
           selectedCategory={
             selectedCategory
           }
-          events={
-            categoryEvents
-          }
+          events={categoryEvents}
           selectedMonth={
             selectedMonthParameter
           }
@@ -1318,13 +1070,10 @@ export default async function Home({
         }
 
         .sectionHead {
-          display: flex;
-          justify-content: space-between;
-          align-items: end;
-          gap: 24px;
           margin-bottom: 30px;
           padding-bottom: 16px;
-          border-bottom: 1px solid #deded9;
+          border-bottom:
+            1px solid #deded9;
         }
 
         .sectionSubTitle {
@@ -1351,26 +1100,29 @@ export default async function Home({
         }
 
         .grid-large {
-          grid-template-columns: repeat(
-            3,
-            minmax(0, 1fr)
-          );
+          grid-template-columns:
+            repeat(
+              3,
+              minmax(0, 1fr)
+            );
           gap: 26px;
         }
 
         .grid-medium {
-          grid-template-columns: repeat(
-            5,
-            minmax(0, 1fr)
-          );
+          grid-template-columns:
+            repeat(
+              5,
+              minmax(0, 1fr)
+            );
           gap: 18px;
         }
 
         .grid-small {
-          grid-template-columns: repeat(
-            5,
-            minmax(0, 1fr)
-          );
+          grid-template-columns:
+            repeat(
+              5,
+              minmax(0, 1fr)
+            );
           gap: 14px;
         }
 
@@ -1378,7 +1130,8 @@ export default async function Home({
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          border: 1px solid #e7e7e2;
+          border:
+            1px solid #e7e7e2;
           background: #fff;
           box-shadow:
             0 10px 30px
@@ -1399,72 +1152,48 @@ export default async function Home({
 
         /*
          * フライヤー表示
+         *
+         * 今は画像サイズが統一されていないため、
+         * すべて切り抜かず全体表示します。
          */
         .cardImageLink {
           position: relative;
-          display: block;
+          display: grid;
+          place-items: center;
+          width: 100%;
           overflow: hidden;
-          background: #efefeb;
+          aspect-ratio: 4 / 5;
+          background: #eeeeea;
         }
 
         .image {
           display: block;
-          width: 100%;
-        }
-
-        /*
-         * 人気イベント
-         * フライヤー全体をなるべく切らずに表示
-         */
-        .card-large .cardImageLink {
-          display: grid;
-          place-items: center;
-          aspect-ratio: 16 / 10;
-          padding: 7px;
-          background: #e9e9e5;
-        }
-
-        .card-large .image {
           width: 100%;
           height: 100%;
           object-fit: contain;
           object-position: center;
         }
 
-        /*
-         * 新着イベント
-         * 枠を統一し、上側を残して切り抜く
-         */
+        .card-large .cardImageLink {
+          padding: 10px;
+        }
+
         .card-medium .cardImageLink {
-          aspect-ratio: 16 / 10;
+          padding: 7px;
         }
 
-        .card-medium .image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center 35%;
-        }
-
-        /*
-         * 今週・カテゴリー検索
-         */
         .card-small .cardImageLink {
-          aspect-ratio: 16 / 9;
-        }
-
-        .card-small .image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center 35%;
+          padding: 5px;
         }
 
         .placeholder {
           display: grid;
           place-items: center;
+          width: 100%;
+          height: 100%;
           color: #888;
           font-weight: 800;
+          letter-spacing: 0.1em;
         }
 
         .cardBody {
@@ -1549,7 +1278,8 @@ export default async function Home({
 
         .metaRow {
           display: grid;
-          grid-template-columns: 22px 1fr;
+          grid-template-columns:
+            22px 1fr;
           gap: 7px;
           align-items: start;
         }
@@ -1577,7 +1307,8 @@ export default async function Home({
           overflow-wrap: anywhere;
         }
 
-        .card-large .metaRow strong {
+        .card-large
+          .metaRow strong {
           font-size: 14px;
         }
 
@@ -1594,7 +1325,8 @@ export default async function Home({
           font-weight: 800;
         }
 
-        .card-large .detailButton {
+        .card-large
+          .detailButton {
           padding: 16px;
           border-radius: 11px;
           font-size: 14px;
@@ -1613,7 +1345,8 @@ export default async function Home({
          */
         .calendarCard {
           overflow: hidden;
-          border: 1px solid #deded9;
+          border:
+            1px solid #deded9;
           border-radius: 20px;
           background: #fff;
         }
@@ -1624,7 +1357,8 @@ export default async function Home({
             52px 1fr 52px;
           align-items: center;
           padding: 20px;
-          border-bottom: 1px solid #e6e6e1;
+          border-bottom:
+            1px solid #e6e6e1;
         }
 
         .calendarHeader h2 {
@@ -1646,10 +1380,11 @@ export default async function Home({
         .calendarWeekdays,
         .calendarGrid {
           display: grid;
-          grid-template-columns: repeat(
-            7,
-            minmax(0, 1fr)
-          );
+          grid-template-columns:
+            repeat(
+              7,
+              minmax(0, 1fr)
+            );
         }
 
         .calendarWeekdays {
@@ -1673,8 +1408,16 @@ export default async function Home({
         .calendarCell {
           min-height: 165px;
           padding: 10px;
-          border-right: 1px solid #ecece7;
-          border-bottom: 1px solid #ecece7;
+          border-right:
+            1px solid #ecece7;
+          border-bottom:
+            1px solid #ecece7;
+        }
+
+        .calendarCell:nth-child(
+          7n
+        ) {
+          border-right: 0;
         }
 
         .calendarCellEmpty {
@@ -1687,7 +1430,8 @@ export default async function Home({
 
         .calendarDayNumber {
           display: flex;
-          justify-content: space-between;
+          justify-content:
+            space-between;
           margin-bottom: 8px;
           font-weight: 800;
         }
@@ -1766,12 +1510,13 @@ export default async function Home({
         .modalBackdrop {
           position: absolute;
           inset: 0;
-          background: rgba(
-            0,
-            0,
-            0,
-            0.55
-          );
+          background:
+            rgba(
+              0,
+              0,
+              0,
+              0.55
+            );
         }
 
         .moreEventsModal {
@@ -1792,7 +1537,8 @@ export default async function Home({
 
         .moreEventsHeader {
           display: flex;
-          justify-content: space-between;
+          justify-content:
+            space-between;
           margin-bottom: 20px;
         }
 
@@ -1835,7 +1581,8 @@ export default async function Home({
 
         .categoryFilter {
           padding: 11px 17px;
-          border: 1px solid #dcdcd7;
+          border:
+            1px solid #dcdcd7;
           border-radius: 999px;
           background: #fff;
           color: #333;
@@ -1844,6 +1591,7 @@ export default async function Home({
           font-weight: 800;
         }
 
+        .categoryFilter:hover,
         .categoryFilter.active {
           border-color: #111;
           background: #111;
@@ -1852,11 +1600,31 @@ export default async function Home({
 
         .selectedCategoryHead {
           display: flex;
-          justify-content: space-between;
+          justify-content:
+            space-between;
+          align-items: center;
+          gap: 20px;
           margin-bottom: 22px;
           padding: 20px;
           border-radius: 14px;
           background: #eee9dc;
+        }
+
+        .selectedCategoryHead span {
+          color: #777;
+          font-size: 10px;
+          font-weight: 700;
+        }
+
+        .selectedCategoryHead h2 {
+          margin: 4px 0 0;
+          font-size: 22px;
+        }
+
+        .selectedCategoryHead a {
+          color: #111;
+          font-size: 12px;
+          font-weight: 800;
         }
 
         @media (
@@ -1864,10 +1632,11 @@ export default async function Home({
         ) {
           .grid-medium,
           .grid-small {
-            grid-template-columns: repeat(
-              3,
-              minmax(0, 1fr)
-            );
+            grid-template-columns:
+              repeat(
+                3,
+                minmax(0, 1fr)
+              );
           }
         }
 
@@ -1877,10 +1646,11 @@ export default async function Home({
           .grid-large,
           .grid-medium,
           .grid-small {
-            grid-template-columns: repeat(
-              2,
-              minmax(0, 1fr)
-            );
+            grid-template-columns:
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
 
           .calendarCard {
@@ -1919,42 +1689,61 @@ export default async function Home({
             grid-template-columns: 1fr;
           }
 
-          .card-small {
-            display: grid;
-            grid-template-columns:
-              minmax(125px, 40%)
-              minmax(0, 60%);
-          }
-
-          .card-small
-            .cardImageLink {
-            height: 100%;
-            aspect-ratio: auto;
-          }
-
-          .card-small .image {
-            width: 100%;
-            height: 100%;
-            min-height: 210px;
-            object-fit: cover;
-            object-position: center 35%;
-          }
-        }
-
-        @media (
-          max-width: 390px
-        ) {
+          /*
+           * スマホでも全カードを
+           * 縦型のまま維持します。
+           */
+          .card-large,
+          .card-medium,
           .card-small {
             display: flex;
+            flex-direction: column;
           }
 
-          .card-small
-            .cardImageLink {
-            aspect-ratio: 16 / 9;
+          .cardImageLink {
+            width: 100%;
+            aspect-ratio: 4 / 5;
           }
 
-          .card-small .image {
-            min-height: 0;
+          .image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+          }
+
+          .calendarHeader {
+            grid-template-columns:
+              44px 1fr 44px;
+            padding: 14px;
+          }
+
+          .calendarHeader h2 {
+            font-size: 20px;
+          }
+
+          .calendarMoveButton {
+            width: 36px;
+            height: 36px;
+          }
+
+          .moreEventsModal {
+            padding: 20px;
+          }
+
+          .categoryNavigation {
+            gap: 8px;
+          }
+
+          .categoryFilter {
+            padding: 10px 13px;
+            font-size: 12px;
+          }
+
+          .selectedCategoryHead {
+            align-items:
+              flex-start;
+            padding: 17px;
           }
         }
       `}</style>
