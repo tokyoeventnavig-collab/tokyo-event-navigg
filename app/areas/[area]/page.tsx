@@ -1,1105 +1,641 @@
-import Image from "next/image";
 import Link from "next/link";
-import heroBanner from "../hero-banner.png";
-import OrganizerCta from "./components/OrganizerCta";
-import AreaSearch from "./components/AreaSearch";
-import CategorySearch from "./components/CategorySearch";
 import {
-  getCategoryOptions,
   getEvents,
   type EventItem,
-} from "../lib/notion";
+} from "../../../lib/notion";
 
 export const revalidate = 300;
 
-type CardSize = "large" | "medium" | "small";
-
-type HomePageProps = {
-  searchParams: Promise<{
-    category?: string;
-    month?: string;
+type AreaPageProps = {
+  params: Promise<{
+    area: string;
   }>;
 };
 
-type CalendarCell = {
-  day: number | null;
-  events: EventItem[];
-};
+function getEventTimestamp(
+  event: EventItem,
+): number {
+  const source =
+    event.dateStart ||
+    event.dateISO ||
+    "";
 
-type CategoryColor = {
-  backgroundColor: string;
-  borderColor: string;
-  color: string;
-};
-
-function getEventTimestamp(event: EventItem): number {
-  if (!event.dateStart) {
+  if (!source) {
     return Number.POSITIVE_INFINITY;
   }
 
-  const value = event.dateStart.includes("T")
-    ? event.dateStart
-    : `${event.dateStart}T00:00:00+09:00`;
+  const dateValue = source.includes("T")
+    ? source
+    : `${source}T00:00:00+09:00`;
 
-  const timestamp = new Date(value).getTime();
+  const timestamp =
+    new Date(dateValue).getTime();
 
   return Number.isNaN(timestamp)
     ? Number.POSITIVE_INFINITY
     : timestamp;
 }
 
-function getJstDateParts(date: Date): {
-  year: number;
-  month: number;
-  day: number;
-} {
-  const parts = new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    timeZone: "Asia/Tokyo",
-  }).formatToParts(date);
-
-  return {
-    year: Number(
-      parts.find((part) => part.type === "year")?.value || 0,
-    ),
-    month: Number(
-      parts.find((part) => part.type === "month")?.value || 0,
-    ),
-    day: Number(
-      parts.find((part) => part.type === "day")?.value || 0,
-    ),
-  };
-}
-
-function getEventDateParts(
+function getTimeText(
   event: EventItem,
-): {
-  year: number;
-  month: number;
-  day: number;
-} | null {
-  const timestamp = getEventTimestamp(event);
-
-  if (!Number.isFinite(timestamp)) {
-    return null;
-  }
-
-  return getJstDateParts(new Date(timestamp));
-}
-
-function parseSelectedMonth(
-  monthValue?: string,
-): {
-  year: number;
-  month: number;
-} {
-  if (
-    monthValue &&
-    /^\d{4}-\d{2}$/.test(monthValue)
-  ) {
-    const [yearText, monthText] = monthValue.split("-");
-
-    const year = Number(yearText);
-    const month = Number(monthText);
-
-    if (
-      year >= 2000 &&
-      year <= 2100 &&
-      month >= 1 &&
-      month <= 12
-    ) {
-      return {
-        year,
-        month,
-      };
-    }
-  }
-
-  const now = getJstDateParts(new Date());
-
-  return {
-    year: now.year,
-    month: now.month,
-  };
-}
-
-function formatMonthParameter(
-  year: number,
-  month: number,
 ): string {
-  return `${year}-${String(month).padStart(2, "0")}`;
-}
-
-function moveMonth(
-  year: number,
-  month: number,
-  amount: number,
-): {
-  year: number;
-  month: number;
-} {
-  const date = new Date(
-    Date.UTC(year, month - 1 + amount, 1),
-  );
-
-  return {
-    year: date.getUTCFullYear(),
-    month: date.getUTCMonth() + 1,
-  };
-}
-
-function createHomeUrl({
-  category,
-  month,
-  hash,
-}: {
-  category?: string;
-  month?: string;
-  hash?: string;
-}): string {
-  const params = new URLSearchParams();
-
-  if (category) {
-    params.set("category", category);
-  }
-
-  if (month) {
-    params.set("month", month);
-  }
-
-  const query = params.toString();
-
-  return `/${query ? `?${query}` : ""}${
-    hash ? `#${hash}` : ""
-  }`;
-}
-
-function getCategoryColor(
-  category: string,
-): CategoryColor {
-  const palette: CategoryColor[] = [
-    {
-      backgroundColor: "#fff1f1",
-      borderColor: "#e7aaaa",
-      color: "#7d3030",
-    },
-    {
-      backgroundColor: "#eef5ff",
-      borderColor: "#abc6e8",
-      color: "#28517c",
-    },
-    {
-      backgroundColor: "#eff8f0",
-      borderColor: "#abd0af",
-      color: "#306238",
-    },
-    {
-      backgroundColor: "#fff6e8",
-      borderColor: "#e1c08c",
-      color: "#74501e",
-    },
-    {
-      backgroundColor: "#f4efff",
-      borderColor: "#c7b4e7",
-      color: "#563d7c",
-    },
-    {
-      backgroundColor: "#eaf8f7",
-      borderColor: "#9dccca",
-      color: "#265e59",
-    },
-    {
-      backgroundColor: "#fff0f7",
-      borderColor: "#e2a7c4",
-      color: "#793255",
-    },
-    {
-      backgroundColor: "#f2f2ec",
-      borderColor: "#ccccbb",
-      color: "#555541",
-    },
-  ];
-
-  const hash = Array.from(category).reduce(
-    (total, character) =>
-      total + character.charCodeAt(0),
-    0,
-  );
-
-  return palette[hash % palette.length];
-}
-
-function buildCalendarCells({
-  events,
-  year,
-  month,
-}: {
-  events: EventItem[];
-  year: number;
-  month: number;
-}): CalendarCell[] {
-  const firstWeekday =
-    (
-      new Date(
-        Date.UTC(year, month - 1, 1),
-      ).getUTCDay() + 6
-    ) % 7;
-
-  const daysInMonth = new Date(
-    Date.UTC(year, month, 0),
-  ).getUTCDate();
-
-  const eventsByDay = new Map<number, EventItem[]>();
-
-  events.forEach((event) => {
-    const dateParts = getEventDateParts(event);
-
-    if (
-      !dateParts ||
-      dateParts.year !== year ||
-      dateParts.month !== month
-    ) {
-      return;
-    }
-
-    const dayEvents =
-      eventsByDay.get(dateParts.day) || [];
-
-    dayEvents.push(event);
-
-    eventsByDay.set(
-      dateParts.day,
-      dayEvents,
-    );
-  });
-
-  eventsByDay.forEach((dayEvents) => {
-    dayEvents.sort((a, b) =>
-      (a.startTime || "99:99").localeCompare(
-        b.startTime || "99:99",
-        "ja",
-      ),
-    );
-  });
-
-  const cells: CalendarCell[] = [];
-
-  for (
-    let index = 0;
-    index < firstWeekday;
-    index += 1
+  if (
+    event.startTime &&
+    event.endTime
   ) {
-    cells.push({
-      day: null,
-      events: [],
-    });
+    return `${event.startTime} 〜 ${event.endTime}`;
   }
-
-  for (
-    let day = 1;
-    day <= daysInMonth;
-    day += 1
-  ) {
-    cells.push({
-      day,
-      events: eventsByDay.get(day) || [],
-    });
-  }
-
-  while (cells.length % 7 !== 0) {
-    cells.push({
-      day: null,
-      events: [],
-    });
-  }
-
-  return cells;
-}
-
-function EventCard({
-  event,
-  size,
-}: {
-  event: EventItem;
-  size: CardSize;
-}) {
-  const hasTime =
-    event.startTime || event.endTime;
 
   return (
-    <article className={`card card-${size}`}>
-      <Link
-        href={`/events/${event.id}`}
-        className="cardImageLink"
-      >
-        {event.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={event.image}
-            alt={event.title}
-            className="image"
-          />
-        ) : (
-          <div className="image placeholder">
-            TOKYO EVENT NAVI
-          </div>
-        )}
-      </Link>
+    event.startTime ||
+    event.endTime ||
+    "時間未定"
+  );
+}
 
-      <div className="cardBody">
-        {event.category && (
-          <div className="category">
-            {event.category}
-          </div>
-        )}
+export async function generateMetadata({
+  params,
+}: AreaPageProps) {
+  const { area } = await params;
 
-        <h2 className="eventTitle">
-          <Link href={`/events/${event.id}`}>
-            {event.title}
+  const decodedArea =
+    decodeURIComponent(area);
+
+  return {
+    title: `${decodedArea}のイベント一覧｜東京イベントナビ`,
+    description: `${decodedArea}で開催される飲み会、交流会、趣味イベント、セミナーなどを掲載しています。`,
+  };
+}
+
+export default async function AreaPage({
+  params,
+}: AreaPageProps) {
+  const { area } = await params;
+
+  const decodedArea =
+    decodeURIComponent(area);
+
+  const allEvents =
+    await getEvents();
+
+  const events = allEvents
+    .filter(
+      (event) =>
+        event.area ===
+        decodedArea,
+    )
+    .sort(
+      (a, b) =>
+        getEventTimestamp(a) -
+        getEventTimestamp(b),
+    );
+
+  return (
+    <main className="areaPage">
+      <header className="header">
+        <div className="headerInner">
+          <Link
+            href="/"
+            className="logo"
+          >
+            <span>東京</span>
+            イベントナビ
           </Link>
-        </h2>
 
-        <div className="eventMeta">
-          {event.date && (
-            <div className="metaRow">
-              <span className="metaIcon">
+          <Link
+            href="/"
+            className="backLink"
+          >
+            TOPページへ戻る
+          </Link>
+        </div>
+      </header>
+
+      <section className="hero">
+        <div className="heroDecoration" />
+
+        <div className="heroInner">
+          <div>
+            <p className="heroLabel">
+              SEARCH BY AREA
+            </p>
+
+            <h1>
+              <strong>
+                {decodedArea}
+              </strong>
+              のイベント
+            </h1>
+
+            <p className="heroDescription">
+              {decodedArea}
+              で開催予定のイベントを
+              まとめて確認できます。
+            </p>
+          </div>
+
+          <div className="eventCount">
+            <span>開催予定</span>
+
+            <strong>
+              {events.length}
+            </strong>
+
+            <small>件</small>
+          </div>
+        </div>
+      </section>
+
+      <section className="eventSection">
+        <div className="container">
+          <div className="sectionHead">
+            <div>
+              <p>AREA EVENTS</p>
+
+              <h2>
+                開催予定のイベント
+              </h2>
+            </div>
+
+            <Link
+              href="/"
+              className="allEventsLink"
+            >
+              すべてのイベントを見る
+              <span>→</span>
+            </Link>
+          </div>
+
+          {events.length === 0 ? (
+            <div className="empty">
+              <span className="emptyIcon">
                 📅
               </span>
 
-              <div>
-                <span className="metaLabel">
-                  開催日
-                </span>
+              <h2>
+                現在、
+                {decodedArea}
+                のイベントはありません
+              </h2>
 
-                <strong>
-                  {event.date}
-                </strong>
-              </div>
+              <p>
+                新しいイベントが掲載されるまで
+                お待ちください。
+              </p>
+
+              <Link href="/">
+                TOPページへ戻る
+              </Link>
             </div>
-          )}
-
-          {hasTime && (
-            <div className="metaRow">
-              <span className="metaIcon">
-                🕐
-              </span>
-
-              <div>
-                <span className="metaLabel">
-                  開催時間
-                </span>
-
-                <strong>
-                  {event.startTime || "未定"}
-
-                  {event.endTime
-                    ? ` 〜 ${event.endTime}`
-                    : ""}
-                </strong>
-              </div>
-            </div>
-          )}
-
-          {event.location && (
-            <div className="metaRow">
-              <span className="metaIcon">
-                📍
-              </span>
-
-              <div>
-                <span className="metaLabel">
-                  会場
-                </span>
-
-                <strong>
-                  {event.location}
-                </strong>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <Link
-          className="detailButton"
-          href={`/events/${event.id}`}
-        >
-          詳細を見る
-        </Link>
-      </div>
-    </article>
-  );
-}
-
-function EventSection({
-  title,
-  events,
-  emptyMessage,
-  size,
-}: {
-  title: string;
-  events: EventItem[];
-  emptyMessage: string;
-  size: CardSize;
-}) {
-  return (
-    <section className="eventSection">
-      <div className="sectionHead">
-        <h1>{title}</h1>
-      </div>
-
-      {events.length === 0 ? (
-        <div className="empty">
-          {emptyMessage}
-        </div>
-      ) : (
-        <div className={`grid grid-${size}`}>
-          {events.map((event) => (
-            <EventCard
-              event={event}
-              size={size}
-              key={`${title}-${event.id}`}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
-function CalendarEventLink({
-  event,
-  modal = false,
-}: {
-  event: EventItem;
-  modal?: boolean;
-}) {
-  const categoryColor =
-    getCategoryColor(
-      event.category || "その他",
-    );
-
-  return (
-    <Link
-      href={`/events/${event.id}`}
-      className={
-        modal
-          ? "calendarEvent calendarEventModal"
-          : "calendarEvent"
-      }
-      style={categoryColor}
-      title={`${
-        event.startTime || "時間未定"
-      } ${event.title}`}
-    >
-      <span>
-        {event.startTime || "未定"}
-      </span>
-
-      <strong>
-        {event.title}
-      </strong>
-    </Link>
-  );
-}
-
-function CalendarSection({
-  events,
-  year,
-  month,
-  selectedCategory,
-}: {
-  events: EventItem[];
-  year: number;
-  month: number;
-  selectedCategory: string;
-}) {
-  const cells =
-    buildCalendarCells({
-      events,
-      year,
-      month,
-    });
-
-  const previousMonth =
-    moveMonth(year, month, -1);
-
-  const nextMonth =
-    moveMonth(year, month, 1);
-
-  const today =
-    getJstDateParts(new Date());
-
-  const previousUrl =
-    createHomeUrl({
-      category:
-        selectedCategory || undefined,
-      month:
-        formatMonthParameter(
-          previousMonth.year,
-          previousMonth.month,
-        ),
-      hash: "event-calendar",
-    });
-
-  const nextUrl =
-    createHomeUrl({
-      category:
-        selectedCategory || undefined,
-      month:
-        formatMonthParameter(
-          nextMonth.year,
-          nextMonth.month,
-        ),
-      hash: "event-calendar",
-    });
-
-  return (
-    <section
-      className="calendarSection"
-      id="event-calendar"
-    >
-      <div className="sectionHead">
-        <div>
-          <p className="sectionSubTitle">
-            EVENT CALENDAR
-          </p>
-
-          <h1>
-            イベントカレンダー
-          </h1>
-        </div>
-      </div>
-
-      <div className="calendarCard">
-        <div className="calendarHeader">
-          <Link
-            href={previousUrl}
-            className="calendarMoveButton"
-            aria-label="前月を見る"
-          >
-            ←
-          </Link>
-
-          <h2>
-            {year}年{month}月
-          </h2>
-
-          <Link
-            href={nextUrl}
-            className="calendarMoveButton"
-            aria-label="次月を見る"
-          >
-            →
-          </Link>
-        </div>
-
-        <div className="calendarWeekdays">
-          {[
-            "月",
-            "火",
-            "水",
-            "木",
-            "金",
-            "土",
-            "日",
-          ].map((weekday, index) => (
-            <div
-              className={
-                index === 5
-                  ? "saturday"
-                  : index === 6
-                    ? "sunday"
-                    : ""
-              }
-              key={weekday}
-            >
-              {weekday}
-            </div>
-          ))}
-        </div>
-
-        <div className="calendarGrid">
-          {cells.map((cell, index) => {
-            const weekdayIndex =
-              index % 7;
-
-            const isToday =
-              cell.day !== null &&
-              today.year === year &&
-              today.month === month &&
-              today.day === cell.day;
-
-            const visibleEvents =
-              cell.events.slice(0, 3);
-
-            const hiddenEvents =
-              cell.events.slice(3);
-
-            const modalId =
-              `calendar-modal-${year}-${month}-${cell.day}-${index}`;
-
-            return (
-              <div
-                className={[
-                  "calendarCell",
-
-                  cell.day === null
-                    ? "calendarCellEmpty"
-                    : "",
-
-                  isToday
-                    ? "calendarCellToday"
-                    : "",
-
-                  weekdayIndex === 5
-                    ? "calendarCellSaturday"
-                    : "",
-
-                  weekdayIndex === 6
-                    ? "calendarCellSunday"
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                key={`calendar-cell-${index}`}
-              >
-                {cell.day !== null && (
-                  <>
-                    <div className="calendarDayNumber">
-                      <span>
-                        {cell.day}
-                      </span>
-
-                      {isToday && (
-                        <small>
-                          今日
-                        </small>
-                      )}
-                    </div>
-
-                    <div className="calendarEvents">
-                      {visibleEvents.map(
-                        (event) => (
-                          <CalendarEventLink
-                            event={event}
-                            key={`calendar-event-${event.id}`}
+          ) : (
+            <div className="eventGrid">
+              {events.map(
+                (event) => (
+                  <article
+                    key={event.id}
+                    className="eventCard"
+                  >
+                    <Link
+                      href={`/events/${event.id}`}
+                      className="imageLink"
+                    >
+                      <div className="imageWrap">
+                        {event.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={
+                              event.image
+                            }
+                            alt={
+                              event.title
+                            }
                           />
-                        ),
+                        ) : (
+                          <div className="placeholder">
+                            TOKYO EVENT NAVI
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+
+                    <div className="cardBody">
+                      {event.category && (
+                        <span className="category">
+                          {
+                            event.category
+                          }
+                        </span>
                       )}
 
-                      {hiddenEvents.length > 0 && (
-                        <>
-                          <input
-                            type="checkbox"
-                            id={modalId}
-                            className="modalToggle"
-                          />
+                      <h2 className="eventTitle">
+                        <Link
+                          href={`/events/${event.id}`}
+                        >
+                          {event.title}
+                        </Link>
+                      </h2>
 
-                          <label
-                            htmlFor={modalId}
-                            className="moreEventsButton"
-                          >
-                            ＋他
-                            {hiddenEvents.length}
-                            件
-                          </label>
+                      <div className="eventMeta">
+                        {event.date && (
+                          <div className="metaRow">
+                            <span>📅</span>
 
-                          <div className="moreEventsOverlay">
-                            <label
-                              htmlFor={modalId}
-                              className="modalBackdrop"
-                              aria-label="閉じる"
-                            />
+                            <div>
+                              <small>
+                                開催日
+                              </small>
 
-                            <div
-                              className="moreEventsModal"
-                              role="dialog"
-                              aria-modal="true"
-                            >
-                              <div className="moreEventsHeader">
-                                <div>
-                                  <span>
-                                    {year}年
-                                    {month}月
-                                    {cell.day}日
-                                  </span>
-
-                                  <h3>
-                                    この日のイベント
-                                  </h3>
-                                </div>
-
-                                <label
-                                  htmlFor={modalId}
-                                  className="modalCloseButton"
-                                >
-                                  ×
-                                </label>
-                              </div>
-
-                              <div className="moreEventsList">
-                                {cell.events.map(
-                                  (event) => (
-                                    <CalendarEventLink
-                                      event={event}
-                                      modal
-                                      key={`modal-event-${event.id}`}
-                                    />
-                                  ),
-                                )}
-                              </div>
+                              <strong>
+                                {
+                                  event.date
+                                }
+                              </strong>
                             </div>
                           </div>
-                        </>
-                      )}
+                        )}
+
+                        <div className="metaRow">
+                          <span>🕐</span>
+
+                          <div>
+                            <small>
+                              開催時間
+                            </small>
+
+                            <strong>
+                              {getTimeText(
+                                event,
+                              )}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {event.location && (
+                          <div className="metaRow">
+                            <span>📍</span>
+
+                            <div>
+                              <small>
+                                会場
+                              </small>
+
+                              <strong>
+                                {
+                                  event.location
+                                }
+                              </strong>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <Link
+                        href={`/events/${event.id}`}
+                        className="detailButton"
+                      >
+                        詳細を見る
+                      </Link>
                     </div>
-                  </>
-                )}
-              </div>
-            );
-          })}
+                  </article>
+                ),
+              )}
+            </div>
+          )}
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-export default async function Home({
-  searchParams,
-}: HomePageProps) {
-  const params =
-    await searchParams;
+      <footer className="footer">
+        <Link href="/">
+          東京イベントナビ
+        </Link>
 
-  const selectedCategory =
-    params.category?.trim() || "";
-
-  const selectedMonth =
-    parseSelectedMonth(
-      params.month,
-    );
-
-  const [allEvents, categoryOptions] =
-    await Promise.all([
-      getEvents(),
-      getCategoryOptions(),
-    ]);
-
-  const featuredEvents =
-    allEvents
-      .filter(
-        (event) =>
-          event.featured,
-      )
-      .sort(
-        (a, b) =>
-          getEventTimestamp(a) -
-          getEventTimestamp(b),
-      )
-      .slice(0, 3);
-
-  const newEvents =
-    [...allEvents]
-      .sort((a, b) => {
-        const aTime =
-          a.createdTime
-            ? new Date(
-                a.createdTime,
-              ).getTime()
-            : 0;
-
-        const bTime =
-          b.createdTime
-            ? new Date(
-                b.createdTime,
-              ).getTime()
-            : 0;
-
-        return bTime - aTime;
-      })
-      .slice(0, 10);
-
-  const now = Date.now();
-
-  const sevenDaysLater =
-    now +
-    7 *
-      24 *
-      60 *
-      60 *
-      1000;
-
-  const weeklyEvents =
-    allEvents
-      .filter((event) => {
-        const eventTime =
-          getEventTimestamp(event);
-
-        return (
-          Number.isFinite(eventTime) &&
-          eventTime >= now &&
-          eventTime <= sevenDaysLater
-        );
-      })
-      .sort(
-        (a, b) =>
-          getEventTimestamp(a) -
-          getEventTimestamp(b),
-      )
-      .slice(0, 5);
-
-
-
-  return (
-    <main className="homePage">
-      <header className="bannerHeader">
-        <Image
-          src={heroBanner}
-          alt="東京イベントナビ"
-          className="topBanner"
-          priority
-        />
-      </header>
-
-      <div className="container sections">
-        <EventSection
-          title="人気イベント"
-          events={featuredEvents}
-          emptyMessage="現在、人気イベントはありません。"
-          size="large"
-        />
-
-        <EventSection
-          title="新着イベント"
-          events={newEvents}
-          emptyMessage="現在、新着イベントはありません。"
-          size="medium"
-        />
-
-        <EventSection
-          title="今週のイベント"
-          events={weeklyEvents}
-          emptyMessage="現在時刻から7日以内に開催されるイベントはありません。"
-          size="small"
-        />
-
-        <CalendarSection
-          events={allEvents}
-          year={selectedMonth.year}
-          month={selectedMonth.month}
-          selectedCategory={
-            selectedCategory
-          }
-        />
-
-        <CategorySearch
-          events={allEvents}
-          categories={categoryOptions}
-        />
-
-        <AreaSearch events={allEvents} />
-
-        <OrganizerCta />
-      </div>
+        <p>
+          東京で開催されるイベントを、
+          探している人へ分かりやすく届けます。
+        </p>
+      </footer>
 
       <style>{`
         * {
           box-sizing: border-box;
         }
 
-        .homePage {
+        body {
+          margin: 0;
+        }
+
+        .areaPage {
           min-height: 100vh;
           background: #f7f7f5;
-          color: #111;
+          color: #17243b;
+          font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Helvetica Neue",
+            "Yu Gothic",
+            "Hiragino Kaku Gothic ProN",
+            sans-serif;
         }
 
-        .bannerHeader {
-          width: 100%;
+        .header {
+          border-bottom:
+            1px solid
+            rgba(23, 36, 59, 0.08);
+          background: #fff;
+        }
+
+        .headerInner {
+          width: min(
+            1120px,
+            calc(100% - 40px)
+          );
+          min-height: 70px;
+          display: flex;
+          justify-content:
+            space-between;
+          align-items: center;
+          margin: 0 auto;
+        }
+
+        .logo {
+          color: #17243b;
+          text-decoration: none;
+          font-size: 19px;
+          font-weight: 900;
+        }
+
+        .logo span {
+          color: #f26419;
+        }
+
+        .backLink {
+          padding: 11px 15px;
+          border-radius: 9px;
+          background: #17243b;
+          color: #fff;
+          text-decoration: none;
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .hero {
+          position: relative;
           overflow: hidden;
-          background: #000;
+          background:
+            radial-gradient(
+              circle at 10% 20%,
+              rgba(242, 100, 25, 0.14),
+              transparent 29%
+            ),
+            linear-gradient(
+              135deg,
+              #fff7e9,
+              #fffdf9,
+              #ffead0
+            );
         }
 
-        .topBanner {
-          display: block;
-          width: 100%;
-          height: auto;
+        .heroDecoration {
+          position: absolute;
+          top: -180px;
+          right: -110px;
+          width: 420px;
+          height: 420px;
+          border:
+            82px solid
+            rgba(242, 100, 25, 0.06);
+          border-radius: 50%;
+        }
+
+        .heroInner {
+          position: relative;
+          width: min(
+            1120px,
+            calc(100% - 40px)
+          );
+          min-height: 330px;
+          display: flex;
+          justify-content:
+            space-between;
+          align-items: center;
+          gap: 40px;
+          margin: 0 auto;
+          padding: 60px 0;
+        }
+
+        .heroLabel {
+          margin: 0 0 13px;
+          color: #f26419;
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: 0.2em;
+        }
+
+        .hero h1 {
+          margin: 0;
+          font-size: clamp(
+            39px,
+            6vw,
+            66px
+          );
+          line-height: 1.25;
+          letter-spacing: -0.06em;
+        }
+
+        .hero h1 strong {
+          color: #f26419;
+        }
+
+        .heroDescription {
+          margin: 17px 0 0;
+          color: #6c7584;
+          font-size: 13px;
+          line-height: 1.8;
+        }
+
+        .eventCount {
+          width: 150px;
+          height: 150px;
+          flex: 0 0 auto;
+          display: grid;
+          place-items: center;
+          align-content: center;
+          border: 9px solid #fff;
+          border-radius: 50%;
+          background:
+            linear-gradient(
+              145deg,
+              #f26419,
+              #ff8a35
+            );
+          box-shadow:
+            0 20px 45px
+            rgba(242, 100, 25, 0.28);
+          color: #fff;
+          text-align: center;
+          transform: rotate(5deg);
+        }
+
+        .eventCount span {
+          font-size: 9px;
+          font-weight: 900;
+        }
+
+        .eventCount strong {
+          font-size: 47px;
+          line-height: 1;
+        }
+
+        .eventCount small {
+          font-size: 9px;
+        }
+
+        .eventSection {
+          padding: 80px 0 110px;
         }
 
         .container {
           width: min(
-            1240px,
+            1120px,
             calc(100% - 40px)
           );
           margin: 0 auto;
         }
 
-        .sections {
-          display: grid;
-          gap: 100px;
-          padding: 64px 0 120px;
-        }
-
         .sectionHead {
           display: flex;
-          justify-content: space-between;
-          align-items: end;
-          gap: 24px;
-          margin-bottom: 30px;
-          padding-bottom: 16px;
-          border-bottom: 1px solid #deded9;
+          justify-content:
+            space-between;
+          align-items: flex-end;
+          gap: 30px;
+          margin-bottom: 29px;
         }
 
-        .sectionSubTitle {
+        .sectionHead p {
           margin: 0 0 7px;
-          color: #999;
-          font-size: 10px;
-          font-weight: 800;
+          color: #f26419;
+          font-size: 8px;
+          font-weight: 900;
           letter-spacing: 0.18em;
         }
 
-        .sectionHead h1 {
+        .sectionHead h2 {
           margin: 0;
-          font-size: clamp(
-            27px,
-            4vw,
-            38px
-          );
-          line-height: 1.3;
+          font-size: 29px;
         }
 
-        .grid {
+        .allEventsLink {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          color: #596273;
+          text-decoration: none;
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .allEventsLink span {
+          color: #f26419;
+          font-size: 17px;
+        }
+
+        .eventGrid {
           display: grid;
-          align-items: stretch;
+          grid-template-columns:
+            repeat(
+              3,
+              minmax(0, 1fr)
+            );
+          gap: 21px;
         }
 
-        .grid-large {
-          grid-template-columns: repeat(
-            3,
-            minmax(0, 1fr)
-          );
-          gap: 26px;
-        }
-
-        .grid-medium {
-          grid-template-columns: repeat(
-            5,
-            minmax(0, 1fr)
-          );
-          gap: 18px;
-        }
-
-        .grid-small {
-          grid-template-columns: repeat(
-            5,
-            minmax(0, 1fr)
-          );
-          gap: 14px;
-        }
-
-        .card {
+        .eventCard {
+          min-width: 0;
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          border: 1px solid #e7e7e2;
+          border: 1px solid #e8e5df;
+          border-radius: 18px;
           background: #fff;
           box-shadow:
-            0 10px 30px
-            rgba(0, 0, 0, 0.045);
+            0 12px 32px
+            rgba(41, 37, 31, 0.06);
+          transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
         }
 
-        .card-large {
-          border-radius: 22px;
+        .eventCard:hover {
+          box-shadow:
+            0 20px 44px
+            rgba(41, 37, 31, 0.12);
+          transform:
+            translateY(-6px);
         }
 
-        .card-medium {
-          border-radius: 15px;
-        }
-
-        .card-small {
-          border-radius: 13px;
-        }
-
-        /*
-         * フライヤー表示
-         * 元の横長・切り抜き方式
-         */
-        .cardImageLink {
+        .imageLink {
           display: block;
+          background: #eee;
+        }
+
+        .imageWrap {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 16 / 10;
           overflow: hidden;
           background: #eee;
         }
 
-        .image {
+        .imageWrap img {
+          position: absolute;
+          inset: 0;
           display: block;
           width: 100%;
+          height: 100%;
           object-fit: cover;
+          transition:
+            transform 0.35s ease;
         }
 
-        .card-large .image,
-        .card-medium .image {
-          aspect-ratio: 16 / 10;
-        }
-
-        .card-small .image {
-          aspect-ratio: 16 / 9;
+        .eventCard:hover
+          .imageWrap img {
+          transform: scale(1.05);
         }
 
         .placeholder {
+          position: absolute;
+          inset: 0;
           display: grid;
           place-items: center;
-          color: #888;
-          font-weight: 800;
-          letter-spacing: 0.1em;
+          color: #999;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.14em;
         }
 
         .cardBody {
-          display: flex;
           flex: 1;
+          display: flex;
           flex-direction: column;
-        }
-
-        .card-large .cardBody {
-          padding: 25px;
-        }
-
-        .card-medium .cardBody {
-          padding: 15px;
-        }
-
-        .card-small .cardBody {
-          padding: 13px;
+          padding: 20px;
         }
 
         .category {
           display: inline-flex;
           width: fit-content;
+          margin-bottom: 13px;
+          padding: 7px 11px;
           border-radius: 999px;
-          background: #f1eee5;
-          color: #5f5337;
-          font-weight: 800;
-        }
-
-        .card-large .category {
-          margin-bottom: 16px;
-          padding: 8px 14px;
-          font-size: 12px;
-        }
-
-        .card-medium .category {
-          margin-bottom: 11px;
-          padding: 6px 10px;
-          font-size: 10px;
-        }
-
-        .card-small .category {
-          margin-bottom: 9px;
-          padding: 5px 9px;
+          background: #fff0df;
+          color: #a94d1c;
           font-size: 9px;
+          font-weight: 900;
         }
 
         .eventTitle {
           margin: 0;
+          font-size: 18px;
+          line-height: 1.5;
         }
 
         .eventTitle a {
@@ -1107,530 +643,170 @@ export default async function Home({
           text-decoration: none;
         }
 
-        .card-large .eventTitle {
-          font-size: 23px;
-          line-height: 1.45;
-        }
-
-        .card-medium .eventTitle {
-          font-size: 15px;
-          line-height: 1.5;
-        }
-
-        .card-small .eventTitle {
-          font-size: 14px;
-          line-height: 1.45;
-        }
-
         .eventMeta {
           display: grid;
-          gap: 9px;
-          margin: 15px 0 17px;
-        }
-
-        .card-large .eventMeta {
-          gap: 15px;
-          margin: 25px 0 27px;
+          gap: 13px;
+          margin: 22px 0 24px;
         }
 
         .metaRow {
           display: grid;
-          grid-template-columns: 22px 1fr;
-          gap: 7px;
+          grid-template-columns:
+            25px minmax(0, 1fr);
+          gap: 9px;
           align-items: start;
         }
 
-        .metaIcon {
-          font-size: 13px;
+        .metaRow > span {
+          font-size: 15px;
         }
 
         .metaRow > div {
-          display: grid;
-          gap: 2px;
           min-width: 0;
+          display: grid;
+          gap: 3px;
         }
 
-        .metaLabel {
-          color: #999;
-          font-size: 9px;
-          font-weight: 700;
+        .metaRow small {
+          color: #9a9da5;
+          font-size: 8px;
         }
 
         .metaRow strong {
-          color: #222;
-          font-size: 12px;
-          line-height: 1.45;
+          color: #3b4555;
+          font-size: 11px;
+          line-height: 1.55;
           overflow-wrap: anywhere;
-        }
-
-        .card-large .metaRow strong {
-          font-size: 14px;
         }
 
         .detailButton {
           display: block;
           margin-top: auto;
-          padding: 11px;
-          border-radius: 8px;
-          background: #111;
+          padding: 13px 15px;
+          border-radius: 9px;
+          background: #17243b;
           color: #fff;
           text-align: center;
           text-decoration: none;
-          font-size: 11px;
-          font-weight: 800;
-        }
-
-        .card-large .detailButton {
-          padding: 16px;
-          border-radius: 11px;
-          font-size: 14px;
+          font-size: 10px;
+          font-weight: 900;
         }
 
         .empty {
-          padding: 50px 20px;
-          border-radius: 15px;
-          background: #fff;
-          color: #777;
-          text-align: center;
-          line-height: 1.8;
-        }
-
-        /*
-         * カレンダー
-         */
-        .calendarCard {
-          overflow: hidden;
-          border: 1px solid #deded9;
+          display: grid;
+          justify-items: center;
+          padding: 75px 20px;
           border-radius: 20px;
           background: #fff;
-          box-shadow:
-            0 12px 36px
-            rgba(0, 0, 0, 0.045);
-        }
-
-        .calendarHeader {
-          display: grid;
-          grid-template-columns:
-            52px 1fr 52px;
-          align-items: center;
-          padding: 20px;
-          border-bottom: 1px solid #e6e6e1;
-        }
-
-        .calendarHeader h2 {
-          margin: 0;
           text-align: center;
-          font-size: 25px;
         }
 
-        .calendarMoveButton {
-          width: 42px;
-          height: 42px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          background: #111;
+        .emptyIcon {
+          font-size: 49px;
+        }
+
+        .empty h2 {
+          margin: 20px 0 10px;
+          font-size: 23px;
+          line-height: 1.5;
+        }
+
+        .empty p {
+          margin: 0;
+          color: #7f8793;
+          font-size: 12px;
+        }
+
+        .empty a {
+          margin-top: 24px;
+          padding: 12px 18px;
+          border-radius: 9px;
+          background: #17243b;
+          color: #fff;
+          text-decoration: none;
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .footer {
+          padding: 45px 20px;
+          background: #17243b;
+          color: #aeb7c4;
+          text-align: center;
+        }
+
+        .footer a {
           color: #fff;
           text-decoration: none;
           font-size: 17px;
-          font-weight: 800;
+          font-weight: 900;
         }
 
-        .calendarWeekdays {
-          display: grid;
-          grid-template-columns: repeat(
-            7,
-            1fr
-          );
-          border-bottom: 1px solid #e6e6e1;
-          background: #f3f3ef;
-        }
-
-        .calendarWeekdays > div {
-          padding: 12px 5px;
-          text-align: center;
-          font-size: 12px;
-          font-weight: 800;
-        }
-
-        .calendarWeekdays .saturday {
-          color: #4e77ac;
-        }
-
-        .calendarWeekdays .sunday {
-          color: #c95d5d;
-        }
-
-        .calendarGrid {
-          display: grid;
-          grid-template-columns: repeat(
-            7,
-            minmax(0, 1fr)
-          );
-        }
-
-        .calendarCell {
-          min-height: 165px;
-          padding: 10px;
-          border-right: 1px solid #ecece7;
-          border-bottom: 1px solid #ecece7;
-          background: #fff;
-        }
-
-        .calendarCell:nth-child(7n) {
-          border-right: 0;
-        }
-
-        .calendarCellEmpty {
-          background: #fafaf8;
-        }
-
-        .calendarCellToday {
-          background: #fff9df;
-          box-shadow:
-            inset 0 0 0 2px
-            #d8b84a;
-        }
-
-        .calendarDayNumber {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 8px;
-          font-size: 13px;
-          font-weight: 800;
-        }
-
-        .calendarCellSaturday
-          .calendarDayNumber {
-          color: #4e77ac;
-        }
-
-        .calendarCellSunday
-          .calendarDayNumber {
-          color: #c95d5d;
-        }
-
-        .calendarDayNumber small {
-          color: #917817;
+        .footer p {
+          margin: 12px 0 0;
           font-size: 9px;
-          font-weight: 800;
+          line-height: 1.7;
         }
 
-        .calendarEvents {
-          display: grid;
-          gap: 5px;
-        }
-
-        .calendarEvent {
-          display: grid;
-          grid-template-columns:
-            32px minmax(0, 1fr);
-          gap: 5px;
-          align-items: center;
-          min-width: 0;
-          padding: 6px 7px;
-          overflow: hidden;
-          border: 1px solid;
-          border-radius: 7px;
-          text-decoration: none;
-        }
-
-        .calendarEvent span {
-          font-size: 8px;
-          font-weight: 800;
-          white-space: nowrap;
-        }
-
-        .calendarEvent strong {
-          overflow: hidden;
-          font-size: 9px;
-          line-height: 1.35;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        /*
-         * 4件目以降のポップアップ
-         */
-        .modalToggle {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          opacity: 0;
-          pointer-events: none;
-        }
-
-        .moreEventsButton {
-          display: block;
-          padding: 6px 7px;
-          border-radius: 7px;
-          background: #111;
-          color: #fff;
-          cursor: pointer;
-          text-align: center;
-          font-size: 9px;
-          font-weight: 800;
-        }
-
-        .moreEventsOverlay {
-          position: fixed;
-          z-index: 1000;
-          inset: 0;
-          display: none;
-          place-items: center;
-          padding: 20px;
-        }
-
-        .modalToggle:checked
-          + .moreEventsButton
-          + .moreEventsOverlay {
-          display: grid;
-        }
-
-        .modalBackdrop {
-          position: absolute;
-          inset: 0;
-          background: rgba(
-            0,
-            0,
-            0,
-            0.55
-          );
-          cursor: pointer;
-        }
-
-        .moreEventsModal {
-          position: relative;
-          z-index: 1;
-          width: min(
-            560px,
-            100%
-          );
-          max-height: calc(
-            100vh - 40px
-          );
-          overflow-y: auto;
-          padding: 25px;
-          border-radius: 18px;
-          background: #fff;
-          box-shadow:
-            0 28px 80px
-            rgba(0, 0, 0, 0.3);
-        }
-
-        .moreEventsHeader {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 20px;
-          margin-bottom: 20px;
-          padding-bottom: 15px;
-          border-bottom: 1px solid #e7e7e2;
-        }
-
-        .moreEventsHeader span {
-          color: #888;
-          font-size: 11px;
-          font-weight: 700;
-        }
-
-        .moreEventsHeader h3 {
-          margin: 4px 0 0;
-          font-size: 23px;
-        }
-
-        .modalCloseButton {
-          width: 36px;
-          height: 36px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          background: #111;
-          color: #fff;
-          cursor: pointer;
-          font-size: 22px;
-          line-height: 1;
-        }
-
-        .moreEventsList {
-          display: grid;
-          gap: 9px;
-        }
-
-        .calendarEventModal {
-          grid-template-columns:
-            48px minmax(0, 1fr);
-          padding: 11px 13px;
-          border-radius: 10px;
-        }
-
-        .calendarEventModal span {
-          font-size: 11px;
-        }
-
-        .calendarEventModal strong {
-          font-size: 13px;
-          white-space: normal;
-        }
-
-        /*
-         * カテゴリー検索
-         */
-        .categoryNavigation {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin-bottom: 30px;
-        }
-
-        .categoryFilter {
-          padding: 11px 17px;
-          border: 1px solid #dcdcd7;
-          border-radius: 999px;
-          background: #fff;
-          color: #333;
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 800;
-        }
-
-        .categoryFilter:hover,
-        .categoryFilter.active {
-          border-color: #111;
-          background: #111;
-          color: #fff;
-        }
-
-        .selectedCategoryHead {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 20px;
-          margin-bottom: 22px;
-          padding: 20px 22px;
-          border-radius: 14px;
-          background: #eee9dc;
-        }
-
-        .selectedCategoryHead span {
-          color: #777;
-          font-size: 10px;
-          font-weight: 700;
-        }
-
-        .selectedCategoryHead h2 {
-          margin: 4px 0 0;
-          font-size: 22px;
-        }
-
-        .selectedCategoryHead a {
-          color: #111;
-          font-size: 12px;
-          font-weight: 800;
-        }
-
-        @media (max-width: 1050px) {
-          .grid-medium,
-          .grid-small {
-            grid-template-columns: repeat(
-              3,
-              minmax(0, 1fr)
-            );
-          }
-
-          .calendarCell {
-            min-height: 145px;
-            padding: 7px;
-          }
-        }
-
-        @media (max-width: 800px) {
-          .grid-large,
-          .grid-medium,
-          .grid-small {
-            grid-template-columns: repeat(
-              2,
-              minmax(0, 1fr)
-            );
-          }
-
-          .calendarCard {
-            overflow-x: auto;
-          }
-
-          .calendarWeekdays,
-          .calendarGrid {
-            min-width: 900px;
+        @media (max-width: 900px) {
+          .eventGrid {
+            grid-template-columns:
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
         }
 
         @media (max-width: 640px) {
+          .headerInner,
+          .heroInner,
           .container {
-            width: calc(
-              100% - 24px
-            );
+            width:
+              calc(100% - 24px);
           }
 
-          .topBanner {
-            width: 150%;
-            max-width: none;
-            margin-left: -25%;
+          .heroInner {
+            min-height: 300px;
           }
 
-          .sections {
-            gap: 66px;
-            padding-top: 36px;
-            padding-bottom: 75px;
+          .hero h1 {
+            font-size: 39px;
+          }
+
+          .eventCount {
+            width: 105px;
+            height: 105px;
+            border-width: 6px;
+          }
+
+          .eventCount strong {
+            font-size: 32px;
           }
 
           .sectionHead {
-            margin-bottom: 21px;
-            padding-bottom: 12px;
+            align-items:
+              flex-start;
+            flex-direction: column;
           }
 
-          .sectionHead h1 {
-            font-size: 26px;
-          }
-
-          .grid-large,
-          .grid-medium,
-          .grid-small {
+          .eventGrid {
             grid-template-columns: 1fr;
-            gap: 18px;
+          }
+        }
+
+        @media (max-width: 430px) {
+          .heroInner {
+            display: grid;
           }
 
-          .calendarHeader {
-            grid-template-columns:
-              44px 1fr 44px;
-            padding: 14px;
+          .hero h1 {
+            font-size: 34px;
           }
 
-          .calendarHeader h2 {
-            font-size: 20px;
-          }
-
-          .calendarMoveButton {
-            width: 36px;
-            height: 36px;
-          }
-
-          .moreEventsModal {
-            padding: 20px;
-          }
-
-          .categoryNavigation {
-            gap: 8px;
-          }
-
-          .categoryFilter {
-            padding: 10px 13px;
-            font-size: 12px;
-          }
-
-          .selectedCategoryHead {
-            align-items: flex-start;
-            padding: 17px;
+          .eventCount {
+            width: 95px;
+            height: 95px;
           }
         }
       `}</style>
