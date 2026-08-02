@@ -7,14 +7,8 @@ type Property = Record<string, any>;
 type NotionPage = {
   id: string;
   url?: string;
-  created_time?: string;
-  last_edited_time?: string;
   properties?: Record<string, Property>;
   cover?: Property | null;
-};
-
-type NotionDatabase = {
-  properties?: Record<string, Property>;
 };
 
 export type EventItem = {
@@ -23,12 +17,12 @@ export type EventItem = {
   published: boolean;
   featured: boolean;
   date: string;
-  dateStart: string;
-  createdTime: string;
+  dateISO: string;
   startTime: string;
   endTime: string;
   location: string;
   venueAddress: string;
+  area: string;
   image: string;
   url: string;
   category: string;
@@ -37,11 +31,8 @@ export type EventItem = {
   organizer: string;
 };
 
-const API_KEY =
-  process.env.NOTION_API_KEY;
-
-const DATABASE_ID =
-  process.env.NOTION_DATABASE_ID;
+const API_KEY = process.env.NOTION_API_KEY;
+const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
 const names = {
   title:
@@ -102,9 +93,7 @@ const names = {
     "主催者",
 };
 
-function text(
-  prop?: Property,
-): string {
+function text(prop?: Property): string {
   if (!prop) {
     return "";
   }
@@ -122,17 +111,12 @@ function text(
       : []);
 
   return items
-    .map(
-      (item) =>
-        item.plain_text || "",
-    )
+    .map((item) => item.plain_text || "")
     .join("")
     .trim();
 }
 
-function value(
-  prop?: Property,
-): string {
+function value(prop?: Property): string {
   if (!prop) {
     return "";
   }
@@ -153,13 +137,10 @@ function value(
   }
 
   if (prop.type === "multi_select") {
-    return (
-      prop.multi_select || []
-    )
+    return (prop.multi_select || [])
       .map(
-        (item: {
-          name?: string;
-        }) => item.name || "",
+        (item: { name?: string }) =>
+          item.name || "",
       )
       .filter(Boolean)
       .join("・");
@@ -179,13 +160,8 @@ function value(
     return prop.email || "";
   }
 
-  if (
-    prop.type ===
-    "phone_number"
-  ) {
-    return (
-      prop.phone_number || ""
-    );
+  if (prop.type === "phone_number") {
+    return prop.phone_number || "";
   }
 
   if (prop.type === "checkbox") {
@@ -196,29 +172,21 @@ function value(
 
   if (prop.type === "formula") {
     if (
-      prop.formula?.type ===
-      "string"
+      prop.formula?.type === "string"
     ) {
-      return (
-        prop.formula.string || ""
-      );
+      return prop.formula.string || "";
     }
 
     if (
-      prop.formula?.type ===
-      "number"
+      prop.formula?.type === "number"
     ) {
-      return prop.formula
-        .number == null
+      return prop.formula.number == null
         ? ""
-        : String(
-            prop.formula.number,
-          );
+        : String(prop.formula.number);
     }
 
     if (
-      prop.formula?.type ===
-      "boolean"
+      prop.formula?.type === "boolean"
     ) {
       return prop.formula.boolean
         ? "true"
@@ -237,15 +205,12 @@ function checkboxValue(
   }
 
   if (prop.type === "checkbox") {
-    return Boolean(
-      prop.checkbox,
-    );
+    return Boolean(prop.checkbox);
   }
 
   if (
     prop.type === "formula" &&
-    prop.formula?.type ===
-      "boolean"
+    prop.formula?.type === "boolean"
   ) {
     return Boolean(
       prop.formula.boolean,
@@ -264,7 +229,7 @@ function checkboxValue(
   ].includes(currentValue);
 }
 
-function rawDateValue(
+function getDateISO(
   prop?: Property,
 ): string {
   return (
@@ -277,23 +242,16 @@ function rawDateValue(
 function formatDate(
   prop?: Property,
 ): string {
-  const start =
-    rawDateValue(prop);
+  const start = getDateISO(prop);
 
   if (!start) {
     return value(prop);
   }
 
-  const date = new Date(
-    start.includes("T")
-      ? start
-      : `${start}T00:00:00+09:00`,
-  );
+  const date = new Date(start);
 
   if (
-    Number.isNaN(
-      date.getTime(),
-    )
+    Number.isNaN(date.getTime())
   ) {
     return start;
   }
@@ -305,8 +263,7 @@ function formatDate(
       month: "long",
       day: "numeric",
       weekday: "short",
-      timeZone:
-        "Asia/Tokyo",
+      timeZone: "Asia/Tokyo",
     },
   ).format(date);
 }
@@ -314,17 +271,15 @@ function formatDate(
 function formatTimeText(
   input: string,
 ): string {
-  const trimmed =
-    input.trim();
+  const trimmed = input.trim();
 
   if (!trimmed) {
     return "";
   }
 
-  const colonMatch =
-    trimmed.match(
-      /(\d{1,2})[：:](\d{2})/,
-    );
+  const colonMatch = trimmed.match(
+    /(\d{1,2})[：:](\d{2})/,
+  );
 
   if (colonMatch) {
     const hour =
@@ -349,8 +304,7 @@ function formatTimeText(
       );
 
     const minute = (
-      japaneseMatch[2] ||
-      "00"
+      japaneseMatch[2] || "00"
     ).padStart(2, "0");
 
     return `${hour}:${minute}`;
@@ -374,13 +328,10 @@ function timeValue(
     dateStart &&
     dateStart.includes("T")
   ) {
-    const date =
-      new Date(dateStart);
+    const date = new Date(dateStart);
 
     if (
-      !Number.isNaN(
-        date.getTime(),
-      )
+      !Number.isNaN(date.getTime())
     ) {
       return new Intl.DateTimeFormat(
         "ja-JP",
@@ -388,8 +339,7 @@ function timeValue(
           hour: "2-digit",
           minute: "2-digit",
           hour12: false,
-          timeZone:
-            "Asia/Tokyo",
+          timeZone: "Asia/Tokyo",
         },
       ).format(date);
     }
@@ -404,35 +354,26 @@ function imageValue(
   prop?: Property,
   cover?: Property | null,
 ): string {
-  const file =
-    prop?.files?.[0];
+  const file = prop?.files?.[0];
 
   if (
     file?.type === "external"
   ) {
-    return (
-      file.external?.url || ""
-    );
+    return file.external?.url || "";
   }
 
   if (file?.type === "file") {
-    return (
-      file.file?.url || ""
-    );
+    return file.file?.url || "";
   }
 
   if (
     cover?.type === "external"
   ) {
-    return (
-      cover.external?.url || ""
-    );
+    return cover.external?.url || "";
   }
 
   if (cover?.type === "file") {
-    return (
-      cover.file?.url || ""
-    );
+    return cover.file?.url || "";
   }
 
   return "";
@@ -446,9 +387,7 @@ function isPublished(
   }
 
   if (prop.type === "checkbox") {
-    return Boolean(
-      prop.checkbox,
-    );
+    return Boolean(prop.checkbox);
   }
 
   const currentValue =
@@ -463,110 +402,342 @@ function isPublished(
   ].includes(currentValue);
 }
 
+/*
+ * 会場住所と会場名から、
+ * 検索に使用するエリアを自動判定します。
+ *
+ * 上にあるルールほど優先されます。
+ * 例：高田馬場は「新宿区」より先に判定します。
+ */
+export function detectArea(
+  venueAddress: string,
+  location: string,
+): string {
+  const source = `${venueAddress} ${location}`
+    .replace(/\s+/g, "")
+    .replace(/[‐－―ー]/g, "-");
+
+  const areaRules = [
+    {
+      area: "高田馬場",
+      keywords: [
+        "高田馬場",
+        "西早稲田",
+        "下落合",
+      ],
+    },
+    {
+      area: "新宿",
+      keywords: [
+        "新宿",
+        "歌舞伎町",
+        "西新宿",
+        "新宿三丁目",
+        "新宿御苑",
+        "大久保",
+        "百人町",
+      ],
+    },
+    {
+      area: "渋谷",
+      keywords: [
+        "渋谷",
+        "道玄坂",
+        "宇田川町",
+        "神南",
+        "松濤",
+        "桜丘町",
+        "宮益坂",
+      ],
+    },
+    {
+      area: "恵比寿・代官山",
+      keywords: [
+        "恵比寿",
+        "代官山",
+        "広尾",
+        "猿楽町",
+      ],
+    },
+    {
+      area: "原宿・表参道",
+      keywords: [
+        "原宿",
+        "表参道",
+        "神宮前",
+        "青山",
+      ],
+    },
+    {
+      area: "池袋",
+      keywords: [
+        "池袋",
+        "西池袋",
+        "東池袋",
+        "南池袋",
+        "北池袋",
+      ],
+    },
+    {
+      area: "六本木・麻布",
+      keywords: [
+        "六本木",
+        "西麻布",
+        "麻布十番",
+        "南麻布",
+        "元麻布",
+        "東麻布",
+        "乃木坂",
+      ],
+    },
+    {
+      area: "赤坂",
+      keywords: [
+        "赤坂",
+        "赤坂見附",
+        "溜池山王",
+      ],
+    },
+    {
+      area: "銀座・有楽町",
+      keywords: [
+        "銀座",
+        "有楽町",
+        "日比谷",
+        "京橋",
+      ],
+    },
+    {
+      area: "東京・丸の内",
+      keywords: [
+        "丸の内",
+        "大手町",
+        "八重洲",
+        "東京駅",
+        "日本橋",
+      ],
+    },
+    {
+      area: "上野・御徒町",
+      keywords: [
+        "上野",
+        "御徒町",
+        "上野広小路",
+        "湯島",
+      ],
+    },
+    {
+      area: "浅草",
+      keywords: [
+        "浅草",
+        "雷門",
+        "花川戸",
+      ],
+    },
+    {
+      area: "秋葉原・神田",
+      keywords: [
+        "秋葉原",
+        "外神田",
+        "神田",
+        "岩本町",
+      ],
+    },
+    {
+      area: "品川・田町",
+      keywords: [
+        "品川",
+        "高輪",
+        "港南",
+        "田町",
+        "三田",
+      ],
+    },
+    {
+      area: "浜松町・新橋",
+      keywords: [
+        "浜松町",
+        "新橋",
+        "汐留",
+        "大門",
+        "芝公園",
+      ],
+    },
+    {
+      area: "目黒",
+      keywords: [
+        "目黒",
+        "中目黒",
+        "上目黒",
+        "下目黒",
+      ],
+    },
+    {
+      area: "五反田・大崎",
+      keywords: [
+        "五反田",
+        "大崎",
+        "西五反田",
+        "東五反田",
+      ],
+    },
+    {
+      area: "中野",
+      keywords: [
+        "中野",
+        "中野坂上",
+        "東中野",
+      ],
+    },
+    {
+      area: "吉祥寺",
+      keywords: [
+        "吉祥寺",
+        "武蔵野市",
+      ],
+    },
+    {
+      area: "錦糸町",
+      keywords: [
+        "錦糸町",
+        "錦糸",
+        "江東橋",
+      ],
+    },
+  ];
+
+  for (
+    const rule of areaRules
+  ) {
+    const matched =
+      rule.keywords.some(
+        (keyword) =>
+          source.includes(keyword),
+      );
+
+    if (matched) {
+      return rule.area;
+    }
+  }
+
+  /*
+   * 主要エリアに該当しない場合は、
+   * 住所の区名を表示します。
+   *
+   * 例：
+   * 東京都北区赤羽 → 北区
+   * 東京都世田谷区三軒茶屋 → 世田谷区
+   */
+  const wardMatch =
+    source.match(
+      /東京都([^0-9]+?区)/,
+    );
+
+  if (wardMatch?.[1]) {
+    return wardMatch[1];
+  }
+
+  /*
+   * 市部の住所にも対応します。
+   *
+   * 例：
+   * 東京都町田市 → 町田市
+   */
+  const cityMatch =
+    source.match(
+      /東京都([^0-9]+?市)/,
+    );
+
+  if (cityMatch?.[1]) {
+    return cityMatch[1];
+  }
+
+  return "その他";
+}
+
 function convertPage(
   page: NotionPage,
 ): EventItem {
   const properties =
     page.properties || {};
 
+  const location = value(
+    properties[names.location],
+  );
+
+  const venueAddress = value(
+    properties[
+      names.venueAddress
+    ],
+  );
+
   return {
     id: page.id,
 
     title:
       text(
-        properties[
-          names.title
-        ],
+        properties[names.title],
       ) || "名称未設定",
 
-    published:
-      isPublished(
-        properties[
-          names.published
-        ],
-      ),
+    published: isPublished(
+      properties[names.published],
+    ),
 
-    featured:
-      checkboxValue(
-        properties[
-          names.featured
-        ],
-      ),
+    featured: checkboxValue(
+      properties[names.featured],
+    ),
 
-    date:
-      formatDate(
-        properties[
-          names.date
-        ],
-      ),
+    date: formatDate(
+      properties[names.date],
+    ),
 
-    dateStart:
-      rawDateValue(
-        properties[
-          names.date
-        ],
-      ),
+    dateISO: getDateISO(
+      properties[names.date],
+    ),
 
-    createdTime:
-      page.created_time || "",
+    startTime: timeValue(
+      properties[
+        names.startTime
+      ],
+    ),
 
-    startTime:
-      timeValue(
-        properties[
-          names.startTime
-        ],
-      ),
+    endTime: timeValue(
+      properties[
+        names.endTime
+      ],
+    ),
 
-    endTime:
-      timeValue(
-        properties[
-          names.endTime
-        ],
-      ),
+    location,
 
-    location:
-      value(
-        properties[
-          names.location
-        ],
-      ),
+    venueAddress,
 
-    venueAddress:
-      value(
-        properties[
-          names.venueAddress
-        ],
-      ),
+    area: detectArea(
+      venueAddress,
+      location,
+    ),
 
-    image:
-      imageValue(
-        properties[
-          names.image
-        ],
-        page.cover,
-      ),
+    image: imageValue(
+      properties[names.image],
+      page.cover,
+    ),
 
     url:
       value(
-        properties[
-          names.url
-        ],
+        properties[names.url],
       ) ||
       "https://lin.ee/Q6dBeSg",
 
-    category:
-      value(
-        properties[
-          names.category
-        ],
-      ),
+    category: value(
+      properties[
+        names.category
+      ],
+    ),
 
-    description:
-      value(
-        properties[
-          names.description
-        ],
-      ),
+    description: value(
+      properties[
+        names.description
+      ],
+    ),
 
     participationCondition:
       value(
@@ -576,12 +747,11 @@ function convertPage(
         ],
       ),
 
-    organizer:
-      value(
-        properties[
-          names.organizer
-        ],
-      ),
+    organizer: value(
+      properties[
+        names.organizer
+      ],
+    ),
   };
 }
 
@@ -658,117 +828,6 @@ export async function getEvents(): Promise<
   }
 }
 
-/*
- * Notionの「カテゴリー」列に
- * 登録されている選択肢を取得します。
- *
- * イベントが0件でも、
- * Notionの選択肢に残っていれば
- * カテゴリーボタンとして表示されます。
- */
-export async function getCategoryOptions(): Promise<
-  string[]
-> {
-  if (
-    !API_KEY ||
-    !DATABASE_ID
-  ) {
-    return [];
-  }
-
-  try {
-    const response =
-      await fetch(
-        `https://api.notion.com/v1/databases/${DATABASE_ID}`,
-        {
-          method: "GET",
-
-          headers: {
-            Authorization:
-              `Bearer ${API_KEY}`,
-
-            "Notion-Version":
-              "2022-06-28",
-          },
-
-          next: {
-            revalidate: 300,
-          },
-        },
-      );
-
-    if (!response.ok) {
-      const body =
-        await response.text();
-
-      console.error(
-        `Notion database error ${response.status}: ${body}`,
-      );
-
-      return [];
-    }
-
-    const database =
-      (await response.json()) as NotionDatabase;
-
-    const categoryProperty =
-      database.properties?.[
-        names.category
-      ];
-
-    if (!categoryProperty) {
-      console.error(
-        `Notionの「${names.category}」列が見つかりません。`,
-      );
-
-      return [];
-    }
-
-    let options:
-      | Array<{
-          name?: string;
-        }>
-      | undefined;
-
-    if (
-      categoryProperty.type ===
-      "select"
-    ) {
-      options =
-        categoryProperty.select
-          ?.options;
-    }
-
-    if (
-      categoryProperty.type ===
-      "multi_select"
-    ) {
-      options =
-        categoryProperty
-          .multi_select?.options;
-    }
-
-    return Array.from(
-      new Set(
-        (options || [])
-          .map(
-            (option) =>
-              option.name?.trim() ||
-              "",
-          )
-          .filter(Boolean),
-      ),
-    );
-  } catch (error) {
-    console.error(
-      "カテゴリー選択肢の取得に失敗しました。",
-      error,
-    );
-
-    return [];
-  }
-}
-
 export async function getEventById(
   id: string,
 ): Promise<EventItem | null> {
@@ -779,9 +838,7 @@ export async function getEventById(
   try {
     const response =
       await fetch(
-        `https://api.notion.com/v1/pages/${encodeURIComponent(
-          id,
-        )}`,
+        `https://api.notion.com/v1/pages/${encodeURIComponent(id)}`,
         {
           method: "GET",
 
