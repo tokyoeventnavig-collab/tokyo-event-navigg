@@ -320,6 +320,16 @@ export default function EventDetailClient({
     setCopied,
   ] = useState(false);
 
+  const [
+    calendarOpen,
+    setCalendarOpen,
+  ] = useState(false);
+
+  const [
+    shareOpen,
+    setShareOpen,
+  ] = useState(false);
+
   useEffect(() => {
     const savedFavorites =
       readSavedIds(FAVORITES_KEY);
@@ -550,6 +560,70 @@ export default function EventDetailClient({
     );
   }
 
+
+  function getShareText() {
+    return (
+      `${event.title}\n` +
+      `${event.date} ` +
+      `${getEventTime(event)}\n` +
+      `${window.location.href}`
+    );
+  }
+
+  function shareToLine() {
+    window.open(
+      `https://line.me/R/msg/text/?${encodeURIComponent(
+        getShareText(),
+      )}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+
+    setShareOpen(false);
+  }
+
+  function shareToX() {
+    const parameters =
+      new URLSearchParams({
+        text:
+          `${event.title}\n` +
+          `${event.date} ` +
+          `${getEventTime(event)}`,
+        url:
+          window.location.href,
+      });
+
+    window.open(
+      `https://twitter.com/intent/tweet?${parameters.toString()}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+
+    setShareOpen(false);
+  }
+
+  function shareByEmail() {
+    const subject =
+      encodeURIComponent(
+        event.title,
+      );
+
+    const body =
+      encodeURIComponent(
+        getShareText(),
+      );
+
+    window.location.href =
+      `mailto:?subject=${subject}&body=${body}`;
+
+    setShareOpen(false);
+  }
+
+  async function copyShareUrl() {
+    await copyCurrentUrl();
+    setShareOpen(false);
+  }
+
   async function shareEvent() {
     if (navigator.share) {
       try {
@@ -562,6 +636,7 @@ export default function EventDetailClient({
           url: window.location.href,
         });
 
+        setShareOpen(false);
         return;
       } catch {
         return;
@@ -569,6 +644,7 @@ export default function EventDetailClient({
     }
 
     await copyCurrentUrl();
+    setShareOpen(false);
   }
 
   const titleParts =
@@ -665,11 +741,9 @@ export default function EventDetailClient({
             </h1>
 
             <p className="leadText">
-              気になるイベントを
-              見つけたら、公式LINEから
-              簡単にお申し込みいただけます。
-              開催内容をご確認のうえ、
-              お気軽にお問い合わせください。
+              気になるイベントを見つけたら、公式LINEから簡単にお申し込みいただけます。
+              <br />
+              開催内容をご確認のうえ、お気軽にお問い合わせください。
             </p>
 
             <div className="quickActions">
@@ -693,37 +767,109 @@ export default function EventDetailClient({
                   : "お気に入り"}
               </button>
 
-              <div className="calendarMenu">
+              <div className="actionMenu">
                 <button
                   type="button"
                   className="calendarButton"
+                  onClick={() => {
+                    setCalendarOpen(
+                      (current) =>
+                        !current,
+                    );
+
+                    setShareOpen(false);
+                  }}
+                  aria-expanded={
+                    calendarOpen
+                  }
                 >
                   📅 カレンダー追加
                 </button>
 
-                <div className="calendarOptions">
-                  <button
-                    type="button"
-                    onClick={openGoogleCalendar}
-                  >
-                    Googleカレンダー
-                  </button>
+                {calendarOpen && (
+                  <div className="actionOptions calendarOptions">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        openGoogleCalendar();
+                        setCalendarOpen(false);
+                      }}
+                    >
+                      Googleカレンダー
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={downloadCalendarFile}
-                  >
-                    Apple・Outlook
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        downloadCalendarFile();
+                        setCalendarOpen(false);
+                      }}
+                    >
+                      Apple・Outlook
+                    </button>
+                  </div>
+                )}
               </div>
 
-              <button
-                type="button"
-                onClick={shareEvent}
-              >
-                ↗ 共有する
-              </button>
+              <div className="actionMenu">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShareOpen(
+                      (current) =>
+                        !current,
+                    );
+
+                    setCalendarOpen(false);
+                  }}
+                  aria-expanded={
+                    shareOpen
+                  }
+                >
+                  ↗ 共有する
+                </button>
+
+                {shareOpen && (
+                  <div className="actionOptions shareOptions">
+                    <button
+                      type="button"
+                      onClick={shareToLine}
+                    >
+                      LINEで送る
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={shareToX}
+                    >
+                      Xで共有
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={shareByEmail}
+                    >
+                      メールで送る
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={copyShareUrl}
+                    >
+                      {copied
+                        ? "コピーしました"
+                        : "URLをコピー"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={shareEvent}
+                    >
+                      その他のアプリ
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="eventFacts">
@@ -1167,10 +1313,15 @@ export default function EventDetailClient({
         }
 
         .leadText {
+          width: 100%;
+          max-width: 610px;
           margin: 24px 0 0;
-          color: #aaa;
+          color: #aaaaaa;
           font-size: 12px;
           line-height: 2;
+          word-break: normal;
+          overflow-wrap: break-word;
+          line-break: strict;
         }
 
         .quickActions {
@@ -1211,40 +1362,37 @@ export default function EventDetailClient({
           color: #111111;
         }
 
-        .calendarMenu {
+        .actionMenu {
           position: relative;
         }
 
-        .calendarMenu > button {
+        .actionMenu > button {
           width: 100%;
         }
 
-        .calendarOptions {
+        .actionOptions {
           position: absolute;
-          z-index: 30;
-          top: calc(100% + 7px);
+          z-index: 60;
+          top: calc(100% + 5px);
           left: 0;
-          min-width: 160px;
-          display: none;
+          min-width: 175px;
+          display: grid;
           overflow: hidden;
           border: 1px solid #3a3a3a;
           border-radius: 9px;
           background: #171717;
           box-shadow:
             0 14px 28px
-            rgba(0, 0, 0, 0.28);
+            rgba(0, 0, 0, 0.32);
         }
 
-        .calendarMenu:hover
-          .calendarOptions,
-        .calendarMenu:focus-within
-          .calendarOptions {
-          display: grid;
+        .shareOptions {
+          min-width: 165px;
         }
 
-        .calendarOptions button {
+        .actionOptions button {
           width: 100%;
-          min-height: 40px;
+          min-height: 41px;
           padding: 0 13px;
           border: 0;
           border-bottom:
@@ -1252,14 +1400,18 @@ export default function EventDetailClient({
           border-radius: 0;
           background: #171717;
           color: #ffffff;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 9px;
+          font-weight: 800;
           text-align: left;
         }
 
-        .calendarOptions button:last-child {
+        .actionOptions button:last-child {
           border-bottom: 0;
         }
 
-        .calendarOptions button:hover {
+        .actionOptions button:hover {
           background: #ffffff;
           color: #111111;
         }
@@ -1754,7 +1906,7 @@ export default function EventDetailClient({
             padding: 0 10px;
           }
 
-          .calendarOptions {
+          .actionOptions {
             right: 0;
             left: 0;
             min-width: 0;
