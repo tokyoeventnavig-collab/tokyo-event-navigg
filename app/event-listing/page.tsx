@@ -14,56 +14,56 @@ const eventCategories = [
     title: "飲み会・交流会",
     text: "友達づくり、恋活、社会人交流会、異業種交流など。",
     image:
-      "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=900&q=85",
   },
   {
     icon: "☕",
     title: "カフェ会・ランチ会",
     text: "少人数で話せる交流会や、食事を楽しむイベント。",
     image:
-      "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=85",
   },
   {
     icon: "🎲",
     title: "ボードゲーム・ゲーム会",
     text: "初心者歓迎のボードゲーム会やカードゲーム会。",
     image:
-      "https://images.unsplash.com/photo-1606503153255-59d8b8b82176?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=900&q=85",
   },
   {
     icon: "📊",
     title: "セミナー・勉強会",
     text: "ビジネス、学習、スキルアップを目的としたイベント。",
     image:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=900&q=85",
   },
   {
     icon: "🏃",
     title: "スポーツ・アウトドア",
     text: "ランニング、ヨガ、ゴルフ、フットサル、登山など。",
     image:
-      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=900&q=85",
   },
   {
     icon: "🎨",
     title: "趣味・体験イベント",
     text: "料理、写真、音楽、ものづくり、ワークショップなど。",
     image:
-      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?auto=format&fit=crop&w=900&q=85",
   },
   {
     icon: "🌏",
     title: "語学・国際交流",
     text: "語学学習、海外文化、外国人参加者との交流イベント。",
     image:
-      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=900&q=85",
   },
   {
     icon: "✨",
     title: "その他",
     text: "ライブ、マルシェ、上映会などもご相談いただけます。",
     image:
-      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=85",
   },
 ];
 
@@ -73,21 +73,21 @@ const worries = [
     title: "良いイベントなのに、知られていない",
     text: "内容には自信があるのに、イベント情報を届けられる場所が少ない。",
     image:
-      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=700&q=85",
+      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=700&q=85",
   },
   {
     number: "02",
     title: "毎回、自分から声をかけ続けている",
     text: "SNS投稿や個別連絡だけでは、告知できる人数に限界がある。",
     image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=85",
+      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=700&q=85",
   },
   {
     number: "03",
     title: "初開催で申込みが入るか不安",
     text: "実績が少ないため、興味を持ってもらえても参加につながりにくい。",
     image:
-      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=700&q=85",
+      "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=700&q=85",
   },
 ];
 
@@ -97,21 +97,21 @@ const burdens = [
     title: "開催直前まで人数が読めない",
     text: "会場、料理、スタッフの準備をどの程度すべきか判断しにくい。",
     image:
-      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=700&q=85",
+      "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?auto=format&fit=crop&w=700&q=85",
   },
   {
     number: "05",
     title: "準備と告知を両立できない",
     text: "企画や当日準備をしながら、告知や問い合わせにも追われてしまう。",
     image:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=700&q=85",
+      "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=700&q=85",
   },
   {
     number: "06",
     title: "情報をきれいにまとめられない",
     text: "日時、会場、参加条件などが分散し、参加者に伝わりにくい。",
     image:
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&q=85",
+      "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=700&q=85",
   },
 ];
 
@@ -121,28 +121,28 @@ const benefits = [
     title: "新しい参加者へ届けられる",
     text: "普段の告知だけでは接点がなかった、東京でイベントを探している方へ情報を届けます。",
     image:
-      "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=900&q=85",
   },
   {
     number: "02",
     title: "告知の入口を増やせる",
     text: "新着、今週、カレンダー、カテゴリーなど、さまざまな探し方から発見されます。",
     image:
-      "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=900&q=85",
   },
   {
     number: "03",
     title: "イベントの信頼感が高まる",
     text: "必要な情報を整理した専用ページで、初めての方にも安心して内容を確認してもらえます。",
     image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=900&q=85",
   },
   {
     number: "04",
     title: "イベントの魅力を伝えられる",
     text: "フライヤーと写真、概要、参加条件を掲載し、イベントの雰囲気まで分かりやすく伝えます。",
     image:
-      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?auto=format&fit=crop&w=900&q=85",
   },
 ];
 
@@ -301,7 +301,7 @@ function ListingMockup() {
           <div className="browserCards">
             <div className="mainEventCard">
               <img
-                src="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=900&q=85"
+                src="https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=900&q=85"
                 alt=""
               />
 
@@ -349,7 +349,7 @@ function ListingMockup() {
 
         <div className="phoneScreen">
           <img
-            src="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=600&q=85"
+            src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=85"
             alt=""
           />
 
@@ -488,21 +488,21 @@ export default function EventListingPage() {
             <div className="photoCollage">
               <figure className="photo photoMain">
                 <img
-                  src="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1100&q=90"
+                  src="https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=1100&q=90"
                   alt="イベントで交流する参加者"
                 />
               </figure>
 
               <figure className="photo photoSubOne">
                 <img
-                  src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=700&q=90"
+                  src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=700&q=90"
                   alt="交流を楽しむ参加者"
                 />
               </figure>
 
               <figure className="photo photoSubTwo">
                 <img
-                  src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=700&q=90"
+                  src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=700&q=90"
                   alt="イベント会場の参加者"
                 />
               </figure>
@@ -813,7 +813,7 @@ export default function EventListingPage() {
         <div className="container informationLayout">
           <div className="informationPhoto">
             <img
-              src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1100&q=90"
+              src="https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?auto=format&fit=crop&w=1100&q=90"
               alt="イベント掲載について打ち合わせする様子"
             />
 
@@ -922,7 +922,7 @@ export default function EventListingPage() {
         <div className="container policyLayout">
           <div className="policyImage">
             <img
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1000&q=90"
+              src="https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=1000&q=90"
               alt="安心してイベントを楽しむ参加者"
             />
 
@@ -2921,7 +2921,7 @@ export default function EventListingPage() {
           overflow: hidden;
           background-image:
             url(
-              "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=2000&q=90"
+              "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=2000&q=90"
             );
           background-position: center;
           background-size: cover;
