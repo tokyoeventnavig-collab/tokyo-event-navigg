@@ -13,30 +13,18 @@ type NotionPage = {
   cover?: Property | null;
 };
 
+type NotionDatabase = {
+  properties?: Record<string, Property>;
+};
+
 export type EventItem = {
   id: string;
   title: string;
   published: boolean;
   featured: boolean;
-
-  /*
-   * 画面表示用の開催日
-   * 例：2026年8月8日(土)
-   */
   date: string;
-
-  /*
-   * 並び替え・今週判定に使う
-   * Notionから取得した元の開催日時
-   */
   dateStart: string;
-
-  /*
-   * Notionにページが作成された日時
-   * 新着イベントの並び替えに使用
-   */
   createdTime: string;
-
   startTime: string;
   endTime: string;
   location: string;
@@ -49,8 +37,11 @@ export type EventItem = {
   organizer: string;
 };
 
-const API_KEY = process.env.NOTION_API_KEY;
-const DATABASE_ID = process.env.NOTION_DATABASE_ID;
+const API_KEY =
+  process.env.NOTION_API_KEY;
+
+const DATABASE_ID =
+  process.env.NOTION_DATABASE_ID;
 
 const names = {
   title:
@@ -102,7 +93,8 @@ const names = {
     "イベント概要",
 
   participationCondition:
-    process.env.NOTION_PROP_PARTICIPATION_CONDITION ||
+    process.env
+      .NOTION_PROP_PARTICIPATION_CONDITION ||
     "参加条件",
 
   organizer:
@@ -110,7 +102,9 @@ const names = {
     "主催者",
 };
 
-function text(prop?: Property): string {
+function text(
+  prop?: Property,
+): string {
   if (!prop) {
     return "";
   }
@@ -128,12 +122,17 @@ function text(prop?: Property): string {
       : []);
 
   return items
-    .map((item) => item.plain_text || "")
+    .map(
+      (item) =>
+        item.plain_text || "",
+    )
     .join("")
     .trim();
 }
 
-function value(prop?: Property): string {
+function value(
+  prop?: Property,
+): string {
   if (!prop) {
     return "";
   }
@@ -154,10 +153,13 @@ function value(prop?: Property): string {
   }
 
   if (prop.type === "multi_select") {
-    return (prop.multi_select || [])
+    return (
+      prop.multi_select || []
+    )
       .map(
-        (item: { name?: string }) =>
-          item.name || "",
+        (item: {
+          name?: string;
+        }) => item.name || "",
       )
       .filter(Boolean)
       .join("・");
@@ -177,8 +179,13 @@ function value(prop?: Property): string {
     return prop.email || "";
   }
 
-  if (prop.type === "phone_number") {
-    return prop.phone_number || "";
+  if (
+    prop.type ===
+    "phone_number"
+  ) {
+    return (
+      prop.phone_number || ""
+    );
   }
 
   if (prop.type === "checkbox") {
@@ -188,17 +195,31 @@ function value(prop?: Property): string {
   }
 
   if (prop.type === "formula") {
-    if (prop.formula?.type === "string") {
-      return prop.formula.string || "";
+    if (
+      prop.formula?.type ===
+      "string"
+    ) {
+      return (
+        prop.formula.string || ""
+      );
     }
 
-    if (prop.formula?.type === "number") {
-      return prop.formula.number == null
+    if (
+      prop.formula?.type ===
+      "number"
+    ) {
+      return prop.formula
+        .number == null
         ? ""
-        : String(prop.formula.number);
+        : String(
+            prop.formula.number,
+          );
     }
 
-    if (prop.formula?.type === "boolean") {
+    if (
+      prop.formula?.type ===
+      "boolean"
+    ) {
       return prop.formula.boolean
         ? "true"
         : "false";
@@ -216,14 +237,19 @@ function checkboxValue(
   }
 
   if (prop.type === "checkbox") {
-    return Boolean(prop.checkbox);
+    return Boolean(
+      prop.checkbox,
+    );
   }
 
   if (
     prop.type === "formula" &&
-    prop.formula?.type === "boolean"
+    prop.formula?.type ===
+      "boolean"
   ) {
-    return Boolean(prop.formula.boolean);
+    return Boolean(
+      prop.formula.boolean,
+    );
   }
 
   const currentValue =
@@ -248,23 +274,27 @@ function rawDateValue(
   );
 }
 
-function formatDate(prop?: Property): string {
-  const start = rawDateValue(prop);
+function formatDate(
+  prop?: Property,
+): string {
+  const start =
+    rawDateValue(prop);
 
   if (!start) {
     return value(prop);
   }
 
-  /*
-   * 日付だけの場合は日本時間の0時として扱います。
-   */
   const date = new Date(
     start.includes("T")
       ? start
       : `${start}T00:00:00+09:00`,
   );
 
-  if (Number.isNaN(date.getTime())) {
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
     return start;
   }
 
@@ -275,7 +305,8 @@ function formatDate(prop?: Property): string {
       month: "long",
       day: "numeric",
       weekday: "short",
-      timeZone: "Asia/Tokyo",
+      timeZone:
+        "Asia/Tokyo",
     },
   ).format(date);
 }
@@ -283,33 +314,43 @@ function formatDate(prop?: Property): string {
 function formatTimeText(
   input: string,
 ): string {
-  const trimmed = input.trim();
+  const trimmed =
+    input.trim();
 
   if (!trimmed) {
     return "";
   }
 
-  const colonMatch = trimmed.match(
-    /(\d{1,2})[：:](\d{2})/,
-  );
+  const colonMatch =
+    trimmed.match(
+      /(\d{1,2})[：:](\d{2})/,
+    );
 
   if (colonMatch) {
     const hour =
-      colonMatch[1].padStart(2, "0");
+      colonMatch[1].padStart(
+        2,
+        "0",
+      );
 
     return `${hour}:${colonMatch[2]}`;
   }
 
-  const japaneseMatch = trimmed.match(
-    /(\d{1,2})時(?:(\d{1,2})分)?/,
-  );
+  const japaneseMatch =
+    trimmed.match(
+      /(\d{1,2})時(?:(\d{1,2})分)?/,
+    );
 
   if (japaneseMatch) {
     const hour =
-      japaneseMatch[1].padStart(2, "0");
+      japaneseMatch[1].padStart(
+        2,
+        "0",
+      );
 
     const minute = (
-      japaneseMatch[2] || "00"
+      japaneseMatch[2] ||
+      "00"
     ).padStart(2, "0");
 
     return `${hour}:${minute}`;
@@ -333,44 +374,65 @@ function timeValue(
     dateStart &&
     dateStart.includes("T")
   ) {
-    const date = new Date(dateStart);
+    const date =
+      new Date(dateStart);
 
-    if (!Number.isNaN(date.getTime())) {
+    if (
+      !Number.isNaN(
+        date.getTime(),
+      )
+    ) {
       return new Intl.DateTimeFormat(
         "ja-JP",
         {
           hour: "2-digit",
           minute: "2-digit",
           hour12: false,
-          timeZone: "Asia/Tokyo",
+          timeZone:
+            "Asia/Tokyo",
         },
       ).format(date);
     }
   }
 
-  return formatTimeText(value(prop));
+  return formatTimeText(
+    value(prop),
+  );
 }
 
 function imageValue(
   prop?: Property,
   cover?: Property | null,
 ): string {
-  const file = prop?.files?.[0];
+  const file =
+    prop?.files?.[0];
 
-  if (file?.type === "external") {
-    return file.external?.url || "";
+  if (
+    file?.type === "external"
+  ) {
+    return (
+      file.external?.url || ""
+    );
   }
 
   if (file?.type === "file") {
-    return file.file?.url || "";
+    return (
+      file.file?.url || ""
+    );
   }
 
-  if (cover?.type === "external") {
-    return cover.external?.url || "";
+  if (
+    cover?.type === "external"
+  ) {
+    return (
+      cover.external?.url || ""
+    );
   }
 
   if (cover?.type === "file") {
-    return cover.file?.url || "";
+    return (
+      cover.file?.url || ""
+    );
   }
 
   return "";
@@ -384,7 +446,9 @@ function isPublished(
   }
 
   if (prop.type === "checkbox") {
-    return Boolean(prop.checkbox);
+    return Boolean(
+      prop.checkbox,
+    );
   }
 
   const currentValue =
@@ -409,105 +473,155 @@ function convertPage(
     id: page.id,
 
     title:
-      text(properties[names.title]) ||
-      "名称未設定",
+      text(
+        properties[
+          names.title
+        ],
+      ) || "名称未設定",
 
-    published: isPublished(
-      properties[names.published],
-    ),
+    published:
+      isPublished(
+        properties[
+          names.published
+        ],
+      ),
 
-    featured: checkboxValue(
-      properties[names.featured],
-    ),
+    featured:
+      checkboxValue(
+        properties[
+          names.featured
+        ],
+      ),
 
-    date: formatDate(
-      properties[names.date],
-    ),
+    date:
+      formatDate(
+        properties[
+          names.date
+        ],
+      ),
 
-    dateStart: rawDateValue(
-      properties[names.date],
-    ),
+    dateStart:
+      rawDateValue(
+        properties[
+          names.date
+        ],
+      ),
 
     createdTime:
       page.created_time || "",
 
-    startTime: timeValue(
-      properties[names.startTime],
-    ),
+    startTime:
+      timeValue(
+        properties[
+          names.startTime
+        ],
+      ),
 
-    endTime: timeValue(
-      properties[names.endTime],
-    ),
+    endTime:
+      timeValue(
+        properties[
+          names.endTime
+        ],
+      ),
 
-    location: value(
-      properties[names.location],
-    ),
+    location:
+      value(
+        properties[
+          names.location
+        ],
+      ),
 
-    venueAddress: value(
-      properties[names.venueAddress],
-    ),
+    venueAddress:
+      value(
+        properties[
+          names.venueAddress
+        ],
+      ),
 
-    image: imageValue(
-      properties[names.image],
-      page.cover,
-    ),
+    image:
+      imageValue(
+        properties[
+          names.image
+        ],
+        page.cover,
+      ),
 
     url:
-      value(properties[names.url]) ||
+      value(
+        properties[
+          names.url
+        ],
+      ) ||
       "https://lin.ee/Q6dBeSg",
 
-    category: value(
-      properties[names.category],
-    ),
+    category:
+      value(
+        properties[
+          names.category
+        ],
+      ),
 
-    description: value(
-      properties[names.description],
-    ),
+    description:
+      value(
+        properties[
+          names.description
+        ],
+      ),
 
-    participationCondition: value(
-      properties[
-        names.participationCondition
-      ],
-    ),
+    participationCondition:
+      value(
+        properties[
+          names
+            .participationCondition
+        ],
+      ),
 
-    organizer: value(
-      properties[names.organizer],
-    ),
+    organizer:
+      value(
+        properties[
+          names.organizer
+        ],
+      ),
   };
 }
 
 export async function getEvents(): Promise<
   EventItem[]
 > {
-  if (!API_KEY || !DATABASE_ID) {
+  if (
+    !API_KEY ||
+    !DATABASE_ID
+  ) {
     return [];
   }
 
   try {
-    const response = await fetch(
-      `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
-      {
-        method: "POST",
-        headers: {
-          Authorization:
-            `Bearer ${API_KEY}`,
+    const response =
+      await fetch(
+        `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
+        {
+          method: "POST",
 
-          "Notion-Version":
-            "2022-06-28",
+          headers: {
+            Authorization:
+              `Bearer ${API_KEY}`,
 
-          "Content-Type":
-            "application/json",
+            "Notion-Version":
+              "2022-06-28",
+
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            page_size: 100,
+          }),
+
+          next: {
+            revalidate: 300,
+          },
         },
-
-        body: JSON.stringify({
-          page_size: 100,
-        }),
-
-        next: {
-          revalidate: 300,
-        },
-      },
-    );
+      );
 
     if (!response.ok) {
       const body =
@@ -523,9 +637,12 @@ export async function getEvents(): Promise<
     const data =
       await response.json();
 
-    return (data.results || [])
-      .map((page: NotionPage) =>
-        convertPage(page),
+    return (
+      data.results || []
+    )
+      .map(
+        (page: NotionPage) =>
+          convertPage(page),
       )
       .filter(
         (event: EventItem) =>
@@ -541,6 +658,117 @@ export async function getEvents(): Promise<
   }
 }
 
+/*
+ * Notionの「カテゴリー」列に
+ * 登録されている選択肢を取得します。
+ *
+ * イベントが0件でも、
+ * Notionの選択肢に残っていれば
+ * カテゴリーボタンとして表示されます。
+ */
+export async function getCategoryOptions(): Promise<
+  string[]
+> {
+  if (
+    !API_KEY ||
+    !DATABASE_ID
+  ) {
+    return [];
+  }
+
+  try {
+    const response =
+      await fetch(
+        `https://api.notion.com/v1/databases/${DATABASE_ID}`,
+        {
+          method: "GET",
+
+          headers: {
+            Authorization:
+              `Bearer ${API_KEY}`,
+
+            "Notion-Version":
+              "2022-06-28",
+          },
+
+          next: {
+            revalidate: 300,
+          },
+        },
+      );
+
+    if (!response.ok) {
+      const body =
+        await response.text();
+
+      console.error(
+        `Notion database error ${response.status}: ${body}`,
+      );
+
+      return [];
+    }
+
+    const database =
+      (await response.json()) as NotionDatabase;
+
+    const categoryProperty =
+      database.properties?.[
+        names.category
+      ];
+
+    if (!categoryProperty) {
+      console.error(
+        `Notionの「${names.category}」列が見つかりません。`,
+      );
+
+      return [];
+    }
+
+    let options:
+      | Array<{
+          name?: string;
+        }>
+      | undefined;
+
+    if (
+      categoryProperty.type ===
+      "select"
+    ) {
+      options =
+        categoryProperty.select
+          ?.options;
+    }
+
+    if (
+      categoryProperty.type ===
+      "multi_select"
+    ) {
+      options =
+        categoryProperty
+          .multi_select?.options;
+    }
+
+    return Array.from(
+      new Set(
+        (options || [])
+          .map(
+            (option) =>
+              option.name?.trim() ||
+              "",
+          )
+          .filter(Boolean),
+      ),
+    );
+  } catch (error) {
+    console.error(
+      "カテゴリー選択肢の取得に失敗しました。",
+      error,
+    );
+
+    return [];
+  }
+}
+
 export async function getEventById(
   id: string,
 ): Promise<EventItem | null> {
@@ -549,26 +777,27 @@ export async function getEventById(
   }
 
   try {
-    const response = await fetch(
-      `https://api.notion.com/v1/pages/${encodeURIComponent(
-        id,
-      )}`,
-      {
-        method: "GET",
+    const response =
+      await fetch(
+        `https://api.notion.com/v1/pages/${encodeURIComponent(
+          id,
+        )}`,
+        {
+          method: "GET",
 
-        headers: {
-          Authorization:
-            `Bearer ${API_KEY}`,
+          headers: {
+            Authorization:
+              `Bearer ${API_KEY}`,
 
-          "Notion-Version":
-            "2022-06-28",
+            "Notion-Version":
+              "2022-06-28",
+          },
+
+          next: {
+            revalidate: 300,
+          },
         },
-
-        next: {
-          revalidate: 300,
-        },
-      },
-    );
+      );
 
     if (!response.ok) {
       const body =
