@@ -23,9 +23,6 @@ const FAVORITES_KEY =
 const HISTORY_KEY =
   "tokyo-event-navi:history";
 
-const REMINDERS_KEY =
-  "tokyo-event-navi:reminders";
-
 const HISTORY_LIMIT = 10;
 
 function readSavedIds(
@@ -323,20 +320,12 @@ export default function EventDetailClient({
     setCopied,
   ] = useState(false);
 
-  const [
-    reminderIds,
-    setReminderIds,
-  ] = useState<string[]>([]);
-
   useEffect(() => {
     const savedFavorites =
       readSavedIds(FAVORITES_KEY);
 
     const savedHistory =
       readSavedIds(HISTORY_KEY);
-
-    const savedReminders =
-      readSavedIds(REMINDERS_KEY);
 
     const nextHistory = [
       event.id,
@@ -347,7 +336,6 @@ export default function EventDetailClient({
 
     setFavoriteIds(savedFavorites);
     setHistoryIds(nextHistory);
-    setReminderIds(savedReminders);
 
     saveIds(
       HISTORY_KEY,
@@ -357,9 +345,6 @@ export default function EventDetailClient({
 
   const isFavorite =
     favoriteIds.includes(event.id);
-
-  const hasReminder =
-    reminderIds.includes(event.id);
 
   const recentEvents =
     useMemo(() => {
@@ -429,37 +414,6 @@ export default function EventDetailClient({
     }
   }
 
-
-  function toggleReminder() {
-    const nextReminders =
-      hasReminder
-        ? reminderIds.filter(
-            (id) =>
-              id !== event.id,
-          )
-        : [
-            event.id,
-            ...reminderIds,
-          ];
-
-    setReminderIds(
-      nextReminders,
-    );
-
-    saveIds(
-      REMINDERS_KEY,
-      nextReminders,
-    );
-
-    if (
-      !hasReminder &&
-      "Notification" in window &&
-      Notification.permission ===
-        "default"
-    ) {
-      void Notification.requestPermission();
-    }
-  }
 
   function openGoogleCalendar() {
     const startDate =
@@ -593,22 +547,6 @@ export default function EventDetailClient({
 
     URL.revokeObjectURL(
       objectUrl,
-    );
-  }
-
-  function shareToLine() {
-    const text =
-      `${event.title}\n` +
-      `${event.date} ` +
-      `${getEventTime(event)}\n` +
-      `${window.location.href}`;
-
-    window.open(
-      `https://line.me/R/msg/text/?${encodeURIComponent(
-        text,
-      )}`,
-      "_blank",
-      "noopener,noreferrer",
     );
   }
 
@@ -755,64 +693,38 @@ export default function EventDetailClient({
                   : "お気に入り"}
               </button>
 
-              <button
-                type="button"
-                className={
-                  hasReminder
-                    ? "reminderButton active"
-                    : "reminderButton"
-                }
-                onClick={toggleReminder}
-              >
-                {hasReminder
-                  ? "🔔 通知登録済み"
-                  : "🔔 開催通知"}
-              </button>
+              <div className="calendarMenu">
+                <button
+                  type="button"
+                  className="calendarButton"
+                >
+                  📅 カレンダー追加
+                </button>
 
-              <button
-                type="button"
-                onClick={openGoogleCalendar}
-              >
-                📅 Google
-              </button>
+                <div className="calendarOptions">
+                  <button
+                    type="button"
+                    onClick={openGoogleCalendar}
+                  >
+                    Googleカレンダー
+                  </button>
 
-              <button
-                type="button"
-                onClick={downloadCalendarFile}
-              >
-                ＋ カレンダー
-              </button>
-
-              <button
-                type="button"
-                onClick={shareToLine}
-              >
-                LINEで送る
-              </button>
+                  <button
+                    type="button"
+                    onClick={downloadCalendarFile}
+                  >
+                    Apple・Outlook
+                  </button>
+                </div>
+              </div>
 
               <button
                 type="button"
                 onClick={shareEvent}
               >
-                ↗ その他へ共有
-              </button>
-
-              <button
-                type="button"
-                onClick={copyCurrentUrl}
-              >
-                {copied
-                  ? "コピー済み"
-                  : "リンクコピー"}
+                ↗ 共有する
               </button>
             </div>
-
-            {hasReminder && (
-              <p className="reminderNote">
-                開催通知を保存しました。
-                現在はこのブラウザ内への保存です。
-              </p>
-            )}
 
             <div className="eventFacts">
               <div className="factRow">
@@ -1262,8 +1174,13 @@ export default function EventDetailClient({
         }
 
         .quickActions {
-          display: flex;
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns:
+            repeat(
+              3,
+              minmax(0, auto)
+            );
+          justify-content: start;
           gap: 8px;
           margin: 21px 0 24px;
         }
@@ -1288,19 +1205,63 @@ export default function EventDetailClient({
         }
 
         .quickActions
-          .favoriteButton.active,
-        .quickActions
-          .reminderButton.active {
+          .favoriteButton.active {
           border-color: #ffffff;
           background: #ffffff;
           color: #111111;
         }
 
-        .reminderNote {
-          margin: -12px 0 20px;
-          color: #8f8f8f;
-          font-size: 8px;
-          line-height: 1.6;
+        .calendarMenu {
+          position: relative;
+        }
+
+        .calendarMenu > button {
+          width: 100%;
+        }
+
+        .calendarOptions {
+          position: absolute;
+          z-index: 30;
+          top: calc(100% + 7px);
+          left: 0;
+          min-width: 160px;
+          display: none;
+          overflow: hidden;
+          border: 1px solid #3a3a3a;
+          border-radius: 9px;
+          background: #171717;
+          box-shadow:
+            0 14px 28px
+            rgba(0, 0, 0, 0.28);
+        }
+
+        .calendarMenu:hover
+          .calendarOptions,
+        .calendarMenu:focus-within
+          .calendarOptions {
+          display: grid;
+        }
+
+        .calendarOptions button {
+          width: 100%;
+          min-height: 40px;
+          padding: 0 13px;
+          border: 0;
+          border-bottom:
+            1px solid #303030;
+          border-radius: 0;
+          background: #171717;
+          color: #ffffff;
+          text-align: left;
+        }
+
+        .calendarOptions button:last-child {
+          border-bottom: 0;
+        }
+
+        .calendarOptions button:hover {
+          background: #ffffff;
+          color: #111111;
         }
 
         .quickActions span {
@@ -1784,16 +1745,19 @@ export default function EventDetailClient({
           }
 
           .quickActions {
-            display: grid;
             grid-template-columns:
-              repeat(
-                3,
-                minmax(0, 1fr)
-              );
+              1fr;
           }
 
           .quickActions button {
-            padding: 0 8px;
+            width: 100%;
+            padding: 0 10px;
+          }
+
+          .calendarOptions {
+            right: 0;
+            left: 0;
+            min-width: 0;
           }
 
           .contentSection {
