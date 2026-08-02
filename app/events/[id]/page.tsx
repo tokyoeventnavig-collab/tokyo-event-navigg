@@ -1,20 +1,648 @@
-import Link from "next/link";
+ChatGPT
+
+
+
+
+
+ここまでできてるのつかえない？
+
+
+
+
+
+これになりました
+
+
+スクリーンショット 2026-08-02 2.43.28.png
+スクリーンショット 2026-08-02 2.43.16.png
+スクリーンショット 2026-08-02 2.43.05.png
+
+今までの削除したい
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ここから？
+
+
+
+見えないようになってるが、数値は全て入れてある
+
+止まりました
+
+保存したけど、自動で進んでない
+
+
+
+
+
+
+どこ
+
+
+
+
+
+
+
+これになりました
+
+
+
+
+
+
+
+
+クリックしてこれしか出ない
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+かぎマーク
+
+
+スクリーンショット 2026-08-02 5.06.56.png
+スクリーンショット 2026-08-02 5.06.59.png
+これが完成形で出ました
+
+スクリーンショット 2026-08-02 5.09.52.png
+スクリーンショット 2026-08-02 5.09.37.png
+どれ出せばいいか分からない
+
+
+
+
+スクリーンショット 2026-08-02 5.33.03.png
+スクリーンショット 2026-08-02 5.33.12.png
+スクリーンショット 2026-08-02 5.34.25.png
+
+金額載せないでカテゴリーと開始時間と終了時間を東京イベントナビと同じもしくは、
+見やすいようにしてほしい
+
+
+今、こんな感じで詳細開いたページの記載内容が少ないからnotion確認して詳細ページをよくしてほしい　提案してくれた内容も盛り込んで申し込みしたくなるように　このイベントに申し込むのリンク先はhttps://lin.ee/Q6dBeSg　でおねっがいします
+
+
+
+
+
+
+貼り付けられたテキスト（1 点）.txt
+ドキュメント
+
+そしたらアップロードした画像をTOPの黒の画像と差し替えて
+
+えらーです
+
+人気イベントにも
+なってないよ
+
+
+貼り付けられたテキスト（1 点）.txt
+ドキュメント
+
+スクリーンショット 2026-08-02 9.54.41.png
+スクリーンショット 2026-08-02 9.54.51.png
+スクリーンショット 2026-08-02 9.54.57.png
+スクリーンショット 2026-08-02 9.55.02.png
+スクリーンショット 2026-08-02 9.55.06.png
+スクリーンショット 2026-08-02 9.55.10.png
+これらもリンク先で同じように作れますか？
+
+ここ文字の行がズレてるのとパッとみて興味を引くデザインにしてほしい
+
+1m 46s考えました
+生成された画像：東京イベントナビ掲載案内ページ
+
+
+編集
+
+
+外国人のところは日本人に差し替え　行の段落がおかしいところなおす　添付画像は
+文字が
+
+今日 17:19
+スクリーンショット 2026-08-02 17.18.59.png
+スクリーンショット 2026-08-02 17.18.37.png
+このページをもっとオシャレにしてください
+
+スクリーンショット 2026-08-02 17.52.13.png
+スクリーンショット 2026-08-02 17.52.09.png
+スクリーンショット 2026-08-02 17.52.01.png
+これらの画像を変えてほしい
+
+1m 22s考えました
+生成された画像：You need to generate a title for this image.
+
+
+編集
+
+
+スクリーンショット 2026-08-02 18.56.11.png
+所々にある
+FREEは無料にしてください
+　それか無料の掲載ない方が価値出る？　画像は
+
+
+貼り付けられたテキスト（1 点）(2).txt
+ドキュメント
+
+スクリーンショット 2026-08-02 19.40.19.png
+
+スクリーンショット 2026-08-02 19.46.56.png
+スクリーンショット 2026-08-02 19.47.40.png
+いくつか前からエラーです
+
+スクリーンショット 2026-08-02 19.56.18.png
+スクリーンショット 2026-08-02 19.56.42.png
+スクリーンショット 2026-08-02 19.56.52.png
+
+スクリーンショット 2026-08-02 19.58.12.png
+
+スクリーンショット 2026-08-02 20.55.56.png
+こんな感じに
+なってます
+
+
+スクリーンショット 2026-08-02 21.59.24.png
+こうなります
+
+このまま進めたいのですが、ここで問題があります。
+app/events/[id]/page.tsxは約250〜400行、app/page.tsxは1,000行以上あるため、1回のChatGPT返信に収まりません。途中でコードが切れると、そのまま貼り付けた際にコンパイルエラーになります。
+
+なので、このまま「続きを送る」と、逆に壊れたコードを渡してしまいます。
+
+一番確実な方法は次のどちらかです。
+
+**Canvas（長文コード用）**でファイル丸ごと1本を出す（途中で切れません）
+ファイルを添付（.tsx）として渡す
+この2つなら、あなたが希望している「GitHubで全削除→丸ごと貼り付け」がそのままできます。
+このチャットの通常メッセージでは、page.tsxのような長いファイルを最後まで欠けずに送ることはできません。なので、途中までのコードを送ってエラーを増やすより、欠けない形で渡すのが確実です。
+
+どちらがいいか
+分からないから
+どっちも出して
+
+両方用意します。
+ただし、この画面ではCanvasを直接作れないため、代わりに次の2通りで渡します。
+
+そのまま開ける個別ファイル
+チャット内の丸ごとコード
+まず、次に必要な app/events/[id]/page.tsx は125行なので、チャットにも丸ごと載せられます。
+個別ファイル
+page.tsx
+page.tsx
+
+ファイルを開いたら、内容をすべて選択してGitHubへ貼り付ければ大丈夫です。
+
+4つ目：app/events/[id]/page.tsx
+GitHubで次を開いてください。
+app/events/[id]/page.tsx
+現在の中身をすべて削除し、以下を丸ごと貼り付けます。
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getEventById } from "../../../lib/notion";
+
+import {
+  getEventById,
+  getEvents,
+  type EventItem,
+} from "../../../lib/notion";
+
+import EventDetailClient from "./EventDetailClient";
 
 export const revalidate = 300;
 
-const APPLICATION_URL = "https://lin.ee/Q6dBeSg";
-
-type EventDetailPageProps = {
+type Props = {
   params: Promise<{
     id: string;
   }>;
 };
 
+function getEventTimestamp(
+  event: EventItem,
+): number {
+  const source =
+    event.dateStart ||
+    event.dateISO ||
+    "";
+
+  if (!source) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const dateValue =
+    source.includes("T")
+      ? source
+      : `${source}T00:00:00+09:00`;
+
+  const timestamp =
+    new Date(dateValue).getTime();
+
+  return Number.isNaN(timestamp)
+    ? Number.POSITIVE_INFINITY
+    : timestamp;
+}
+
+function getCategoryTokens(
+  value: string,
+): string[] {
+  return value
+    .split(/[・,、/／]/)
+    .map((item) =>
+      item.trim(),
+    )
+    .filter(Boolean);
+}
+
+function getSimilarityScore(
+  currentEvent: EventItem,
+  candidateEvent: EventItem,
+): number {
+  let score = 0;
+
+  const currentCategories =
+    new Set(
+      getCategoryTokens(
+        currentEvent.category,
+      ),
+    );
+
+  const candidateCategories =
+    getCategoryTokens(
+      candidateEvent.category,
+    );
+
+  const hasSameCategory =
+    candidateCategories.some(
+      (category) =>
+        currentCategories.has(
+          category,
+        ),
+    );
+
+  if (hasSameCategory) {
+    score += 6;
+  }
+
+  if (
+    currentEvent.area &&
+    currentEvent.area !==
+      "その他" &&
+    candidateEvent.area ===
+      currentEvent.area
+  ) {
+    score += 4;
+  }
+
+  if (
+    currentEvent.organizer &&
+    candidateEvent.organizer ===
+      currentEvent.organizer
+  ) {
+    score += 3;
+  }
+
+  const currentTimestamp =
+    getEventTimestamp(
+      currentEvent,
+    );
+
+  const candidateTimestamp =
+    getEventTimestamp(
+      candidateEvent,
+    );
+
+  if (
+    Number.isFinite(
+      currentTimestamp,
+    ) &&
+    Number.isFinite(
+      candidateTimestamp,
+    )
+  ) {
+    const differenceInDays =
+      Math.abs(
+        candidateTimestamp -
+          currentTimestamp,
+      ) /
+      86400000;
+
+    if (
+      differenceInDays <= 7
+    ) {
+      score += 3;
+    } else if (
+      differenceInDays <= 30
+    ) {
+      score += 1;
+    }
+  }
+
+  return score;
+}
+
 export async function generateMetadata({
   params,
-}: EventDetailPageProps) {
+}: Props): Promise<Metadata> {
+  const { id } =
+    await params;
+
+  const event =
+    await getEventById(id);
+
+  if (!event) {
+    return {
+      title:
+        "イベントが見つかりません｜東京イベントナビ",
+    };
+  }
+
+  const description =
+    event.description ||
+    `${event.title}の日時・会場・参加条件・申込方法を確認できます。`;
+
+  return {
+    title:
+      `${event.title}｜東京イベントナビ`,
+
+    description,
+
+    openGraph: {
+      title: event.title,
+      description,
+      type: "website",
+
+      images: event.image
+        ? [
+            {
+              url:
+                event.image,
+            },
+          ]
+        : [],
+    },
+
+    twitter: {
+      card:
+        "summary_large_image",
+
+      title: event.title,
+
+      description,
+
+      images: event.image
+        ? [
+            event.image,
+          ]
+        : [],
+    },
+  };
+}
+
+export default async function EventPage({
+  params,
+}: Props) {
+  const { id } =
+    await params;
+
+  const [
+    event,
+    allEvents,
+  ] = await Promise.all([
+    getEventById(id),
+    getEvents(),
+  ]);
+
+  if (!event) {
+    notFound();
+  }
+
+  const relatedEvents =
+    allEvents
+      .filter(
+        (candidateEvent) =>
+          candidateEvent.id !==
+          event.id,
+      )
+      .map(
+        (
+          candidateEvent,
+        ) => ({
+          event:
+            candidateEvent,
+
+          score:
+            getSimilarityScore(
+              event,
+              candidateEvent,
+            ),
+        }),
+      )
+      .filter(
+        ({ score }) =>
+          score > 0,
+      )
+      .sort((a, b) => {
+        if (
+          b.score !==
+          a.score
+        ) {
+          return (
+            b.score -
+            a.score
+          );
+        }
+
+        return (
+          getEventTimestamp(
+            a.event,
+          ) -
+          getEventTimestamp(
+            b.event,
+          )
+        );
+      })
+      .slice(0, 5)
+      .map(
+        ({ event }) =>
+          event,
+      );
+
+  return (
+    <EventDetailClient
+      event={event}
+      allEvents={allEvents}
+      relatedEvents={
+        relatedEvents
+      }
+    />
+  );
+}
+貼り付けたら、Commit changesを押してください。
+次の app/page.tsx は約1,600行あるため、チャットへ貼るより、上の個別ファイルを開いて全選択する方法が確実です。
+
+page.tsx
+コード
+
+
+page.tsx
+コード
+
+
+スクリーンショット 2026-08-03 3.23.26.png
+エラー出ました
+
+原因は明確です。
+スクショではエラー箇所が、
+
+./app/page.tsx:4:1
+になっています。
+つまり、イベント詳細ページ用のコードを app/events/[id]/page.tsx ではなく、TOPページの app/page.tsx に貼っています。
+
+そのため、
+
+../../../lib/notion
+というイベント詳細ページ用の相対パスを、TOPページから探してしまいエラーになっています。
+修正手順
+1．app/page.tsxを元のTOPページへ戻す
+以下のファイルを開き、内容をすべてコピーしてください。
+page.tsx
+
+GitHubで、
+
+app/page.tsx
+を開き、現在の中身を全部削除して、コピーした内容を丸ごと貼り付けてCommitします。
+2．イベント詳細コードは正しい場所へ貼る
+以下のファイルを開いてください。
+page.tsx
+
+GitHubで次の場所を開きます。
+
+app
+└ events
+   └ [id]
+      └ page.tsx
+このファイルの中身をすべて削除し、イベント詳細用コードを丸ごと貼り付けてCommitしてください。
+正しい配置
+app/page.tsx
+→ TOPページ用コード
+
+app/events/[id]/page.tsx
+→ イベント詳細ページ用コード
+
+app/events/[id]/EventDetailClient.tsx
+→ お気に入り・履歴・固定申込ボタン用コード
+今回のエラーはコード内容ではなく、貼り付け先が1階層違ったことが原因です。上の2ファイルを正しい場所へ戻せば解消します。
+
+page.tsx
+コード
+
+
+page.tsx
+コード
+
+
+page.tsx
+
+
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import {
+  getEventById,
+  getEvents,
+  type EventItem,
+} from "../../../lib/notion";
+
+import EventDetailClient from "./EventDetailClient";
+
+export const revalidate = 300;
+
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+function timestamp(event: EventItem): number {
+  const source = event.dateStart || event.dateISO || "";
+  if (!source) return Number.POSITIVE_INFINITY;
+  const time = new Date(source).getTime();
+  return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
+}
+
+function tokens(value: string): string[] {
+  return value
+    .split(/[・,、/／]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function score(current: EventItem, candidate: EventItem): number {
+  let value = 0;
+  const categories = new Set(tokens(current.category));
+
+  if (tokens(candidate.category).some((item) => categories.has(item))) {
+    value += 6;
+  }
+
+  if (
+    current.area &&
+    current.area !== "その他" &&
+    candidate.area === current.area
+  ) {
+    value += 4;
+  }
+
+  if (
+    current.organizer &&
+    candidate.organizer === current.organizer
+  ) {
+    value += 3;
+  }
+
+  const difference = Math.abs(timestamp(current) - timestamp(candidate));
+
+  if (Number.isFinite(difference)) {
+    const days = difference / 86400000;
+    if (days <= 7) value += 3;
+    else if (days <= 30) value += 1;
+  }
+
+  return value;
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
   const { id } = await params;
   const event = await getEventById(id);
 
@@ -24,711 +652,51 @@ export async function generateMetadata({
     };
   }
 
+  const description =
+    event.description ||
+    `${event.title}の日時・会場・参加条件・申込方法を確認できます。`;
+
   return {
     title: `${event.title}｜東京イベントナビ`,
-    description:
-      event.description ||
-      `${event.title}の開催日時・会場・参加条件・申込み情報をご案内します。`,
+    description,
+    openGraph: {
+      title: event.title,
+      description,
+      type: "website",
+      images: event.image ? [{ url: event.image }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: event.title,
+      description,
+      images: event.image ? [event.image] : [],
+    },
   };
 }
 
-export default async function EventDetailPage({
-  params,
-}: EventDetailPageProps) {
+export default async function EventPage({ params }: Props) {
   const { id } = await params;
-  const event = await getEventById(id);
 
-  if (!event) {
-    notFound();
-  }
+  const [event, allEvents] = await Promise.all([
+    getEventById(id),
+    getEvents(),
+  ]);
 
-  const hasTime = event.startTime || event.endTime;
-  const mapsQuery = event.venueAddress || event.location;
+  if (!event) notFound();
 
-  const mapsUrl = mapsQuery
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        mapsQuery,
-      )}`
-    : "";
+  const related = allEvents
+    .filter((item) => item.id !== event.id)
+    .map((item) => ({ item, score: score(event, item) }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score || timestamp(a.item) - timestamp(b.item))
+    .slice(0, 5)
+    .map(({ item }) => item);
 
   return (
-    <main className="eventPage">
-      <header className="siteHeader">
-        <div className="wideContainer headerInner">
-          <Link className="brand" href="/">
-            <span className="brandEnglish">
-              TOKYO EVENT NAVI
-            </span>
-
-            <span className="brandJapanese">
-              東京イベントナビ
-            </span>
-          </Link>
-
-          <Link className="backLink" href="/">
-            イベント一覧
-          </Link>
-        </div>
-      </header>
-
-      <section className="eventHero">
-        <div className="wideContainer heroGrid">
-          <div className="visualArea">
-            {event.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="heroImage"
-                src={event.image}
-                alt={event.title}
-              />
-            ) : (
-              <div className="heroImage placeholder">
-                TOKYO EVENT NAVI
-              </div>
-            )}
-          </div>
-
-          <div className="heroContent">
-            {event.category && (
-              <p className="category">
-                {event.category}
-              </p>
-            )}
-
-            <h1>{event.title}</h1>
-
-            <p className="heroLead">
-              気になるイベントを見つけたら、
-              公式LINEから簡単にお申し込みいただけます。
-              開催内容をご確認のうえ、お気軽にお問い合わせください。
-            </p>
-
-            <div className="quickInformation">
-              {event.date && (
-                <div className="quickRow">
-                  <span className="quickIcon">📅</span>
-
-                  <div>
-                    <span className="quickLabel">
-                      開催日
-                    </span>
-
-                    <strong>{event.date}</strong>
-                  </div>
-                </div>
-              )}
-
-              {hasTime && (
-                <div className="quickRow">
-                  <span className="quickIcon">🕐</span>
-
-                  <div>
-                    <span className="quickLabel">
-                      開催時間
-                    </span>
-
-                    <strong>
-                      {event.startTime || "未定"}
-                      {event.endTime
-                        ? ` 〜 ${event.endTime}`
-                        : ""}
-                    </strong>
-                  </div>
-                </div>
-              )}
-
-              {(event.location || event.venueAddress) && (
-                <div className="quickRow">
-                  <span className="quickIcon">📍</span>
-
-                  <div>
-                    <span className="quickLabel">
-                      会場
-                    </span>
-
-                    {event.location && (
-                      <strong>{event.location}</strong>
-                    )}
-
-                    {event.venueAddress && (
-                      <span className="quickAddress">
-                        {event.venueAddress}
-                      </span>
-                    )}
-
-                    {mapsUrl && (
-                      <a
-                        className="heroMapLink"
-                        href={mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Googleマップで確認
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <a
-              className="primaryButton"
-              href={APPLICATION_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              公式LINEから申し込む
-              <span>→</span>
-            </a>
-
-            <p className="buttonNote">
-              LINEを開き、参加希望のイベント名をお送りください。
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mainSection">
-        <div className="contentContainer">
-          <div className="mainColumn">
-            <section className="contentCard">
-              <p className="sectionEnglish">
-                EVENT INFORMATION
-              </p>
-
-              <h2>開催情報</h2>
-
-              <div className="informationList">
-                {event.date && (
-                  <div className="informationRow">
-                    <div className="informationIcon">
-                      📅
-                    </div>
-
-                    <div>
-                      <span>開催日</span>
-                      <strong>{event.date}</strong>
-                    </div>
-                  </div>
-                )}
-
-                {hasTime && (
-                  <div className="informationRow">
-                    <div className="informationIcon">
-                      🕐
-                    </div>
-
-                    <div>
-                      <span>開催時間</span>
-
-                      <strong>
-                        {event.startTime || "未定"}
-                        {event.endTime
-                          ? ` 〜 ${event.endTime}`
-                          : ""}
-                      </strong>
-                    </div>
-                  </div>
-                )}
-
-                {event.location && (
-                  <div className="informationRow">
-                    <div className="informationIcon">
-                      📍
-                    </div>
-
-                    <div>
-                      <span>会場名</span>
-                      <strong>{event.location}</strong>
-                    </div>
-                  </div>
-                )}
-
-                {event.venueAddress && (
-                  <div className="informationRow">
-                    <div className="informationIcon">
-                      🚃
-                    </div>
-
-                    <div>
-                      <span>会場住所</span>
-
-                      <strong>
-                        {event.venueAddress}
-                      </strong>
-
-                      {mapsUrl && (
-                        <a
-                          className="mapLink"
-                          href={mapsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Googleマップで確認
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {event.participationCondition && (
-                  <div className="informationRow">
-                    <div className="informationIcon">
-                      👥
-                    </div>
-
-                    <div>
-                      <span>参加条件</span>
-
-                      <strong>
-                        {event.participationCondition}
-                      </strong>
-                    </div>
-                  </div>
-                )}
-
-                {event.organizer && (
-                  <div className="informationRow">
-                    <div className="informationIcon">
-                      🎪
-                    </div>
-
-                    <div>
-                      <span>主催者</span>
-                      <strong>{event.organizer}</strong>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            <section className="contentCard">
-              <p className="sectionEnglish">
-                ABOUT THIS EVENT
-              </p>
-
-              <h2>イベント概要</h2>
-
-              {event.description ? (
-                <p className="description">
-                  {event.description}
-                </p>
-              ) : (
-                <p className="description emptyText">
-                  詳細は公式LINEからお問い合わせください。
-                  開催内容や参加方法をご案内します。
-                </p>
-              )}
-            </section>
-
-            <section className="recommendCard">
-              <div className="recommendIcon">
-                ✨
-              </div>
-
-              <div>
-                <p className="sectionEnglish">
-                  INFORMATION
-                </p>
-
-                <h2>参加をご検討中の方へ</h2>
-
-                <p>
-                  お申し込み状況や当日の詳細については、
-                  公式LINEからお気軽にお問い合わせください。
-                </p>
-              </div>
-            </section>
-
-            <section className="ctaSection">
-              <p className="ctaSmall">
-                TOKYO EVENT NAVI
-              </p>
-
-              <h2>このイベントに参加する</h2>
-
-              <p>
-                お申し込み・空席確認・ご質問は、
-                公式LINEから受け付けています。
-              </p>
-
-              <a
-                className="bottomButton"
-                href={APPLICATION_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                公式LINEから申し込む
-              </a>
-            </section>
-
-            <Link className="returnLink" href="/">
-              ← その他のイベントを見る
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <div className="mobileFixedCta">
-        <a
-          href={APPLICATION_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          公式LINEから申し込む
-        </a>
-      </div>
-
-      <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        .eventPage {
-          min-height: 100vh;
-          background: #f6f6f3;
-          color: #111;
-        }
-
-        .wideContainer {
-          width: min(1180px, calc(100% - 40px));
-          margin: 0 auto;
-        }
-
-        .contentContainer {
-          width: min(900px, calc(100% - 40px));
-          margin: 0 auto;
-        }
-
-        .siteHeader {
-          background: #101010;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        .headerInner {
-          min-height: 82px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 24px;
-        }
-
-        .brand {
-          display: grid;
-          gap: 3px;
-          color: #fff;
-          text-decoration: none;
-        }
-
-        .brandEnglish {
-          font-size: 10px;
-          letter-spacing: 0.2em;
-          font-weight: 800;
-          opacity: 0.68;
-        }
-
-        .brandJapanese {
-          font-size: 18px;
-          font-weight: 800;
-        }
-
-        .backLink {
-          padding: 10px 16px;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 999px;
-          color: #fff;
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 700;
-        }
-
-        .eventHero {
-          padding: 56px 0 64px;
-          background: #101010;
-          color: #fff;
-        }
-
-        .heroGrid {
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1.08fr)
-            minmax(360px, 0.92fr);
-          gap: 60px;
-          align-items: center;
-        }
-
-        .heroImage {
-          display: block;
-          width: 100%;
-          max-height: 650px;
-          object-fit: contain;
-          background: #e8e8e5;
-          border-radius: 22px;
-        }
-
-        .placeholder {
-          min-height: 480px;
-          display: grid;
-          place-items: center;
-          color: #777;
-        }
-
-        .heroContent h1 {
-          margin: 20px 0 0;
-          font-size: clamp(34px, 5vw, 60px);
-          line-height: 1.2;
-        }
-
-        .category {
-          display: inline-flex;
-          margin: 0;
-          padding: 8px 15px;
-          border-radius: 999px;
-          background: #fff;
-          color: #111;
-          font-size: 13px;
-          font-weight: 800;
-        }
-
-        .heroLead {
-          margin: 25px 0 0;
-          color: rgba(255, 255, 255, 0.72);
-          font-size: 15px;
-          line-height: 1.9;
-        }
-
-        .quickInformation {
-          margin-top: 30px;
-          border-top: 1px solid rgba(255, 255, 255, 0.16);
-        }
-
-        .quickRow {
-          display: grid;
-          grid-template-columns: 32px 1fr;
-          gap: 12px;
-          padding: 17px 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-        }
-
-        .quickRow > div {
-          display: grid;
-          gap: 4px;
-        }
-
-        .quickLabel {
-          color: rgba(255, 255, 255, 0.55);
-          font-size: 11px;
-          font-weight: 700;
-        }
-
-        .quickAddress {
-          color: rgba(255, 255, 255, 0.72);
-          font-size: 13px;
-          line-height: 1.7;
-          white-space: pre-wrap;
-        }
-
-        .heroMapLink {
-          width: fit-content;
-          color: #fff;
-          font-size: 12px;
-          font-weight: 800;
-        }
-
-        .primaryButton {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 30px;
-          padding: 20px 24px;
-          border-radius: 12px;
-          background: #fff;
-          color: #111;
-          text-decoration: none;
-          font-weight: 900;
-        }
-
-        .buttonNote {
-          color: rgba(255, 255, 255, 0.55);
-          font-size: 11px;
-          text-align: center;
-        }
-
-        .mainSection {
-          padding: 72px 0 110px;
-        }
-
-        .mainColumn {
-          display: grid;
-          gap: 24px;
-        }
-
-        .contentCard {
-          padding: 48px;
-          border-radius: 22px;
-          background: #fff;
-        }
-
-        .sectionEnglish {
-          margin: 0 0 9px;
-          color: #999;
-          font-size: 10px;
-          font-weight: 800;
-          letter-spacing: 0.18em;
-        }
-
-        .contentCard h2,
-        .recommendCard h2,
-        .ctaSection h2 {
-          margin: 0;
-          font-size: clamp(25px, 4vw, 36px);
-        }
-
-        .informationList {
-          margin-top: 34px;
-          border-top: 1px solid #ecece8;
-        }
-
-        .informationRow {
-          display: grid;
-          grid-template-columns: 42px 1fr;
-          gap: 17px;
-          padding: 23px 0;
-          border-bottom: 1px solid #ecece8;
-        }
-
-        .informationRow > div:last-child {
-          display: grid;
-          gap: 6px;
-        }
-
-        .informationRow span {
-          color: #888;
-          font-size: 12px;
-          font-weight: 700;
-        }
-
-        .informationRow strong {
-          font-size: 16px;
-          line-height: 1.75;
-          white-space: pre-wrap;
-        }
-
-        .mapLink {
-          width: fit-content;
-          color: #111;
-          font-size: 13px;
-          font-weight: 800;
-        }
-
-        .description {
-          margin: 30px 0 0;
-          font-size: 16px;
-          line-height: 2.05;
-          white-space: pre-wrap;
-        }
-
-        .recommendCard {
-          display: grid;
-          grid-template-columns: 70px 1fr;
-          gap: 26px;
-          padding: 42px 48px;
-          border-radius: 22px;
-          background: #eee9dc;
-        }
-
-        .recommendIcon {
-          width: 70px;
-          height: 70px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          background: #fff;
-          font-size: 30px;
-        }
-
-        .ctaSection {
-          padding: 58px 48px;
-          border-radius: 22px;
-          background: #111;
-          color: #fff;
-          text-align: center;
-        }
-
-        .bottomButton {
-          display: block;
-          max-width: 520px;
-          margin: 29px auto 0;
-          padding: 20px;
-          border-radius: 12px;
-          background: #fff;
-          color: #111;
-          text-decoration: none;
-          font-weight: 900;
-        }
-
-        .returnLink {
-          display: block;
-          width: fit-content;
-          margin: 12px auto 0;
-          color: #555;
-          text-decoration: none;
-        }
-
-        .mobileFixedCta {
-          display: none;
-        }
-
-        @media (max-width: 900px) {
-          .heroGrid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .wideContainer,
-          .contentContainer {
-            width: calc(100% - 24px);
-          }
-
-          .eventHero {
-            padding: 20px 0 40px;
-          }
-
-          .contentCard {
-            padding: 28px 20px;
-          }
-
-          .recommendCard {
-            grid-template-columns: 1fr;
-            padding: 30px 22px;
-          }
-
-          .ctaSection {
-            padding: 38px 22px;
-          }
-
-          .mobileFixedCta {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            display: block;
-            padding: 10px 12px;
-            background: #fff;
-          }
-
-          .mobileFixedCta a {
-            display: block;
-            padding: 16px;
-            border-radius: 10px;
-            background: #111;
-            color: #fff;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 900;
-          }
-        }
-      `}</style>
-    </main>
+    <EventDetailClient
+      event={event}
+      allEvents={allEvents}
+      relatedEvents={related}
+    />
   );
 }
