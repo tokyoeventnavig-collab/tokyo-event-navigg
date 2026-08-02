@@ -64,6 +64,38 @@ function saveIds(
   }
 }
 
+function splitEventTitle(
+  title: string,
+): {
+  main: string;
+  qualifier: string;
+} {
+  const normalizedTitle =
+    title.trim();
+
+  const bracketIndex =
+    normalizedTitle.indexOf("【");
+
+  if (bracketIndex <= 0) {
+    return {
+      main: normalizedTitle,
+      qualifier: "",
+    };
+  }
+
+  return {
+    main:
+      normalizedTitle
+        .slice(0, bracketIndex)
+        .trim(),
+
+    qualifier:
+      normalizedTitle
+        .slice(bracketIndex)
+        .trim(),
+  };
+}
+
 function getEventTime(
   event: EventItem,
 ): string {
@@ -285,6 +317,11 @@ export default function EventDetailClient({
     await copyCurrentUrl();
   }
 
+  const titleParts =
+    splitEventTitle(
+      event.title,
+    );
+
   return (
     <main className="detailPage">
       <header className="siteHeader">
@@ -347,7 +384,17 @@ export default function EventDetailClient({
               )}
             </div>
 
-            <h1>{event.title}</h1>
+            <h1>
+              <span className="titleMain">
+                {titleParts.main}
+              </span>
+
+              {titleParts.qualifier && (
+                <span className="titleQualifier">
+                  {titleParts.qualifier}
+                </span>
+              )}
+            </h1>
 
             <p className="leadText">
               気になるイベントを
@@ -794,19 +841,28 @@ export default function EventDetailClient({
 
         .detailColumn h1 {
           width: 100%;
-          max-width: 590px;
+          max-width: 640px;
           margin: 0;
           color: #ffffff;
           font-size: clamp(
             34px,
-            3.75vw,
-            50px
+            3.65vw,
+            48px
           );
           line-height: 1.34;
           letter-spacing: -0.035em;
+        }
+
+        .titleMain {
+          display: block;
           word-break: keep-all;
-          overflow-wrap: anywhere;
-          line-break: strict;
+          overflow-wrap: normal;
+        }
+
+        .titleQualifier {
+          display: block;
+          white-space: nowrap;
+          word-break: keep-all;
         }
 
         .leadText {
@@ -1309,7 +1365,11 @@ export default function EventDetailClient({
           }
 
           .detailColumn h1 {
-            font-size: 31px;
+            font-size: 30px;
+          }
+
+          .titleQualifier {
+            white-space: normal;
           }
 
           .leadText {
