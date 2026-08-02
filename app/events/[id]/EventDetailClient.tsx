@@ -30,29 +30,20 @@ function readSavedIds(
 ): string[] {
   try {
     const storedValue =
-      window.localStorage.getItem(
-        key,
-      );
+      window.localStorage.getItem(key);
 
     const parsedValue =
       storedValue
         ? JSON.parse(storedValue)
         : [];
 
-    if (
-      !Array.isArray(
-        parsedValue,
-      )
-    ) {
+    if (!Array.isArray(parsedValue)) {
       return [];
     }
 
     return parsedValue.filter(
-      (
-        value,
-      ): value is string =>
-        typeof value ===
-        "string",
+      (value): value is string =>
+        typeof value === "string",
     );
   } catch {
     return [];
@@ -69,10 +60,7 @@ function saveIds(
       JSON.stringify(values),
     );
   } catch {
-    /*
-     * localStorageが利用できない環境では
-     * 保存処理を行いません。
-     */
+    // localStorageが使えない環境では保存しません。
   }
 }
 
@@ -83,7 +71,7 @@ function getEventTime(
     event.startTime &&
     event.endTime
   ) {
-    return `${event.startTime} 〜 ${event.endTime}`;
+    return `${event.startTime}〜${event.endTime}`;
   }
 
   return (
@@ -136,9 +124,7 @@ function EventSmallCard({
 
         <div className="smallMeta">
           <p>
-            📅{" "}
-            {event.date ||
-              "開催日未定"}
+            📅 {event.date || "開催日未定"}
           </p>
 
           <p>
@@ -180,39 +166,22 @@ export default function EventDetailClient({
     setCopied,
   ] = useState(false);
 
-  /*
-   * ページを開いたときに、
-   * お気に入り情報と閲覧履歴を読み込みます。
-   */
   useEffect(() => {
     const savedFavorites =
-      readSavedIds(
-        FAVORITES_KEY,
-      );
+      readSavedIds(FAVORITES_KEY);
 
     const savedHistory =
-      readSavedIds(
-        HISTORY_KEY,
-      );
+      readSavedIds(HISTORY_KEY);
 
     const nextHistory = [
       event.id,
       ...savedHistory.filter(
-        (id) =>
-          id !== event.id,
+        (id) => id !== event.id,
       ),
-    ].slice(
-      0,
-      HISTORY_LIMIT,
-    );
+    ].slice(0, HISTORY_LIMIT);
 
-    setFavoriteIds(
-      savedFavorites,
-    );
-
-    setHistoryIds(
-      nextHistory,
-    );
+    setFavoriteIds(savedFavorites);
+    setHistoryIds(nextHistory);
 
     saveIds(
       HISTORY_KEY,
@@ -221,14 +190,8 @@ export default function EventDetailClient({
   }, [event.id]);
 
   const isFavorite =
-    favoriteIds.includes(
-      event.id,
-    );
+    favoriteIds.includes(event.id);
 
-  /*
-   * 保存済みの閲覧履歴IDと、
-   * 現在取得できるイベントを照合します。
-   */
   const recentEvents =
     useMemo(() => {
       const eventMap =
@@ -243,11 +206,10 @@ export default function EventDetailClient({
 
       return historyIds
         .filter(
-          (id) =>
-            id !== event.id,
+          (id) => id !== event.id,
         )
-        .map((id) =>
-          eventMap.get(id),
+        .map(
+          (id) => eventMap.get(id),
         )
         .filter(
           (
@@ -266,17 +228,14 @@ export default function EventDetailClient({
     const nextFavorites =
       isFavorite
         ? favoriteIds.filter(
-            (id) =>
-              id !== event.id,
+            (id) => id !== event.id,
           )
         : [
             event.id,
             ...favoriteIds,
           ];
 
-    setFavoriteIds(
-      nextFavorites,
-    );
+    setFavoriteIds(nextFavorites);
 
     saveIds(
       FAVORITES_KEY,
@@ -293,8 +252,7 @@ export default function EventDetailClient({
       setCopied(true);
 
       window.setTimeout(
-        () =>
-          setCopied(false),
+        () => setCopied(false),
         1600,
       );
     } catch {
@@ -307,16 +265,11 @@ export default function EventDetailClient({
       try {
         await navigator.share({
           title: event.title,
-
           text:
             `${event.title}\n` +
             `${event.date} ` +
-            `${getEventTime(
-              event,
-            )}`,
-
-          url:
-            window.location.href,
+            `${getEventTime(event)}`,
+          url: window.location.href,
         });
 
         return;
@@ -336,42 +289,45 @@ export default function EventDetailClient({
             href="/"
             className="siteLogo"
           >
-            <span>東京</span>
-            イベントナビ
+            <small>
+              TOKYO EVENT NAVI
+            </small>
+
+            <strong>
+              東京イベントナビ
+            </strong>
           </Link>
 
           <Link
             href="/"
             className="backButton"
           >
-            イベント一覧へ
+            イベント一覧
           </Link>
         </div>
       </header>
 
       <section className="heroSection">
         <div className="heroGrid">
-          <div className="flyerCard">
-            <div className="flyerImage">
-              {event.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={
-                    event.image
-                  }
-                  alt={
-                    event.title
-                  }
-                />
-              ) : (
-                <div className="flyerPlaceholder">
-                  TOKYO EVENT NAVI
-                </div>
-              )}
+          <div className="flyerColumn">
+            <div className="flyerFrame">
+              <div className="flyerImage">
+                {event.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                  />
+                ) : (
+                  <div className="flyerPlaceholder">
+                    TOKYO EVENT NAVI
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="heroContent">
+          <div className="detailColumn">
             <div className="badges">
               {event.category && (
                 <span className="categoryBadge">
@@ -381,20 +337,23 @@ export default function EventDetailClient({
 
               {event.verified && (
                 <span className="verifiedBadge">
-                  <strong>
-                    ✓
-                  </strong>
-
-                  東京イベントナビ認証
+                  <strong>✓</strong>
+                  認証済み
                 </span>
               )}
             </div>
 
-            <h1>
-              {event.title}
-            </h1>
+            <h1>{event.title}</h1>
 
-            <div className="actionButtons">
+            <p className="leadText">
+              気になるイベントを
+              見つけたら、公式LINEから
+              簡単にお申し込みいただけます。
+              開催内容をご確認のうえ、
+              お気軽にお問い合わせください。
+            </p>
+
+            <div className="quickActions">
               <button
                 type="button"
                 className={
@@ -402,9 +361,7 @@ export default function EventDetailClient({
                     ? "favoriteButton active"
                     : "favoriteButton"
                 }
-                onClick={
-                  toggleFavorite
-                }
+                onClick={toggleFavorite}
               >
                 <span>
                   {isFavorite
@@ -413,109 +370,75 @@ export default function EventDetailClient({
                 </span>
 
                 {isFavorite
-                  ? "お気に入り保存済み"
-                  : "お気に入りに保存"}
+                  ? "保存済み"
+                  : "お気に入り"}
               </button>
 
               <button
                 type="button"
-                className="shareButton"
-                onClick={
-                  shareEvent
-                }
+                onClick={shareEvent}
               >
-                ↗ 共有する
+                ↗ 共有
               </button>
 
               <button
                 type="button"
-                className="copyButton"
-                onClick={
-                  copyCurrentUrl
-                }
+                onClick={copyCurrentUrl}
               >
                 {copied
-                  ? "コピーしました"
-                  : "リンクをコピー"}
+                  ? "コピー済み"
+                  : "リンクコピー"}
               </button>
             </div>
 
-            <div className="summaryCard">
-              <div className="summaryRow">
-                <span>
-                  📅
-                </span>
+            <div className="eventFacts">
+              <div className="factRow">
+                <span>📅</span>
 
                 <div>
-                  <small>
-                    開催日
-                  </small>
-
+                  <small>開催日</small>
                   <strong>
-                    {event.date ||
-                      "未定"}
+                    {event.date || "未定"}
                   </strong>
                 </div>
               </div>
 
-              <div className="summaryRow">
-                <span>
-                  🕐
-                </span>
+              <div className="factRow">
+                <span>🕐</span>
 
                 <div>
-                  <small>
-                    開催時間
-                  </small>
-
+                  <small>開催時間</small>
                   <strong>
-                    {getEventTime(
-                      event,
-                    )}
+                    {getEventTime(event)}
                   </strong>
                 </div>
               </div>
 
-              <div className="summaryRow">
-                <span>
-                  📍
-                </span>
+              <div className="factRow">
+                <span>📍</span>
 
                 <div>
-                  <small>
-                    会場
-                  </small>
-
+                  <small>会場</small>
                   <strong>
-                    {event.location ||
-                      "未定"}
+                    {event.location || "未定"}
                   </strong>
 
                   {event.venueAddress && (
                     <p>
-                      {
-                        event.venueAddress
-                      }
+                      {event.venueAddress}
                     </p>
                   )}
                 </div>
               </div>
 
               {event.organizer && (
-                <div className="summaryRow">
-                  <span>
-                    👤
-                  </span>
+                <div className="factRow">
+                  <span>👤</span>
 
                   <div>
-                    <small>
-                      主催者
-                    </small>
-
+                    <small>主催者</small>
                     <strong>
-                      {
-                        event.organizer
-                      }
+                      {event.organizer}
                     </strong>
 
                     {event.verified && (
@@ -527,6 +450,24 @@ export default function EventDetailClient({
                 </div>
               )}
             </div>
+
+            <a
+              href={event.url}
+              target="_blank"
+              rel="noreferrer"
+              className="mainApplicationButton"
+            >
+              <span>
+                公式LINEから申し込む
+              </span>
+
+              <strong>→</strong>
+            </a>
+
+            <p className="applicationNote">
+              LINEを開き、参加希望の
+              イベント名をお送りください。
+            </p>
           </div>
         </div>
       </section>
@@ -545,9 +486,7 @@ export default function EventDetailClient({
                 </h2>
 
                 <div className="longText">
-                  {
-                    event.description
-                  }
+                  {event.description}
                 </div>
               </article>
             )}
@@ -563,16 +502,14 @@ export default function EventDetailClient({
                 </h2>
 
                 <div className="longText">
-                  {
-                    event.participationCondition
-                  }
+                  {event.participationCondition}
                 </div>
               </article>
             )}
           </div>
 
           <aside className="sideColumn">
-            <div className="applicationCard">
+            <div className="sideApplicationCard">
               <p className="eyebrow">
                 APPLICATION
               </p>
@@ -581,35 +518,23 @@ export default function EventDetailClient({
                 参加してみませんか？
               </h2>
 
-              <p className="applicationDescription">
-                内容と日時を
-                ご確認のうえ、
-                申込みページへ
-                お進みください。
+              <p>
+                内容と日時をご確認のうえ、
+                申込みページへお進みください。
               </p>
 
               <a
                 href={event.url}
                 target="_blank"
                 rel="noreferrer"
-                className="applicationButton"
               >
-                <span>
-                  このイベントに
-                  申し込む
-                </span>
-
-                <strong>
-                  →
-                </strong>
+                このイベントに申し込む
+                <strong>→</strong>
               </a>
 
               <button
                 type="button"
-                className="sideFavoriteButton"
-                onClick={
-                  toggleFavorite
-                }
+                onClick={toggleFavorite}
               >
                 {isFavorite
                   ? "♥ お気に入り保存済み"
@@ -620,18 +545,13 @@ export default function EventDetailClient({
         </div>
       </section>
 
-      {relatedEvents.length >
-        0 && (
+      {relatedEvents.length > 0 && (
         <section className="relatedSection">
-          <div className="container">
-            <div className="sectionHead">
-              <p>
-                RECOMMENDED
-              </p>
-
+          <div className="compactContainer">
+            <div className="sectionHead compactHead">
+              <p>RECOMMENDED</p>
               <h2>
-                このイベントに似た
-                イベント
+                このイベントに似たイベント
               </h2>
             </div>
 
@@ -639,12 +559,8 @@ export default function EventDetailClient({
               {relatedEvents.map(
                 (relatedEvent) => (
                   <EventSmallCard
-                    key={
-                      relatedEvent.id
-                    }
-                    event={
-                      relatedEvent
-                    }
+                    key={relatedEvent.id}
+                    event={relatedEvent}
                   />
                 ),
               )}
@@ -654,40 +570,29 @@ export default function EventDetailClient({
       )}
 
       <section className="recentSection">
-        <div className="container">
-          <div className="sectionHead">
-            <p>
-              RECENTLY VIEWED
-            </p>
-
+        <div className="compactContainer">
+          <div className="sectionHead compactHead">
+            <p>RECENTLY VIEWED</p>
             <h2>
-              最近チェックした
-              イベント
+              最近チェックしたイベント
             </h2>
           </div>
 
-          {recentEvents.length >
-          0 ? (
+          {recentEvents.length > 0 ? (
             <div className="smallCardGrid">
               {recentEvents.map(
                 (recentEvent) => (
                   <EventSmallCard
-                    key={
-                      recentEvent.id
-                    }
-                    event={
-                      recentEvent
-                    }
+                    key={recentEvent.id}
+                    event={recentEvent}
                   />
                 ),
               )}
             </div>
           ) : (
             <div className="emptyHistory">
-              他のイベントを
-              閲覧すると、
-              最近チェックした
-              イベントが
+              他のイベントを閲覧すると、
+              最近チェックしたイベントが
               ここに表示されます。
             </div>
           )}
@@ -697,14 +602,10 @@ export default function EventDetailClient({
       <div className="mobileStickyBar">
         <button
           type="button"
-          onClick={
-            toggleFavorite
-          }
+          onClick={toggleFavorite}
           aria-label="お気に入り"
         >
-          {isFavorite
-            ? "♥"
-            : "♡"}
+          {isFavorite ? "♥" : "♡"}
         </button>
 
         <a
@@ -712,8 +613,7 @@ export default function EventDetailClient({
           target="_blank"
           rel="noreferrer"
         >
-          このイベントに
-          申し込む
+          このイベントに申し込む
         </a>
       </div>
 
@@ -724,89 +624,101 @@ export default function EventDetailClient({
 
         .detailPage {
           min-height: 100vh;
-          background: #f7f7f5;
-          color: #17243b;
+          background: #f5f5f3;
+          color: #111111;
         }
 
         .siteHeader {
+          background: #0d0d0d;
           border-bottom:
-            1px solid #ebe8e2;
-          background: #fff;
-        }
-
-        .headerInner,
-        .heroGrid,
-        .contentGrid,
-        .container {
-          width: min(
-            1120px,
-            calc(100% - 40px)
-          );
-          margin: 0 auto;
+            1px solid #292929;
         }
 
         .headerInner {
-          min-height: 70px;
+          width: min(
+            1080px,
+            calc(100% - 40px)
+          );
+          min-height: 72px;
           display: flex;
           justify-content:
             space-between;
           align-items: center;
-          gap: 20px;
+          margin: 0 auto;
         }
 
         .siteLogo {
-          color: #17243b;
-          font-size: 19px;
-          font-weight: 900;
+          display: grid;
+          gap: 3px;
+          color: #ffffff;
           text-decoration: none;
         }
 
-        .siteLogo span {
-          color: #111111;
+        .siteLogo small {
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.22em;
+          opacity: 0.65;
+        }
+
+        .siteLogo strong {
+          font-size: 15px;
+          font-weight: 900;
         }
 
         .backButton {
-          padding: 10px 14px;
-          border-radius: 9px;
-          background: #17243b;
-          color: #fff;
+          padding: 10px 17px;
+          border:
+            1px solid #454545;
+          border-radius: 999px;
+          color: #ffffff;
           font-size: 10px;
           font-weight: 800;
           text-decoration: none;
         }
 
         .heroSection {
-          overflow: hidden;
-          padding: 42px 0 52px;
-          background: #ffffff;
-          border-bottom: 1px solid #ececea;
+          padding: 48px 0 58px;
+          background: #0d0d0d;
+          color: #ffffff;
         }
 
         .heroGrid {
+          width: min(
+            1080px,
+            calc(100% - 40px)
+          );
           display: grid;
           grid-template-columns:
-            minmax(0, 0.92fr)
-            minmax(0, 1.08fr);
-          align-items: start;
-          gap: 42px;
+            minmax(0, 1fr)
+            minmax(0, 0.88fr);
+          align-items: center;
+          gap: 54px;
+          margin: 0 auto;
         }
 
-        .flyerCard {
-          padding: 8px;
-          border: 1px solid #e8e8e5;
-          border-radius: 18px;
-          background: #fff;
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
-          transform: none;
+        .flyerColumn {
+          display: flex;
+          justify-content: center;
+        }
+
+        .flyerFrame {
+          width: min(
+            100%,
+            520px
+          );
+          padding: 0;
+          overflow: hidden;
+          border-radius: 21px;
+          background: #ffffff;
         }
 
         .flyerImage {
           position: relative;
           width: 100%;
-          aspect-ratio: 4 / 3;
+          aspect-ratio: 4 / 4.85;
           overflow: hidden;
-          border-radius: 12px;
-          background: #eee;
+          background: #e9e9e9;
         }
 
         .flyerImage :global(img) {
@@ -815,8 +727,9 @@ export default function EventDetailClient({
           display: block;
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           object-position: center;
+          background: #ffffff;
         }
 
         .flyerPlaceholder {
@@ -824,17 +737,21 @@ export default function EventDetailClient({
           inset: 0;
           display: grid;
           place-items: center;
-          color: #999;
-          font-size: 12px;
+          color: #888888;
+          font-size: 11px;
           font-weight: 900;
           letter-spacing: 0.14em;
+        }
+
+        .detailColumn {
+          min-width: 0;
         }
 
         .badges {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
-          margin-bottom: 16px;
+          margin-bottom: 20px;
         }
 
         .categoryBadge,
@@ -842,292 +759,320 @@ export default function EventDetailClient({
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 8px 12px;
+          padding: 7px 12px;
           border-radius: 999px;
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 900;
         }
 
         .categoryBadge {
-          background: #f1f1ef;
-          color: #222222;
+          background: #ffffff;
+          color: #111111;
         }
 
         .verifiedBadge {
-          background: #e6f6ed;
-          color: #18764d;
+          border:
+            1px solid #555555;
+          background: #181818;
+          color: #ffffff;
         }
 
         .verifiedBadge strong {
-          width: 17px;
-          height: 17px;
+          width: 16px;
+          height: 16px;
           display: grid;
           place-items: center;
           border-radius: 50%;
-          background: #239863;
-          color: #fff;
-          font-size: 10px;
+          background: #ffffff;
+          color: #111111;
+          font-size: 9px;
         }
 
-        .heroContent h1 {
+        .detailColumn h1 {
           margin: 0;
-          color: #17243b;
+          color: #ffffff;
           font-size: clamp(
-            32px,
-            4.5vw,
-            54px
+            35px,
+            4vw,
+            51px
           );
-          line-height: 1.28;
+          line-height: 1.35;
           letter-spacing: -0.045em;
         }
 
-        .actionButtons {
+        .leadText {
+          margin: 24px 0 0;
+          color: #aaa;
+          font-size: 12px;
+          line-height: 2;
+        }
+
+        .quickActions {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
-          margin: 23px 0;
+          margin: 21px 0 24px;
         }
 
-        .actionButtons button {
-          min-height: 42px;
-          padding: 0 14px;
-          border: 1px solid #dedbd5;
-          border-radius: 10px;
-          background: #fff;
-          color: #444;
+        .quickActions button {
+          min-height: 38px;
+          padding: 0 13px;
+          border:
+            1px solid #3a3a3a;
+          border-radius: 9px;
+          background: #171717;
+          color: #d8d8d8;
           cursor: pointer;
           font-family: inherit;
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 800;
         }
 
-        .favoriteButton.active {
-          border-color: #ed9ba6;
-          background: #fff0f2;
-          color: #cf3d50;
+        .quickActions button:hover {
+          border-color: #ffffff;
+          color: #ffffff;
         }
 
-        .favoriteButton span {
-          margin-right: 5px;
-          font-size: 17px;
+        .quickActions
+          .favoriteButton.active {
+          border-color: #ffffff;
+          background: #ffffff;
+          color: #111111;
         }
 
-        .summaryCard {
-          display: grid;
-          gap: 12px;
-          padding: 18px;
-          border: 1px solid #e5e5e2;
-          border-radius: 14px;
-          background: #fafaf8;
-          box-shadow: none;
+        .quickActions span {
+          margin-right: 4px;
         }
 
-        .summaryRow {
+        .eventFacts {
+          border-top:
+            1px solid #343434;
+        }
+
+        .factRow {
           display: grid;
           grid-template-columns:
-            30px minmax(0, 1fr);
-          gap: 10px;
-          align-items: start;
+            25px minmax(0, 1fr);
+          gap: 13px;
+          padding: 16px 0;
+          border-bottom:
+            1px solid #343434;
         }
 
-        .summaryRow > span {
-          font-size: 17px;
+        .factRow > span {
+          padding-top: 3px;
+          font-size: 14px;
         }
 
-        .summaryRow > div {
+        .factRow > div {
           min-width: 0;
           display: grid;
-          gap: 3px;
+          gap: 4px;
         }
 
-        .summaryRow small {
-          color: #979ba2;
-          font-size: 9px;
+        .factRow small {
+          color: #737373;
+          font-size: 8px;
           font-weight: 700;
         }
 
-        .summaryRow strong {
-          color: #17243b;
+        .factRow strong {
+          color: #ffffff;
           font-size: 13px;
           line-height: 1.55;
         }
 
-        .summaryRow p {
+        .factRow p {
           margin: 0;
-          color: #6c7480;
-          font-size: 10px;
-          line-height: 1.55;
+          color: #909090;
+          font-size: 9px;
+          line-height: 1.6;
         }
 
-        .summaryRow
-          .verifiedText {
-          color: #218558;
+        .verifiedText {
+          color: #cfcfcf !important;
           font-weight: 800;
         }
 
+        .mainApplicationButton {
+          display: flex;
+          justify-content:
+            space-between;
+          align-items: center;
+          margin-top: 27px;
+          padding: 17px 19px;
+          border-radius: 11px;
+          background: #ffffff;
+          color: #111111;
+          font-size: 12px;
+          font-weight: 900;
+          text-decoration: none;
+        }
+
+        .mainApplicationButton strong {
+          font-size: 18px;
+        }
+
+        .applicationNote {
+          margin: 10px 0 0;
+          color: #777777;
+          font-size: 8px;
+          text-align: center;
+        }
+
         .contentSection {
-          padding: 54px 0;
+          padding: 72px 0;
+          background: #f5f5f3;
         }
 
         .contentGrid {
+          width: min(
+            1080px,
+            calc(100% - 40px)
+          );
           display: grid;
           grid-template-columns:
             minmax(0, 1fr)
-            300px;
+            310px;
           align-items: start;
-          gap: 28px;
+          gap: 24px;
+          margin: 0 auto;
         }
 
         .mainColumn {
           display: grid;
-          gap: 20px;
-        }
-
-        .contentCard,
-        .applicationCard {
-          border: 1px solid #e5e3de;
-          border-radius: 18px;
-          background: #fff;
-          box-shadow:
-            0 10px 28px
-            rgba(
-              0,
-              0,
-              0,
-              0.045
-            );
+          gap: 18px;
         }
 
         .contentCard {
-          padding: 28px;
+          padding: 27px;
+          border:
+            1px solid #e1e1dd;
+          border-radius: 15px;
+          background: #ffffff;
         }
 
         .eyebrow,
         .sectionHead p {
           margin: 0 0 7px;
-          color: #111111;
-          font-size: 8px;
+          color: #777777;
+          font-size: 7px;
           font-weight: 900;
-          letter-spacing: 0.18em;
+          letter-spacing: 0.19em;
         }
 
         .contentCard h2,
-        .applicationCard h2,
+        .sideApplicationCard h2,
         .sectionHead h2 {
           margin: 0;
         }
 
         .contentCard h2 {
-          font-size: 25px;
+          font-size: 23px;
         }
 
         .longText {
-          margin-top: 19px;
-          color: #515a67;
-          font-size: 14px;
+          margin-top: 18px;
+          color: #555555;
+          font-size: 13px;
           line-height: 2;
           white-space: pre-wrap;
         }
 
         .sideColumn {
           position: sticky;
-          top: 22px;
+          top: 20px;
         }
 
-        .applicationCard {
-          padding: 24px;
-          background: #17243b;
-          color: #fff;
+        .sideApplicationCard {
+          padding: 22px;
+          border-radius: 15px;
+          background: #111111;
+          color: #ffffff;
         }
 
-        .applicationCard h2 {
-          font-size: 23px;
+        .sideApplicationCard h2 {
+          font-size: 20px;
         }
 
-        .applicationDescription {
-          margin: 13px 0 21px;
-          color: #bcc4cf;
-          font-size: 11px;
+        .sideApplicationCard > p:not(.eyebrow) {
+          margin: 12px 0 18px;
+          color: #aaaaaa;
+          font-size: 10px;
           line-height: 1.8;
         }
 
-        .applicationButton {
+        .sideApplicationCard a {
           display: flex;
           justify-content:
             space-between;
           align-items: center;
-          gap: 10px;
-          padding: 16px;
-          border-radius: 11px;
-          background: #111111;
-          color: #fff;
-          font-size: 12px;
+          padding: 14px;
+          border-radius: 9px;
+          background: #ffffff;
+          color: #111111;
+          font-size: 10px;
           font-weight: 900;
           text-decoration: none;
         }
 
-        .applicationButton strong {
-          font-size: 18px;
-        }
-
-        .sideFavoriteButton {
+        .sideApplicationCard button {
           width: 100%;
-          margin-top: 10px;
-          padding: 13px;
+          margin-top: 9px;
+          padding: 12px;
           border:
-            1px solid
-            rgba(
-              255,
-              255,
-              255,
-              0.22
-            );
-          border-radius: 10px;
+            1px solid #3f3f3f;
+          border-radius: 9px;
           background: transparent;
-          color: #fff;
+          color: #ffffff;
           cursor: pointer;
           font-family: inherit;
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 800;
         }
 
         .relatedSection,
         .recentSection {
-          padding: 42px 0 54px;
+          padding: 44px 0 55px;
         }
 
         .relatedSection {
-          background: #fff;
+          background: #ffffff;
+          border-top:
+            1px solid #ececea;
         }
 
         .recentSection {
-          background: #f7f7f5;
-          border-top: 1px solid #ececea;
+          background: #f5f5f3;
+          border-top:
+            1px solid #e7e7e3;
         }
 
-        .recentSection .smallCardGrid {
-          align-items: stretch;
+        .compactContainer {
+          width: min(
+            960px,
+            calc(100% - 40px)
+          );
+          margin: 0 auto;
         }
 
-        .recentSection .smallCard {
-          height: 100%;
+        .compactHead {
+          margin-bottom: 17px;
         }
 
-        .sectionHead {
-          margin-bottom: 16px;
-        }
-
-        .sectionHead h2 {
-          color: #171717;
+        .compactHead h2 {
+          color: #111111;
           font-size: 20px;
           line-height: 1.4;
-          letter-spacing: -0.02em;
         }
 
         .smallCardGrid {
           display: grid;
           grid-template-columns:
-            repeat(5, minmax(0, 1fr));
+            repeat(
+              5,
+              minmax(0, 1fr)
+            );
           gap: 10px;
           align-items: stretch;
         }
@@ -1138,31 +1083,32 @@ export default function EventDetailClient({
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          border: 1px solid #e5e5e2;
+          border:
+            1px solid #e3e3df;
           border-radius: 10px;
-          background: #fff;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.035);
+          background: #ffffff;
         }
 
         .smallImageLink {
           display: block;
-          background: #eee;
+          background: #eeeeec;
         }
 
         .smallImageWrap {
           position: relative;
           width: 100%;
-          height: 104px;
+          aspect-ratio: 16 / 9;
           overflow: hidden;
-          background: #eeeeec;
         }
 
         .smallImageWrap :global(img) {
           position: absolute;
           inset: 0;
+          display: block;
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: center;
         }
 
         .smallPlaceholder {
@@ -1170,16 +1116,16 @@ export default function EventDetailClient({
           inset: 0;
           display: grid;
           place-items: center;
-          color: #999;
-          font-size: 7px;
+          color: #999999;
+          font-size: 6px;
           font-weight: 900;
         }
 
         .smallCardBody {
           flex: 1;
+          min-width: 0;
           display: flex;
           flex-direction: column;
-          min-width: 0;
           padding: 9px;
         }
 
@@ -1191,8 +1137,8 @@ export default function EventDetailClient({
           padding: 4px 7px;
           overflow: hidden;
           border-radius: 999px;
-          background: #f1eee5;
-          color: #5f5337;
+          background: #efefed;
+          color: #555555;
           font-size: 7px;
           font-weight: 800;
           white-space: nowrap;
@@ -1201,13 +1147,14 @@ export default function EventDetailClient({
 
         .smallTitle {
           display: -webkit-box;
-          min-height: 33px;
-          margin: 0 0 6px;
+          min-height: 34px;
+          margin: 0 0 7px;
           overflow: hidden;
-          color: #171717;
+          color: #111111;
           font-size: 10px;
-          line-height: 1.55;
-          -webkit-box-orient: vertical;
+          line-height: 1.65;
+          -webkit-box-orient:
+            vertical;
           -webkit-line-clamp: 2;
         }
 
@@ -1218,15 +1165,14 @@ export default function EventDetailClient({
 
         .smallMeta {
           display: grid;
-          gap: 3px;
-          min-height: 28px;
-          margin-bottom: 7px;
+          gap: 4px;
+          margin-bottom: 8px;
         }
 
         .smallMeta p {
           margin: 0;
           overflow: hidden;
-          color: #626a76;
+          color: #777777;
           font-size: 7px;
           line-height: 1.45;
           white-space: nowrap;
@@ -1237,9 +1183,9 @@ export default function EventDetailClient({
           display: block;
           margin-top: auto;
           padding: 7px;
-          border-radius: 7px;
-          background: #17243b;
-          color: #fff;
+          border-radius: 6px;
+          background: #111111;
+          color: #ffffff;
           text-align: center;
           font-size: 7px;
           font-weight: 800;
@@ -1247,12 +1193,14 @@ export default function EventDetailClient({
         }
 
         .emptyHistory {
-          padding: 35px 20px;
-          border-radius: 15px;
-          background: #fff;
-          color: #888;
+          padding: 27px 18px;
+          border:
+            1px solid #e2e2df;
+          border-radius: 11px;
+          background: #ffffff;
+          color: #777777;
           text-align: center;
-          font-size: 12px;
+          font-size: 10px;
           line-height: 1.8;
         }
 
@@ -1261,12 +1209,15 @@ export default function EventDetailClient({
         }
 
         @media (
-          max-width: 950px
+          max-width: 900px
         ) {
           .heroGrid,
           .contentGrid {
-            grid-template-columns:
-              1fr;
+            grid-template-columns: 1fr;
+          }
+
+          .detailColumn {
+            width: 100%;
           }
 
           .sideColumn {
@@ -1288,7 +1239,7 @@ export default function EventDetailClient({
           .headerInner,
           .heroGrid,
           .contentGrid,
-          .container {
+          .compactContainer {
             width:
               calc(100% - 24px);
           }
@@ -1301,57 +1252,52 @@ export default function EventDetailClient({
             gap: 30px;
           }
 
-          .flyerCard {
-            padding: 7px;
-            border-radius: 18px;
-            transform: none;
+          .flyerFrame {
+            width: 100%;
+            max-width: 460px;
           }
 
-          .flyerImage {
-            border-radius: 13px;
-          }
-
-          .heroContent h1 {
+          .detailColumn h1 {
             font-size: 31px;
           }
 
-          .actionButtons {
+          .leadText {
+            font-size: 11px;
+          }
+
+          .quickActions {
             display: grid;
             grid-template-columns:
-              1fr 1fr;
+              repeat(
+                3,
+                minmax(0, 1fr)
+              );
           }
 
-          .copyButton {
-            grid-column:
-              1 / -1;
-          }
-
-          .summaryRow {
-            grid-template-columns:
-              28px
-              minmax(0, 1fr);
+          .quickActions button {
+            padding: 0 8px;
           }
 
           .contentSection {
-            padding: 45px 0 85px;
+            padding: 43px 0 82px;
           }
 
           .contentCard {
-            padding: 21px;
+            padding: 20px;
           }
 
           .smallCardGrid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-          }
-
-          .smallImageWrap {
-            height: 92px;
+            grid-template-columns:
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
+            gap: 9px;
           }
 
           .relatedSection,
           .recentSection {
-            padding: 48px 0 70px;
+            padding: 38px 0 50px;
           }
 
           .mobileStickyBar {
@@ -1362,18 +1308,18 @@ export default function EventDetailClient({
             left: 0;
             display: grid;
             grid-template-columns:
-              58px minmax(0, 1fr);
-            gap: 9px;
+              54px minmax(0, 1fr);
+            gap: 8px;
             padding:
-              10px 12px
+              9px 11px
               calc(
-                10px +
-                  env(
-                    safe-area-inset-bottom
-                  )
+                9px +
+                env(
+                  safe-area-inset-bottom
+                )
               );
             border-top:
-              1px solid #e5e2dc;
+              1px solid #dcdcd8;
             background:
               rgba(
                 255,
@@ -1382,7 +1328,7 @@ export default function EventDetailClient({
                 0.96
               );
             box-shadow:
-              0 -10px 28px
+              0 -8px 24px
               rgba(
                 0,
                 0,
@@ -1395,23 +1341,24 @@ export default function EventDetailClient({
 
           .mobileStickyBar button,
           .mobileStickyBar a {
-            min-height: 51px;
+            min-height: 49px;
             display: grid;
             place-items: center;
-            border-radius: 11px;
+            border-radius: 9px;
           }
 
           .mobileStickyBar button {
-            border: 1px solid #dedbd5;
-            background: #fff;
+            border:
+              1px solid #dcdcd8;
+            background: #ffffff;
             color: #111111;
-            font-size: 24px;
+            font-size: 22px;
           }
 
           .mobileStickyBar a {
             background: #111111;
-            color: #fff;
-            font-size: 13px;
+            color: #ffffff;
+            font-size: 12px;
             font-weight: 900;
             text-align: center;
             text-decoration: none;
@@ -1419,7 +1366,7 @@ export default function EventDetailClient({
         }
 
         @media (
-          max-width: 380px
+          max-width: 370px
         ) {
           .smallCardGrid {
             grid-template-columns:
