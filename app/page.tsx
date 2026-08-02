@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import heroBanner from "../hero-banner.png";
 import OrganizerCta from "./components/OrganizerCta";
+import AreaSearch from "./components/AreaSearch";
 import {
-  getCategoryOptions,
   getEvents,
   type EventItem,
 } from "../lib/notion";
@@ -891,13 +891,7 @@ export default async function Home({
       selectedMonth.month,
     );
 
-  const [
-    allEvents,
-    notionCategories,
-  ] = await Promise.all([
-    getEvents(),
-    getCategoryOptions(),
-  ]);
+  const allEvents = await getEvents();
 
   const featuredEvents =
     allEvents
@@ -962,19 +956,17 @@ export default async function Home({
       )
       .slice(0, 5);
 
-  const categories =
-    notionCategories.length > 0
-      ? notionCategories
-      : Array.from(
-          new Set(
-            allEvents
-              .map(
-                (event) =>
-                  event.category.trim(),
-              )
-              .filter(Boolean),
-          ),
-        );
+  const categories = Array.from(
+    new Set(
+      allEvents
+        .flatMap((event) =>
+          event.category
+            .split("・")
+            .map((category) => category.trim()),
+        )
+        .filter(Boolean),
+    ),
+  ).sort((a, b) => a.localeCompare(b, "ja"));
 
   const categoryEvents =
     (
@@ -1043,6 +1035,8 @@ export default async function Home({
             selectedMonthParameter
           }
         />
+
+        <AreaSearch events={allEvents} />
 
         <OrganizerCta />
       </div>
