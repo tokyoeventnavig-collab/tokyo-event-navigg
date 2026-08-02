@@ -128,6 +128,10 @@ function EventSmallCard({
           </p>
 
           <p>
+            🕐 {getEventTime(event)}
+          </p>
+
+          <p>
             📍{" "}
             {event.location ||
               event.area ||
@@ -690,10 +694,10 @@ export default function EventDetailClient({
           );
           display: grid;
           grid-template-columns:
-            minmax(0, 1fr)
-            minmax(0, 0.88fr);
+            minmax(0, 0.92fr)
+            minmax(0, 1.08fr);
           align-items: center;
-          gap: 54px;
+          gap: 42px;
           margin: 0 auto;
         }
 
@@ -789,15 +793,20 @@ export default function EventDetailClient({
         }
 
         .detailColumn h1 {
+          width: 100%;
+          max-width: 590px;
           margin: 0;
           color: #ffffff;
           font-size: clamp(
-            35px,
-            4vw,
-            51px
+            34px,
+            3.75vw,
+            50px
           );
-          line-height: 1.35;
-          letter-spacing: -0.045em;
+          line-height: 1.34;
+          letter-spacing: -0.035em;
+          word-break: keep-all;
+          overflow-wrap: anywhere;
+          line-break: strict;
         }
 
         .leadText {
@@ -1192,7 +1201,9 @@ export default function EventDetailClient({
         }
 
         .smallMeta {
+          min-height: 48px;
           display: grid;
+          align-content: start;
           gap: 4px;
           margin-bottom: 8px;
         }
@@ -1234,6 +1245,18 @@ export default function EventDetailClient({
 
         .mobileStickyBar {
           display: none;
+        }
+
+        @media (
+          max-width: 1120px
+        ) {
+          .detailColumn h1 {
+            font-size: clamp(
+              31px,
+              3.6vw,
+              44px
+            );
+          }
         }
 
         @media (
