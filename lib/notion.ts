@@ -8,12 +8,9 @@ type NotionPage = {
   id: string;
   url?: string;
   created_time?: string;
+  last_edited_time?: string;
   properties?: Record<string, Property>;
   cover?: Property | null;
-};
-
-type NotionDatabase = {
-  properties?: Record<string, Property>;
 };
 
 export type EventItem = {
@@ -21,22 +18,18 @@ export type EventItem = {
   title: string;
   published: boolean;
   featured: boolean;
-
+  verified: boolean;
   date: string;
   dateISO: string;
   dateStart: string;
   createdTime: string;
-
   startTime: string;
   endTime: string;
-
   location: string;
   venueAddress: string;
   area: string;
-
   image: string;
   url: string;
-
   category: string;
   description: string;
   participationCondition: string;
@@ -48,9 +41,6 @@ const API_KEY =
 
 const DATABASE_ID =
   process.env.NOTION_DATABASE_ID;
-
-const NOTION_VERSION =
-  "2022-06-28";
 
 const names = {
   title:
@@ -64,6 +54,10 @@ const names = {
   featured:
     process.env.NOTION_PROP_FEATURED ||
     "F1",
+
+  verified:
+    process.env.NOTION_PROP_VERIFIED ||
+    "認証",
 
   date:
     process.env.NOTION_PROP_DATE ||
@@ -82,8 +76,7 @@ const names = {
     "会場名",
 
   venueAddress:
-    process.env
-      .NOTION_PROP_VENUE_ADDRESS ||
+    process.env.NOTION_PROP_VENUE_ADDRESS ||
     "会場住所",
 
   image:
@@ -99,8 +92,7 @@ const names = {
     "カテゴリー",
 
   description:
-    process.env
-      .NOTION_PROP_DESCRIPTION ||
+    process.env.NOTION_PROP_DESCRIPTION ||
     "イベント概要",
 
   participationCondition:
@@ -113,17 +105,6 @@ const names = {
     "主催者",
 };
 
-function getHeaders(): Record<
-  string,
-  string
-> {
-  return {
-    Authorization: `Bearer ${API_KEY}`,
-    "Notion-Version": NOTION_VERSION,
-    "Content-Type": "application/json",
-  };
-}
-
 function text(
   prop?: Property,
 ): string {
@@ -134,8 +115,7 @@ function text(
   const items: NotionText[] =
     prop.title ||
     prop.rich_text ||
-    (prop.formula?.type ===
-    "string"
+    (prop.formula?.type === "string"
       ? [
           {
             plain_text:
@@ -184,7 +164,8 @@ function value(
       .map(
         (item: {
           name?: string;
-        }) => item.name || "",
+        }) =>
+          item.name || "",
       )
       .filter(Boolean)
       .join("・");
@@ -207,9 +188,7 @@ function value(
   if (
     prop.type === "phone_number"
   ) {
-    return (
-      prop.phone_number || ""
-    );
+    return prop.phone_number || "";
   }
 
   if (prop.type === "checkbox") {
@@ -277,44 +256,18 @@ function checkboxValue(
     );
   }
 
-  const currentValue =
-    value(prop).toLowerCase();
-
   return [
     "true",
     "yes",
     "はい",
     "公開",
     "オン",
-  ].includes(currentValue);
+  ].includes(
+    value(prop).toLowerCase(),
+  );
 }
 
-function isPublished(
-  prop?: Property,
-): boolean {
-  if (!prop) {
-    return true;
-  }
-
-  if (prop.type === "checkbox") {
-    return Boolean(
-      prop.checkbox,
-    );
-  }
-
-  const currentValue =
-    value(prop).toLowerCase();
-
-  return [
-    "公開",
-    "published",
-    "publish",
-    "yes",
-    "true",
-  ].includes(currentValue);
-}
-
-function getDateISO(
+function getDateStart(
   prop?: Property,
 ): string {
   return (
@@ -328,7 +281,7 @@ function formatDate(
   prop?: Property,
 ): string {
   const start =
-    getDateISO(prop);
+    getDateStart(prop);
 
   if (!start) {
     return value(prop);
@@ -373,13 +326,10 @@ function formatTimeText(
     );
 
   if (colonMatch) {
-    const hour =
-      colonMatch[1].padStart(
-        2,
-        "0",
-      );
-
-    return `${hour}:${colonMatch[2]}`;
+    return `${colonMatch[1].padStart(
+      2,
+      "0",
+    )}:${colonMatch[2]}`;
   }
 
   const japaneseMatch =
@@ -388,18 +338,13 @@ function formatTimeText(
     );
 
   if (japaneseMatch) {
-    const hour =
-      japaneseMatch[1].padStart(
-        2,
-        "0",
-      );
-
-    const minute = (
+    return `${japaneseMatch[1].padStart(
+      2,
+      "0",
+    )}:${(
       japaneseMatch[2] ||
       "00"
-    ).padStart(2, "0");
-
-    return `${hour}:${minute}`;
+    ).padStart(2, "0")}`;
   }
 
   return trimmed;
@@ -461,7 +406,9 @@ function imageValue(
     );
   }
 
-  if (file?.type === "file") {
+  if (
+    file?.type === "file"
+  ) {
     return file.file?.url || "";
   }
 
@@ -473,11 +420,37 @@ function imageValue(
     );
   }
 
-  if (cover?.type === "file") {
+  if (
+    cover?.type === "file"
+  ) {
     return cover.file?.url || "";
   }
 
   return "";
+}
+
+function isPublished(
+  prop?: Property,
+): boolean {
+  if (!prop) {
+    return true;
+  }
+
+  if (prop.type === "checkbox") {
+    return Boolean(
+      prop.checkbox,
+    );
+  }
+
+  return [
+    "公開",
+    "published",
+    "publish",
+    "yes",
+    "true",
+  ].includes(
+    value(prop).toLowerCase(),
+  );
 }
 
 export function detectArea(
@@ -486,8 +459,11 @@ export function detectArea(
 ): string {
   const source =
     `${venueAddress} ${location}`
-      .normalize("NFKC")
-      .replace(/\s+/g, "");
+      .replace(/\s+/g, "")
+      .replace(
+        /[‐－―ー]/g,
+        "-",
+      );
 
   const areaRules = [
     {
@@ -505,6 +481,7 @@ export function detectArea(
         "歌舞伎町",
         "西新宿",
         "新宿三丁目",
+        "新宿御苑",
         "大久保",
         "百人町",
       ],
@@ -516,6 +493,7 @@ export function detectArea(
         "道玄坂",
         "宇田川町",
         "神南",
+        "松濤",
         "桜丘町",
         "宮益坂",
       ],
@@ -592,6 +570,7 @@ export function detectArea(
       keywords: [
         "上野",
         "御徒町",
+        "上野広小路",
         "湯島",
       ],
     },
@@ -678,13 +657,12 @@ export function detectArea(
   for (
     const rule of areaRules
   ) {
-    const matched =
+    if (
       rule.keywords.some(
         (keyword) =>
           source.includes(keyword),
-      );
-
-    if (matched) {
+      )
+    ) {
       return rule.area;
     }
   }
@@ -718,9 +696,7 @@ function convertPage(
 
   const location =
     value(
-      properties[
-        names.location
-      ],
+      properties[names.location],
     );
 
   const venueAddress =
@@ -730,8 +706,8 @@ function convertPage(
       ],
     );
 
-  const dateISO =
-    getDateISO(
+  const dateStart =
+    getDateStart(
       properties[names.date],
     );
 
@@ -757,14 +733,21 @@ function convertPage(
         ],
       ),
 
+    verified:
+      checkboxValue(
+        properties[
+          names.verified
+        ],
+      ),
+
     date:
       formatDate(
         properties[names.date],
       ),
 
-    dateISO,
+    dateISO: dateStart,
 
-    dateStart: dateISO,
+    dateStart,
 
     createdTime:
       page.created_time || "",
@@ -862,8 +845,16 @@ export async function getEvents(): Promise<
           {
             method: "POST",
 
-            headers:
-              getHeaders(),
+            headers: {
+              Authorization:
+                `Bearer ${API_KEY}`,
+
+              "Notion-Version":
+                "2022-06-28",
+
+              "Content-Type":
+                "application/json",
+            },
 
             body:
               JSON.stringify({
@@ -909,11 +900,12 @@ export async function getEvents(): Promise<
     } while (startCursor);
 
     return allPages
-      .map((page) =>
-        convertPage(page),
+      .map(
+        (page: NotionPage) =>
+          convertPage(page),
       )
       .filter(
-        (event) =>
+        (event: EventItem) =>
           event.published,
       );
   } catch (error) {
@@ -926,14 +918,6 @@ export async function getEvents(): Promise<
   }
 }
 
-/*
- * Notionの「カテゴリー」列に
- * 登録されている選択肢を取得します。
- *
- * 公開イベントが0件でも、
- * Notionに登録されているカテゴリーは
- * すべて返します。
- */
 export async function getCategoryOptions(): Promise<
   string[]
 > {
@@ -951,8 +935,16 @@ export async function getCategoryOptions(): Promise<
         {
           method: "GET",
 
-          headers:
-            getHeaders(),
+          headers: {
+            Authorization:
+              `Bearer ${API_KEY}`,
+
+            "Notion-Version":
+              "2022-06-28",
+
+            "Content-Type":
+              "application/json",
+          },
 
           next: {
             revalidate: 300,
@@ -972,7 +964,7 @@ export async function getCategoryOptions(): Promise<
     }
 
     const database =
-      (await response.json()) as NotionDatabase;
+      await response.json();
 
     const categoryProperty =
       database.properties?.[
@@ -987,7 +979,7 @@ export async function getCategoryOptions(): Promise<
       return [];
     }
 
-    const selectOptions:
+    const options:
       Array<{
         name?: string;
       }> =
@@ -999,7 +991,7 @@ export async function getCategoryOptions(): Promise<
 
     return Array.from(
       new Set(
-        selectOptions
+        options
           .map(
             (option) =>
               option.name?.trim() ||
@@ -1021,7 +1013,10 @@ export async function getCategoryOptions(): Promise<
 export async function getEventById(
   id: string,
 ): Promise<EventItem | null> {
-  if (!API_KEY || !id) {
+  if (
+    !API_KEY ||
+    !id
+  ) {
     return null;
   }
 
@@ -1034,8 +1029,13 @@ export async function getEventById(
         {
           method: "GET",
 
-          headers:
-            getHeaders(),
+          headers: {
+            Authorization:
+              `Bearer ${API_KEY}`,
+
+            "Notion-Version":
+              "2022-06-28",
+          },
 
           next: {
             revalidate: 300,
@@ -1054,17 +1054,14 @@ export async function getEventById(
       return null;
     }
 
-    const page =
-      (await response.json()) as NotionPage;
-
     const event =
-      convertPage(page);
+      convertPage(
+        (await response.json()) as NotionPage,
+      );
 
-    if (!event.published) {
-      return null;
-    }
-
-    return event;
+    return event.published
+      ? event
+      : null;
   } catch (error) {
     console.error(
       "イベント詳細の取得に失敗しました。",
