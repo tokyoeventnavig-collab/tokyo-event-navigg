@@ -8,141 +8,161 @@ export const metadata = {
 
 const LINE_URL = "https://lin.ee/P179zyp";
 
-const eventCategories = [
+type SceneType =
+  | "party"
+  | "cafe"
+  | "boardgame"
+  | "seminar"
+  | "sports"
+  | "workshop"
+  | "international"
+  | "festival"
+  | "organizer"
+  | "meeting";
+
+type PeopleSceneProps = {
+  type?: SceneType;
+  title?: string;
+  className?: string;
+};
+
+const eventCategories: {
+  icon: string;
+  title: string;
+  text: string;
+  scene: SceneType;
+}[] = [
   {
     icon: "🍻",
     title: "飲み会・交流会",
     text: "友達づくり、恋活、社会人交流会、異業種交流など。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "party",
   },
   {
     icon: "☕",
     title: "カフェ会・ランチ会",
     text: "少人数で話せる交流会や、食事を楽しむイベント。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "cafe",
   },
   {
     icon: "🎲",
     title: "ボードゲーム・ゲーム会",
     text: "初心者歓迎のボードゲーム会やカードゲーム会。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "boardgame",
   },
   {
     icon: "📊",
     title: "セミナー・勉強会",
     text: "ビジネス、学習、スキルアップを目的としたイベント。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "seminar",
   },
   {
     icon: "🏃",
     title: "スポーツ・アウトドア",
     text: "ランニング、ヨガ、ゴルフ、フットサル、登山など。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "sports",
   },
   {
     icon: "🎨",
     title: "趣味・体験イベント",
     text: "料理、写真、音楽、ものづくり、ワークショップなど。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "workshop",
   },
   {
     icon: "🌏",
     title: "語学・国際交流",
     text: "語学学習、海外文化、外国人参加者との交流イベント。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "international",
   },
   {
     icon: "✨",
     title: "その他",
     text: "ライブ、マルシェ、上映会などもご相談いただけます。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "festival",
   },
 ];
 
-const worries = [
+const worries: {
+  number: string;
+  title: string;
+  text: string;
+  scene: SceneType;
+}[] = [
   {
     number: "01",
     title: "良いイベントなのに、知られていない",
     text: "内容には自信があるのに、イベント情報を届けられる場所が少ない。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "organizer",
   },
   {
     number: "02",
     title: "毎回、自分から声をかけ続けている",
     text: "SNS投稿や個別連絡だけでは、告知できる人数に限界がある。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "meeting",
   },
   {
     number: "03",
     title: "初開催で申込みが入るか不安",
-    text: "実績が少ないため、興味を持ってもらえても参加につながりにくい。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    text: "開催実績が少ないため、興味を持ってもらえても参加につながりにくい。",
+    scene: "seminar",
   },
 ];
 
-const burdens = [
+const burdens: {
+  number: string;
+  title: string;
+  text: string;
+  scene: SceneType;
+}[] = [
   {
     number: "04",
     title: "開催直前まで人数が読めない",
     text: "会場、料理、スタッフの準備をどの程度すべきか判断しにくい。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "organizer",
   },
   {
     number: "05",
     title: "準備と告知を両立できない",
     text: "企画や当日準備をしながら、告知や問い合わせにも追われてしまう。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "meeting",
   },
   {
     number: "06",
     title: "情報をきれいにまとめられない",
     text: "日時、会場、参加条件などが分散し、参加者に伝わりにくい。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "seminar",
   },
 ];
 
-const benefits = [
+const benefits: {
+  number: string;
+  title: string;
+  text: string;
+  scene: SceneType;
+}[] = [
   {
     number: "01",
     title: "新しい参加者へ届けられる",
     text: "普段の告知だけでは接点がなかった、東京でイベントを探している方へ情報を届けます。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "party",
   },
   {
     number: "02",
     title: "告知の入口を増やせる",
     text: "新着、今週、カレンダー、カテゴリーなど、さまざまな探し方から発見されます。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    scene: "cafe",
   },
   {
     number: "03",
     title: "イベントの信頼感が高まる",
-    text: "必要な情報を整理した専用ページで、初めての方にも安心して内容を確認してもらえます。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    text: "必要な情報を整理した専用ページで、初めての方にも安心して確認してもらえます。",
+    scene: "seminar",
   },
   {
     number: "04",
     title: "イベントの魅力を伝えられる",
-    text: "フライヤーと写真、概要、参加条件を掲載し、イベントの雰囲気まで分かりやすく伝えます。",
-    image:
-      "/images/event-listing/generated-event-scene.png",
+    text: "フライヤー、概要、参加条件を掲載し、イベントの雰囲気まで分かりやすく伝えます。",
+    scene: "festival",
   },
 ];
 
@@ -214,7 +234,7 @@ const steps = [
     number: "04",
     icon: "🚀",
     title: "掲載スタート",
-    text: "東京イベントナビの一覧、カレンダー、カテゴリーへ掲載します。",
+    text: "イベント一覧、カレンダー、カテゴリーへ掲載します。",
   },
 ];
 
@@ -245,6 +265,637 @@ const faqs = [
       "開催日時や会場などに変更がある場合は、公式LINEからご連絡ください。",
   },
 ];
+
+function Person({
+  x,
+  y,
+  shirt,
+  hair,
+  skin = "#f3c4a5",
+  scale = 1,
+  facing = "front",
+}: {
+  x: number;
+  y: number;
+  shirt: string;
+  hair: string;
+  skin?: string;
+  scale?: number;
+  facing?: "front" | "left" | "right";
+}) {
+  const faceShift =
+    facing === "left" ? -2 : facing === "right" ? 2 : 0;
+
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      <ellipse
+        cx="0"
+        cy="48"
+        rx="24"
+        ry="8"
+        fill="rgba(0,0,0,.09)"
+      />
+
+      <path
+        d="M-20 28 Q0 15 20 28 L25 53 L-25 53Z"
+        fill={shirt}
+      />
+
+      <rect
+        x="-5"
+        y="17"
+        width="10"
+        height="12"
+        rx="4"
+        fill={skin}
+      />
+
+      <circle cx="0" cy="7" r="16" fill={skin} />
+
+      <path
+        d={
+          facing === "left"
+            ? "M-16 7 Q-12-13 5-11 Q16-8 15 5 Q7 0-3 0 Q-10 3-16 7"
+            : facing === "right"
+              ? "M16 7 Q12-13-5-11 Q-16-8-15 5 Q-7 0 3 0 Q10 3 16 7"
+              : "M-16 6 Q-13-13 0-13 Q15-13 17 5 Q7-1 0 1 Q-8-2-16 6"
+        }
+        fill={hair}
+      />
+
+      <circle
+        cx={-5 + faceShift}
+        cy="8"
+        r="1.4"
+        fill="#43342f"
+      />
+      <circle
+        cx={5 + faceShift}
+        cy="8"
+        r="1.4"
+        fill="#43342f"
+      />
+
+      <path
+        d={`M${-4 + faceShift} 14 Q${faceShift} 17 ${
+          4 + faceShift
+        } 14`}
+        fill="none"
+        stroke="#a15f57"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M-19 33 Q-30 40-25 47"
+        fill="none"
+        stroke={skin}
+        strokeWidth="7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M19 33 Q30 40 25 47"
+        fill="none"
+        stroke={skin}
+        strokeWidth="7"
+        strokeLinecap="round"
+      />
+    </g>
+  );
+}
+
+function PeopleScene({
+  type = "party",
+  title,
+  className = "",
+}: PeopleSceneProps) {
+  const configurations: Record<
+    SceneType,
+    {
+      background: string;
+      floor: string;
+      accent: string;
+      label: string;
+    }
+  > = {
+    party: {
+      background: "#1d2439",
+      floor: "#593629",
+      accent: "#ff8b42",
+      label: "交流イベント",
+    },
+    cafe: {
+      background: "#f4dfc4",
+      floor: "#b47750",
+      accent: "#dc7c4e",
+      label: "カフェ交流会",
+    },
+    boardgame: {
+      background: "#f4ead5",
+      floor: "#986944",
+      accent: "#2f9185",
+      label: "ボードゲーム会",
+    },
+    seminar: {
+      background: "#eaf1f8",
+      floor: "#6f7e92",
+      accent: "#2e5f91",
+      label: "セミナー",
+    },
+    sports: {
+      background: "#bfe5ef",
+      floor: "#64a66e",
+      accent: "#f26e36",
+      label: "スポーツ交流",
+    },
+    workshop: {
+      background: "#f7e7dc",
+      floor: "#b77d59",
+      accent: "#c96b73",
+      label: "体験イベント",
+    },
+    international: {
+      background: "#e5eef9",
+      floor: "#8b7159",
+      accent: "#5079b9",
+      label: "国際交流",
+    },
+    festival: {
+      background: "#201f38",
+      floor: "#543b53",
+      accent: "#ed547d",
+      label: "イベント・ライブ",
+    },
+    organizer: {
+      background: "#f3eee8",
+      floor: "#a2765f",
+      accent: "#e76a30",
+      label: "イベント準備",
+    },
+    meeting: {
+      background: "#edf2f4",
+      floor: "#80766e",
+      accent: "#3a8d70",
+      label: "打ち合わせ",
+    },
+  };
+
+  const config = configurations[type];
+
+  const isDark = type === "party" || type === "festival";
+
+  return (
+    <div className={`peopleScene ${className}`}>
+      <svg
+        viewBox="0 0 600 360"
+        role="img"
+        aria-label={title || config.label}
+      >
+        <rect
+          width="600"
+          height="360"
+          rx="28"
+          fill={config.background}
+        />
+
+        <circle
+          cx="75"
+          cy="58"
+          r="78"
+          fill={config.accent}
+          opacity=".14"
+        />
+        <circle
+          cx="545"
+          cy="38"
+          r="105"
+          fill={config.accent}
+          opacity=".12"
+        />
+
+        {type === "sports" ? (
+          <>
+            <circle
+              cx="480"
+              cy="70"
+              r="28"
+              fill="#ffd76a"
+              opacity=".9"
+            />
+            <path
+              d="M0 185 Q130 130 260 180 T600 165 V360 H0Z"
+              fill="#87c790"
+            />
+            <path
+              d="M0 250 Q180 205 360 250 T600 230 V360 H0Z"
+              fill="#5ca96a"
+            />
+          </>
+        ) : (
+          <>
+            <rect
+              x="0"
+              y="236"
+              width="600"
+              height="124"
+              fill={config.floor}
+            />
+            <rect
+              x="0"
+              y="230"
+              width="600"
+              height="8"
+              fill={config.accent}
+              opacity=".7"
+            />
+          </>
+        )}
+
+        {type === "party" || type === "festival" ? (
+          <>
+            <path
+              d="M25 58 L575 58"
+              stroke="#ffe5a5"
+              strokeWidth="3"
+              opacity=".6"
+            />
+            {[50, 120, 190, 260, 330, 400, 470, 540].map(
+              (cx, index) => (
+                <g key={cx}>
+                  <line
+                    x1={cx}
+                    y1="58"
+                    x2={cx}
+                    y2="72"
+                    stroke="#ffe5a5"
+                    strokeWidth="2"
+                  />
+                  <circle
+                    cx={cx}
+                    cy="79"
+                    r={index % 2 === 0 ? 8 : 6}
+                    fill={
+                      index % 3 === 0
+                        ? "#ff9b54"
+                        : index % 3 === 1
+                          ? "#f9e26b"
+                          : "#ff6e91"
+                    }
+                  />
+                </g>
+              ),
+            )}
+          </>
+        ) : null}
+
+        {type === "seminar" ? (
+          <>
+            <rect
+              x="315"
+              y="52"
+              width="225"
+              height="120"
+              rx="9"
+              fill="#ffffff"
+              stroke="#b9c9d8"
+              strokeWidth="5"
+            />
+            <rect
+              x="345"
+              y="128"
+              width="35"
+              height="24"
+              rx="4"
+              fill="#ed7445"
+            />
+            <rect
+              x="392"
+              y="105"
+              width="35"
+              height="47"
+              rx="4"
+              fill="#5ba878"
+            />
+            <rect
+              x="439"
+              y="82"
+              width="35"
+              height="70"
+              rx="4"
+              fill="#5077b3"
+            />
+            <path
+              d="M343 88 Q390 55 435 75 T500 52"
+              fill="none"
+              stroke="#e74f4f"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+          </>
+        ) : null}
+
+        {type === "cafe" || type === "meeting" ? (
+          <>
+            <rect
+              x="385"
+              y="60"
+              width="125"
+              height="90"
+              rx="9"
+              fill="#fff8eb"
+              stroke="#c8956c"
+              strokeWidth="7"
+            />
+            <circle cx="425" cy="102" r="20" fill="#6ca989" />
+            <path
+              d="M449 115 Q473 80 493 108"
+              fill="none"
+              stroke="#da7c49"
+              strokeWidth="8"
+              strokeLinecap="round"
+            />
+          </>
+        ) : null}
+
+        {type === "international" ? (
+          <>
+            <circle
+              cx="450"
+              cy="105"
+              r="66"
+              fill="#88b3db"
+              stroke="#fff"
+              strokeWidth="7"
+            />
+            <path
+              d="M398 92 Q430 65 448 86 Q468 104 496 84"
+              fill="none"
+              stroke="#e6f1d0"
+              strokeWidth="17"
+              strokeLinecap="round"
+            />
+            <path
+              d="M417 137 Q443 116 476 137"
+              fill="none"
+              stroke="#e6f1d0"
+              strokeWidth="14"
+              strokeLinecap="round"
+            />
+          </>
+        ) : null}
+
+        {type === "organizer" ? (
+          <>
+            <rect
+              x="345"
+              y="92"
+              width="165"
+              height="98"
+              rx="12"
+              fill="#34455f"
+            />
+            <rect
+              x="360"
+              y="107"
+              width="135"
+              height="68"
+              rx="6"
+              fill="#e8f1f3"
+            />
+            <circle cx="427" cy="141" r="8" fill="#e36a32" />
+            <rect
+              x="397"
+              y="190"
+              width="62"
+              height="9"
+              rx="4"
+              fill="#34455f"
+            />
+            <path
+              d="M530 65 Q558 75 542 104"
+              fill="none"
+              stroke="#e76a30"
+              strokeWidth="8"
+              strokeLinecap="round"
+            />
+            <circle cx="538" cy="119" r="5" fill="#e76a30" />
+          </>
+        ) : null}
+
+        {type === "boardgame" || type === "workshop" ? (
+          <>
+            <ellipse
+              cx="306"
+              cy="245"
+              rx="150"
+              ry="42"
+              fill="#5a4034"
+            />
+            <ellipse
+              cx="306"
+              cy="236"
+              rx="150"
+              ry="42"
+              fill="#d9a06e"
+            />
+
+            {type === "boardgame" ? (
+              <>
+                <rect
+                  x="260"
+                  y="202"
+                  width="88"
+                  height="66"
+                  rx="8"
+                  fill="#f7ebc6"
+                  stroke="#4f8176"
+                  strokeWidth="5"
+                  transform="rotate(-4 304 235)"
+                />
+                <circle cx="278" cy="220" r="8" fill="#e46652" />
+                <circle cx="326" cy="223" r="8" fill="#5486b9" />
+                <circle cx="293" cy="247" r="8" fill="#5caa78" />
+                <circle cx="330" cy="250" r="8" fill="#e8b544" />
+              </>
+            ) : (
+              <>
+                <circle cx="280" cy="225" r="19" fill="#dc8868" />
+                <rect
+                  x="318"
+                  y="209"
+                  width="34"
+                  height="48"
+                  rx="9"
+                  fill="#78a18a"
+                />
+                <path
+                  d="M248 257 Q300 185 360 255"
+                  fill="none"
+                  stroke="#f2d7bc"
+                  strokeWidth="9"
+                />
+              </>
+            )}
+          </>
+        ) : null}
+
+        {type === "cafe" || type === "meeting" ? (
+          <>
+            <ellipse
+              cx="300"
+              cy="249"
+              rx="138"
+              ry="35"
+              fill="#684738"
+            />
+            <ellipse
+              cx="300"
+              cy="240"
+              rx="138"
+              ry="35"
+              fill="#d8a578"
+            />
+
+            <g>
+              <rect
+                x="270"
+                y="207"
+                width="30"
+                height="25"
+                rx="6"
+                fill="#fff"
+              />
+              <path
+                d="M300 212 Q318 211 314 223 Q311 232 300 229"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="5"
+              />
+              <rect
+                x="340"
+                y="211"
+                width="30"
+                height="22"
+                rx="6"
+                fill="#fff"
+              />
+            </g>
+          </>
+        ) : null}
+
+        {type === "party" || type === "festival" ? (
+          <>
+            <ellipse
+              cx="300"
+              cy="245"
+              rx="155"
+              ry="36"
+              fill="#352820"
+            />
+            <ellipse
+              cx="300"
+              cy="235"
+              rx="155"
+              ry="36"
+              fill="#906146"
+            />
+            {[230, 275, 320, 365].map((x, index) => (
+              <g key={x}>
+                <rect
+                  x={x}
+                  y={198 + (index % 2) * 5}
+                  width="15"
+                  height="33"
+                  rx="5"
+                  fill={
+                    index % 2 === 0 ? "#f4c65d" : "#d95f68"
+                  }
+                />
+                <rect
+                  x={x + 2}
+                  y={194 + (index % 2) * 5}
+                  width="11"
+                  height="7"
+                  rx="3"
+                  fill="#fff"
+                  opacity=".85"
+                />
+              </g>
+            ))}
+          </>
+        ) : null}
+
+        <Person
+          x={145}
+          y={165}
+          shirt="#376b94"
+          hair="#332a29"
+          scale={1.18}
+          facing="right"
+        />
+        <Person
+          x={235}
+          y={155}
+          shirt="#d77a64"
+          hair="#4b3029"
+          scale={1.12}
+          facing="right"
+        />
+        <Person
+          x={340}
+          y={158}
+          shirt="#a86698"
+          hair="#292629"
+          scale={1.14}
+          facing="left"
+        />
+        <Person
+          x={440}
+          y={170}
+          shirt="#4f9871"
+          hair="#4b322b"
+          scale={1.1}
+          facing="left"
+        />
+
+        {type === "seminar" ? (
+          <Person
+            x={255}
+            y={110}
+            shirt="#263f66"
+            hair="#2f2928"
+            scale={1.04}
+            facing="right"
+          />
+        ) : null}
+
+        <rect
+          x="22"
+          y="22"
+          width="155"
+          height="39"
+          rx="19.5"
+          fill={isDark ? "rgba(255,255,255,.15)" : "#ffffff"}
+          stroke={
+            isDark ? "rgba(255,255,255,.25)" : "rgba(0,0,0,.06)"
+          }
+        />
+
+        <text
+          x="100"
+          y="47"
+          textAnchor="middle"
+          fontSize="15"
+          fontWeight="800"
+          fill={isDark ? "#fff" : "#28344b"}
+          fontFamily="sans-serif"
+        >
+          {title || config.label}
+        </text>
+      </svg>
+    </div>
+  );
+}
 
 function LineButton({
   label = "掲載についてLINEで相談する",
@@ -300,13 +951,14 @@ function ListingMockup() {
 
           <div className="browserCards">
             <div className="mainEventCard">
-              <img
-                src="/images/event-listing/generated-event-scene.png"
-                alt=""
+              <PeopleScene
+                type="party"
+                title="東京交流イベント"
               />
 
               <div className="mainEventBody">
                 <span>飲み会・交流会</span>
+
                 <strong>
                   20〜30代限定
                   <br />
@@ -348,9 +1000,9 @@ function ListingMockup() {
         <div className="phoneSpeaker" />
 
         <div className="phoneScreen">
-          <img
-            src="/images/event-listing/generated-event-scene.png"
-            alt=""
+          <PeopleScene
+            type="party"
+            title="交流イベント"
           />
 
           <span>飲み会・交流会</span>
@@ -485,27 +1137,24 @@ export default function EventListingPage() {
           </div>
 
           <div className="heroVisual">
-            <div className="photoCollage">
-              <figure className="photo photoMain">
-                <img
-                  src="/images/event-listing/generated-event-scene.png"
-                  alt="イベントで交流する参加者"
-                />
-              </figure>
+            <div className="heroCollage">
+              <PeopleScene
+                type="party"
+                title="20〜30代交流会"
+                className="heroMainScene"
+              />
 
-              <figure className="photo photoSubOne">
-                <img
-                  src="/images/event-listing/generated-event-scene.png"
-                  alt="交流を楽しむ参加者"
-                />
-              </figure>
+              <PeopleScene
+                type="boardgame"
+                title="ボードゲーム会"
+                className="heroSubScene heroSubSceneOne"
+              />
 
-              <figure className="photo photoSubTwo">
-                <img
-                  src="/images/event-listing/generated-event-scene.png"
-                  alt="イベント会場の参加者"
-                />
-              </figure>
+              <PeopleScene
+                type="seminar"
+                title="セミナー"
+                className="heroSubScene heroSubSceneTwo"
+              />
 
               <div className="heroOrangeBadge">
                 掲載
@@ -559,9 +1208,9 @@ export default function EventListingPage() {
             {eventCategories.map((category) => (
               <article key={category.title}>
                 <div className="categoryImage">
-                  <img
-                    src={category.image}
-                    alt=""
+                  <PeopleScene
+                    type={category.scene}
+                    title={category.title}
                   />
 
                   <span>{category.icon}</span>
@@ -594,7 +1243,7 @@ export default function EventListingPage() {
             <p>ORGANIZER PROBLEMS</p>
 
             <h2>
-              イベント集客、
+              イベントの告知・運営で
               <span>こんな悩みありませんか？</span>
             </h2>
           </div>
@@ -612,9 +1261,9 @@ export default function EventListingPage() {
                   key={item.number}
                 >
                   <div className="worryImage">
-                    <img
-                      src={item.image}
-                      alt=""
+                    <PeopleScene
+                      type={item.scene}
+                      title={item.title}
                     />
 
                     <span>{item.number}</span>
@@ -642,9 +1291,9 @@ export default function EventListingPage() {
                   key={item.number}
                 >
                   <div className="worryImage">
-                    <img
-                      src={item.image}
-                      alt=""
+                    <PeopleScene
+                      type={item.scene}
+                      title={item.title}
                     />
 
                     <span>{item.number}</span>
@@ -726,9 +1375,9 @@ export default function EventListingPage() {
             {benefits.map((benefit) => (
               <article key={benefit.number}>
                 <div className="benefitImage">
-                  <img
-                    src={benefit.image}
-                    alt=""
+                  <PeopleScene
+                    type={benefit.scene}
+                    title={benefit.title}
                   />
 
                   <span>{benefit.number}</span>
@@ -811,13 +1460,13 @@ export default function EventListingPage() {
 
       <section className="informationSection">
         <div className="container informationLayout">
-          <div className="informationPhoto">
-            <img
-              src="/images/event-listing/generated-event-scene.png"
-              alt="イベント掲載について打ち合わせする様子"
+          <div className="informationVisual">
+            <PeopleScene
+              type="meeting"
+              title="イベント掲載の打ち合わせ"
             />
 
-            <div className="informationPhotoText">
+            <div className="informationVisualText">
               <small>SUPPORT</small>
 
               <strong>
@@ -920,10 +1569,10 @@ export default function EventListingPage() {
 
       <section className="policySection">
         <div className="container policyLayout">
-          <div className="policyImage">
-            <img
-              src="/images/event-listing/generated-event-scene.png"
-              alt="安心してイベントを楽しむ参加者"
+          <div className="policyVisual">
+            <PeopleScene
+              type="party"
+              title="安心して楽しめるイベント"
             />
 
             <div className="shieldIcon">
@@ -1029,6 +1678,13 @@ export default function EventListingPage() {
       </section>
 
       <section className="finalSection">
+        <div className="finalBackground">
+          <PeopleScene
+            type="party"
+            title="東京イベントナビ"
+          />
+        </div>
+
         <div className="finalOverlay" />
 
         <div className="finalContent">
@@ -1114,40 +1770,36 @@ export default function EventListingPage() {
           color: #17243b;
         }
 
-        img {
-          display: block;
-          width: 100%;
+        .container {
+          width: min(1160px, calc(100% - 40px));
+          margin: 0 auto;
         }
 
-        .container {
-          width: min(
-            1160px,
-            calc(100% - 40px)
-          );
-          margin: 0 auto;
+        .peopleScene {
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .peopleScene svg {
+          display: block;
+          width: 100%;
+          height: auto;
         }
 
         .header {
           position: sticky;
           z-index: 100;
           top: 0;
-          border-bottom:
-            1px solid
-            rgba(23, 36, 59, 0.08);
-          background:
-            rgba(255, 253, 248, 0.92);
+          border-bottom: 1px solid rgba(23, 36, 59, 0.08);
+          background: rgba(255, 253, 248, 0.93);
           backdrop-filter: blur(16px);
         }
 
         .headerInner {
-          width: min(
-            1180px,
-            calc(100% - 40px)
-          );
+          width: min(1180px, calc(100% - 40px));
           min-height: 70px;
           display: flex;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           align-items: center;
           gap: 25px;
           margin: 0 auto;
@@ -1217,9 +1869,7 @@ export default function EventListingPage() {
           right: -90px;
           width: 450px;
           height: 450px;
-          border:
-            90px solid
-            rgba(242, 100, 25, 0.07);
+          border: 90px solid rgba(242, 100, 25, 0.07);
         }
 
         .heroDecorationTwo {
@@ -1227,17 +1877,13 @@ export default function EventListingPage() {
           left: -120px;
           width: 370px;
           height: 370px;
-          background:
-            rgba(255, 189, 103, 0.13);
+          background: rgba(255, 189, 103, 0.13);
         }
 
         .heroInner {
           position: relative;
           z-index: 2;
-          width: min(
-            1220px,
-            calc(100% - 48px)
-          );
+          width: min(1220px, calc(100% - 48px));
           min-height: 790px;
           display: grid;
           grid-template-columns:
@@ -1278,11 +1924,7 @@ export default function EventListingPage() {
           display: grid;
           gap: 7px;
           margin: 0;
-          font-size: clamp(
-            51px,
-            5.6vw,
-            78px
-          );
+          font-size: clamp(51px, 5.6vw, 78px);
           line-height: 1.12;
           letter-spacing: -0.065em;
         }
@@ -1309,8 +1951,7 @@ export default function EventListingPage() {
           left: -4px;
           height: 18px;
           border-radius: 999px;
-          background:
-            rgba(255, 184, 102, 0.42);
+          background: rgba(255, 184, 102, 0.42);
           content: "";
           transform: rotate(-1deg);
         }
@@ -1334,29 +1975,22 @@ export default function EventListingPage() {
 
         .heroFeatures {
           display: grid;
-          grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 9px;
           margin-top: 23px;
         }
 
         .heroFeatures article {
           display: grid;
-          grid-template-columns:
-            42px minmax(0, 1fr);
+          grid-template-columns: 42px minmax(0, 1fr);
           align-items: center;
           gap: 10px;
           min-height: 67px;
           padding: 11px 12px;
-          border:
-            1px solid
-            rgba(235, 188, 148, 0.65);
+          border: 1px solid rgba(235, 188, 148, 0.65);
           border-radius: 12px;
-          background:
-            rgba(255, 255, 255, 0.85);
-          box-shadow:
-            0 7px 22px
-            rgba(73, 48, 27, 0.06);
+          background: rgba(255, 255, 255, 0.85);
+          box-shadow: 0 7px 22px rgba(73, 48, 27, 0.06);
         }
 
         .heroFeatures article > span {
@@ -1388,21 +2022,15 @@ export default function EventListingPage() {
 
         .lineButton {
           display: inline-grid;
-          grid-template-columns:
-            48px minmax(0, 1fr) 24px;
+          grid-template-columns: 48px minmax(0, 1fr) 24px;
           align-items: center;
           gap: 14px;
-          width: min(
-            455px,
-            100%
-          );
+          width: min(455px, 100%);
           margin-top: 22px;
           padding: 14px 19px;
           border-radius: 15px;
           background: #08b84e;
-          box-shadow:
-            0 16px 36px
-            rgba(8, 184, 78, 0.23);
+          box-shadow: 0 16px 36px rgba(8, 184, 78, 0.23);
           color: #fff;
           text-align: left;
           text-decoration: none;
@@ -1413,9 +2041,7 @@ export default function EventListingPage() {
 
         .lineButton:hover {
           transform: translateY(-3px);
-          box-shadow:
-            0 21px 44px
-            rgba(8, 184, 78, 0.3);
+          box-shadow: 0 21px 44px rgba(8, 184, 78, 0.3);
         }
 
         .lineLogo {
@@ -1440,8 +2066,7 @@ export default function EventListingPage() {
         }
 
         .lineButtonText small {
-          color:
-            rgba(255, 255, 255, 0.8);
+          color: rgba(255, 255, 255, 0.8);
           font-size: 9px;
           line-height: 1.4;
         }
@@ -1455,56 +2080,47 @@ export default function EventListingPage() {
           min-width: 0;
         }
 
-        .photoCollage {
+        .heroCollage {
           position: relative;
-          min-height: 565px;
+          min-height: 570px;
         }
 
-        .photo {
+        .heroMainScene,
+        .heroSubScene {
           position: absolute;
           overflow: hidden;
           border: 8px solid #fff;
-          border-radius: 24px;
+          border-radius: 25px;
           background: #fff;
-          box-shadow:
-            0 25px 65px
-            rgba(30, 36, 47, 0.2);
+          box-shadow: 0 25px 65px rgba(30, 36, 47, 0.2);
         }
 
-        .photo img {
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .photoMain {
+        .heroMainScene {
           top: 55px;
           right: 20px;
-          width: 83%;
-          height: 420px;
+          width: 84%;
           transform: rotate(2deg);
         }
 
-        .photoSubOne {
-          z-index: 2;
-          bottom: 5px;
+        .heroSubSceneOne {
+          z-index: 3;
+          bottom: 0;
           left: 0;
-          width: 46%;
-          height: 205px;
+          width: 48%;
           transform: rotate(-5deg);
         }
 
-        .photoSubTwo {
-          z-index: 3;
-          right: -5px;
-          bottom: -10px;
-          width: 41%;
-          height: 190px;
+        .heroSubSceneTwo {
+          z-index: 4;
+          right: -4px;
+          bottom: -5px;
+          width: 43%;
           transform: rotate(5deg);
         }
 
         .heroOrangeBadge {
           position: absolute;
-          z-index: 7;
+          z-index: 8;
           top: 0;
           right: -8px;
           width: 122px;
@@ -1514,15 +2130,8 @@ export default function EventListingPage() {
           align-content: center;
           border: 8px solid #fff7e8;
           border-radius: 50%;
-          background:
-            linear-gradient(
-              145deg,
-              #ff762c,
-              #ee5510
-            );
-          box-shadow:
-            0 17px 40px
-            rgba(242, 100, 25, 0.3);
+          background: linear-gradient(145deg, #ff762c, #ee5510);
+          box-shadow: 0 17px 40px rgba(242, 100, 25, 0.3);
           color: #fff;
           font-size: 12px;
           font-weight: 900;
@@ -1536,16 +2145,14 @@ export default function EventListingPage() {
 
         .floatingInfo {
           position: absolute;
-          z-index: 8;
+          z-index: 9;
           display: flex;
           align-items: center;
           gap: 7px;
           padding: 11px 14px;
           border-radius: 11px;
           background: #fff;
-          box-shadow:
-            0 15px 35px
-            rgba(32, 39, 54, 0.16);
+          box-shadow: 0 15px 35px rgba(32, 39, 54, 0.16);
           color: #27354c;
           font-size: 10px;
           font-weight: 900;
@@ -1568,7 +2175,7 @@ export default function EventListingPage() {
         }
 
         .floatingInfoThree {
-          bottom: 120px;
+          bottom: 122px;
           left: 34%;
           transform: rotate(-2deg);
         }
@@ -1593,12 +2200,9 @@ export default function EventListingPage() {
 
         .heroBottom span {
           padding: 8px 14px;
-          border:
-            1px solid
-            rgba(255, 255, 255, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.4);
           border-radius: 999px;
-          background:
-            rgba(255, 255, 255, 0.18);
+          background: rgba(255, 255, 255, 0.18);
           color: #fff;
           font-size: 11px;
           font-weight: 900;
@@ -1624,11 +2228,7 @@ export default function EventListingPage() {
         .solutionHeading h2 {
           margin: 0;
           color: #17243b;
-          font-size: clamp(
-            34px,
-            5vw,
-            56px
-          );
+          font-size: clamp(34px, 5vw, 56px);
           line-height: 1.28;
           letter-spacing: -0.05em;
         }
@@ -1665,21 +2265,17 @@ export default function EventListingPage() {
 
         .categoryGrid {
           display: grid;
-          grid-template-columns:
-            repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 17px;
           margin-top: 50px;
         }
 
         .categoryGrid article {
           overflow: hidden;
-          border:
-            1px solid #efdec7;
+          border: 1px solid #efdec7;
           border-radius: 18px;
           background: #fff;
-          box-shadow:
-            0 10px 28px
-            rgba(62, 45, 25, 0.06);
+          box-shadow: 0 10px 28px rgba(62, 45, 25, 0.06);
           transition:
             transform 0.2s ease,
             box-shadow 0.2s ease;
@@ -1687,32 +2283,29 @@ export default function EventListingPage() {
 
         .categoryGrid article:hover {
           transform: translateY(-5px);
-          box-shadow:
-            0 18px 38px
-            rgba(62, 45, 25, 0.11);
+          box-shadow: 0 18px 38px rgba(62, 45, 25, 0.11);
         }
 
         .categoryImage {
           position: relative;
-          height: 150px;
+          height: 165px;
           overflow: hidden;
         }
 
-        .categoryImage img {
+        .categoryImage .peopleScene {
           height: 100%;
-          object-fit: cover;
-          transition:
-            transform 0.35s ease;
         }
 
-        .categoryGrid article:hover
-          .categoryImage img {
-          transform: scale(1.06);
+        .categoryImage .peopleScene svg {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
         .categoryImage > span {
           position: absolute;
-          bottom: 12px;
+          z-index: 2;
+          bottom: 11px;
           left: 13px;
           width: 48px;
           height: 48px;
@@ -1721,9 +2314,7 @@ export default function EventListingPage() {
           border: 4px solid #fff;
           border-radius: 50%;
           background: #fff0dc;
-          box-shadow:
-            0 8px 20px
-            rgba(0, 0, 0, 0.16);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
           font-size: 23px;
         }
 
@@ -1751,12 +2342,7 @@ export default function EventListingPage() {
           margin-top: 28px;
           padding: 22px;
           border-radius: 16px;
-          background:
-            linear-gradient(
-              135deg,
-              #f26419,
-              #ff963e
-            );
+          background: linear-gradient(135deg, #f26419, #ff963e);
           color: #fff;
           text-align: center;
         }
@@ -1772,12 +2358,7 @@ export default function EventListingPage() {
         }
 
         .worrySection {
-          background:
-            linear-gradient(
-              180deg,
-              #fff 0%,
-              #f1faf4 100%
-            );
+          background: linear-gradient(180deg, #fff 0%, #f1faf4 100%);
         }
 
         .worryGroup {
@@ -1807,8 +2388,7 @@ export default function EventListingPage() {
 
         .worryGrid {
           display: grid;
-          grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 18px;
         }
 
@@ -1817,9 +2397,7 @@ export default function EventListingPage() {
           border: 1px solid;
           border-radius: 18px;
           background: #fff;
-          box-shadow:
-            0 10px 27px
-            rgba(29, 40, 55, 0.06);
+          box-shadow: 0 10px 27px rgba(29, 40, 55, 0.06);
         }
 
         .orangeCard {
@@ -1832,24 +2410,14 @@ export default function EventListingPage() {
 
         .worryImage {
           position: relative;
-          height: 180px;
+          height: 190px;
           overflow: hidden;
         }
 
-        .worryImage img {
+        .worryImage .peopleScene,
+        .worryImage .peopleScene svg {
+          width: 100%;
           height: 100%;
-          object-fit: cover;
-        }
-
-        .worryImage::after {
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(
-              transparent 50%,
-              rgba(0, 0, 0, 0.35)
-            );
-          content: "";
         }
 
         .worryImage > span {
@@ -1898,12 +2466,7 @@ export default function EventListingPage() {
           margin-top: 32px;
           padding: 25px;
           border-radius: 16px;
-          background:
-            linear-gradient(
-              135deg,
-              #17243b,
-              #274363
-            );
+          background: linear-gradient(135deg, #17243b, #274363);
           color: #fff;
           text-align: center;
         }
@@ -1953,9 +2516,7 @@ export default function EventListingPage() {
           padding: 9px 13px;
           border-radius: 999px;
           background: #fff;
-          box-shadow:
-            0 7px 20px
-            rgba(62, 42, 22, 0.07);
+          box-shadow: 0 7px 20px rgba(62, 42, 22, 0.07);
           color: #a64c1b;
           font-size: 10px;
           font-weight: 900;
@@ -1963,7 +2524,7 @@ export default function EventListingPage() {
 
         .mockupArea {
           position: relative;
-          min-height: 620px;
+          min-height: 640px;
           padding: 25px 120px 50px 15px;
         }
 
@@ -1972,9 +2533,7 @@ export default function EventListingPage() {
           border: 9px solid #fff;
           border-radius: 25px;
           background: #f7f7f5;
-          box-shadow:
-            0 29px 75px
-            rgba(37, 36, 42, 0.19);
+          box-shadow: 0 29px 75px rgba(37, 36, 42, 0.19);
           transform:
             perspective(1200px)
             rotateY(2deg)
@@ -2013,8 +2572,7 @@ export default function EventListingPage() {
           flex: 1;
           padding: 7px;
           border-radius: 7px;
-          background:
-            rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.1);
           color: #d9deea;
           text-align: center;
           font-size: 8px;
@@ -2026,13 +2584,11 @@ export default function EventListingPage() {
 
         .browserSectionTitle {
           display: flex;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           align-items: flex-end;
           margin-bottom: 17px;
           padding-bottom: 12px;
-          border-bottom:
-            1px solid #dddcd7;
+          border-bottom: 1px solid #dddcd7;
         }
 
         .browserSectionTitle > div {
@@ -2069,14 +2625,16 @@ export default function EventListingPage() {
           overflow: hidden;
           border-radius: 14px;
           background: #fff;
-          box-shadow:
-            0 8px 20px
-            rgba(0, 0, 0, 0.08);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
-        .mainEventCard img {
+        .mainEventCard > .peopleScene {
           height: 205px;
-          object-fit: cover;
+        }
+
+        .mainEventCard > .peopleScene svg {
+          width: 100%;
+          height: 100%;
         }
 
         .mainEventBody {
@@ -2131,9 +2689,7 @@ export default function EventListingPage() {
           padding: 14px;
           border-radius: 12px;
           background: #fff;
-          box-shadow:
-            0 6px 16px
-            rgba(0, 0, 0, 0.06);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
         }
 
         .browserSide article > span {
@@ -2159,9 +2715,7 @@ export default function EventListingPage() {
           border: 8px solid #19263c;
           border-radius: 33px;
           background: #fff;
-          box-shadow:
-            0 24px 55px
-            rgba(25, 38, 60, 0.29);
+          box-shadow: 0 24px 55px rgba(25, 38, 60, 0.29);
           transform: rotate(5deg);
         }
 
@@ -2179,9 +2733,13 @@ export default function EventListingPage() {
           background: #f7f7f5;
         }
 
-        .phoneScreen img {
+        .phoneScreen .peopleScene {
           height: 165px;
-          object-fit: cover;
+        }
+
+        .phoneScreen .peopleScene svg {
+          width: 100%;
+          height: 100%;
         }
 
         .phoneScreen > span {
@@ -2225,9 +2783,7 @@ export default function EventListingPage() {
           padding: 11px 14px;
           border-radius: 11px;
           background: #fff;
-          box-shadow:
-            0 15px 34px
-            rgba(32, 39, 54, 0.16);
+          box-shadow: 0 15px 34px rgba(32, 39, 54, 0.16);
           font-size: 10px;
           font-weight: 900;
         }
@@ -2257,9 +2813,7 @@ export default function EventListingPage() {
           border: 8px solid #fff7e8;
           border-radius: 50%;
           background: #f26419;
-          box-shadow:
-            0 17px 40px
-            rgba(242, 100, 25, 0.31);
+          box-shadow: 0 17px 40px rgba(242, 100, 25, 0.31);
           color: #fff;
           font-size: 11px;
           font-weight: 900;
@@ -2285,32 +2839,29 @@ export default function EventListingPage() {
 
         .benefitGrid {
           display: grid;
-          grid-template-columns:
-            repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 16px;
           margin-top: 50px;
         }
 
         .benefitGrid article {
           overflow: hidden;
-          border:
-            1px solid #cce1d3;
+          border: 1px solid #cce1d3;
           border-radius: 18px;
           background: #fff;
-          box-shadow:
-            0 10px 28px
-            rgba(28, 75, 47, 0.06);
+          box-shadow: 0 10px 28px rgba(28, 75, 47, 0.06);
         }
 
         .benefitImage {
           position: relative;
-          height: 175px;
+          height: 185px;
           overflow: hidden;
         }
 
-        .benefitImage img {
+        .benefitImage .peopleScene,
+        .benefitImage .peopleScene svg {
+          width: 100%;
           height: 100%;
-          object-fit: cover;
         }
 
         .benefitImage > span {
@@ -2400,9 +2951,7 @@ export default function EventListingPage() {
           border: 7px solid #eaf7ee;
           border-radius: 50%;
           background: #27865a;
-          box-shadow:
-            0 17px 38px
-            rgba(39, 134, 90, 0.2);
+          box-shadow: 0 17px 38px rgba(39, 134, 90, 0.2);
           color: #fff;
           font-size: 10px;
           font-weight: 900;
@@ -2418,22 +2967,19 @@ export default function EventListingPage() {
 
         .includedGrid {
           display: grid;
-          grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 15px;
           margin-top: 48px;
         }
 
         .includedGrid article {
           display: grid;
-          grid-template-columns:
-            58px minmax(0, 1fr) 29px;
+          grid-template-columns: 58px minmax(0, 1fr) 29px;
           align-items: center;
           gap: 17px;
           min-height: 118px;
           padding: 19px;
-          border:
-            1px solid #d6e8dc;
+          border: 1px solid #d6e8dc;
           border-radius: 16px;
           background: #f4fbf6;
         }
@@ -2512,61 +3058,52 @@ export default function EventListingPage() {
           gap: 65px;
         }
 
-        .informationPhoto {
+        .informationVisual {
           position: relative;
           overflow: hidden;
-          min-height: 600px;
+          min-height: 560px;
+          display: flex;
+          align-items: stretch;
           border-radius: 28px;
-          box-shadow:
-            0 25px 60px
-            rgba(50, 40, 29, 0.15);
+          box-shadow: 0 25px 60px rgba(50, 40, 29, 0.15);
+          background: #fff;
         }
 
-        .informationPhoto img {
-          position: absolute;
-          inset: 0;
+        .informationVisual > .peopleScene,
+        .informationVisual > .peopleScene svg {
+          width: 100%;
           height: 100%;
-          object-fit: cover;
         }
 
-        .informationPhoto::after {
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(
-              transparent 40%,
-              rgba(19, 31, 49, 0.85)
-            );
-          content: "";
-        }
-
-        .informationPhotoText {
+        .informationVisualText {
           position: absolute;
           z-index: 2;
           right: 30px;
-          bottom: 35px;
+          bottom: 30px;
           left: 30px;
+          padding: 24px;
+          border-radius: 17px;
+          background: rgba(23, 36, 59, 0.92);
           color: #fff;
         }
 
-        .informationPhotoText small {
+        .informationVisualText small {
           color: #ffb779;
           font-size: 9px;
           font-weight: 900;
           letter-spacing: 0.18em;
         }
 
-        .informationPhotoText strong {
+        .informationVisualText strong {
           display: block;
           margin-top: 8px;
-          font-size: 28px;
+          font-size: 27px;
           line-height: 1.5;
         }
 
         .informationGrid {
           display: grid;
-          grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 10px;
           margin-top: 27px;
         }
@@ -2577,8 +3114,7 @@ export default function EventListingPage() {
           gap: 12px;
           min-height: 71px;
           padding: 13px;
-          border:
-            1px solid #eadac7;
+          border: 1px solid #eadac7;
           border-radius: 12px;
           background: #fff;
         }
@@ -2621,8 +3157,7 @@ export default function EventListingPage() {
           flex: 1;
           min-height: 300px;
           padding: 25px 21px;
-          border:
-            1px solid #efd5bf;
+          border: 1px solid #efd5bf;
           border-radius: 18px;
           background: #fff8ef;
           text-align: center;
@@ -2686,30 +3221,29 @@ export default function EventListingPage() {
           gap: 65px;
         }
 
-        .policyImage {
+        .policyVisual {
           position: relative;
           overflow: hidden;
-          min-height: 520px;
+          min-height: 500px;
+          display: flex;
+          align-items: stretch;
           border-radius: 28px;
-          box-shadow:
-            0 25px 55px
-            rgba(23, 58, 98, 0.18);
+          box-shadow: 0 25px 55px rgba(23, 58, 98, 0.18);
         }
 
-        .policyImage img {
-          position: absolute;
-          inset: 0;
+        .policyVisual > .peopleScene,
+        .policyVisual > .peopleScene svg {
+          width: 100%;
           height: 100%;
-          object-fit: cover;
         }
 
-        .policyImage::after {
+        .policyVisual::after {
           position: absolute;
           inset: 0;
           background:
             linear-gradient(
-              rgba(23, 58, 98, 0.15),
-              rgba(23, 58, 98, 0.48)
+              rgba(23, 58, 98, 0.05),
+              rgba(23, 58, 98, 0.43)
             );
           content: "";
         }
@@ -2733,8 +3267,7 @@ export default function EventListingPage() {
               8% 15%
             );
           background: #fff;
-          transform:
-            translate(-50%, -50%);
+          transform: translate(-50%, -50%);
         }
 
         .shieldIcon span {
@@ -2761,8 +3294,7 @@ export default function EventListingPage() {
           position: relative;
           padding: 13px 15px 13px 46px;
           border-radius: 10px;
-          background:
-            rgba(255, 255, 255, 0.8);
+          background: rgba(255, 255, 255, 0.8);
           color: #445267;
           font-size: 12px;
           font-weight: 700;
@@ -2782,8 +3314,7 @@ export default function EventListingPage() {
           content: "×";
           font-size: 11px;
           font-weight: 900;
-          transform:
-            translateY(-50%);
+          transform: translateY(-50%);
         }
 
         .policyNote {
@@ -2812,8 +3343,7 @@ export default function EventListingPage() {
           align-content: center;
           gap: 8px;
           margin-top: 35px;
-          border-radius:
-            42% 58% 50% 50%;
+          border-radius: 42% 58% 50% 50%;
           background: #fff0df;
           text-align: center;
           transform: rotate(-5deg);
@@ -2841,16 +3371,14 @@ export default function EventListingPage() {
 
         .faqList details {
           overflow: hidden;
-          border:
-            1px solid #e5e4df;
+          border: 1px solid #e5e4df;
           border-radius: 14px;
           background: #fafaf8;
         }
 
         .faqList summary {
           display: grid;
-          grid-template-columns:
-            43px minmax(0, 1fr) 28px;
+          grid-template-columns: 43px minmax(0, 1fr) 28px;
           align-items: center;
           gap: 13px;
           padding: 18px;
@@ -2888,8 +3416,7 @@ export default function EventListingPage() {
 
         .faqAnswer {
           display: grid;
-          grid-template-columns:
-            40px minmax(0, 1fr);
+          grid-template-columns: 40px minmax(0, 1fr);
           gap: 13px;
           padding: 0 18px 19px;
         }
@@ -2919,12 +3446,18 @@ export default function EventListingPage() {
           display: grid;
           place-items: center;
           overflow: hidden;
-          background-image:
-            url(
-              "/images/event-listing/generated-event-scene.png"
-            );
-          background-position: center;
-          background-size: cover;
+          background: #18243a;
+        }
+
+        .finalBackground {
+          position: absolute;
+          inset: 0;
+        }
+
+        .finalBackground .peopleScene,
+        .finalBackground .peopleScene svg {
+          width: 100%;
+          height: 100%;
         }
 
         .finalOverlay {
@@ -2934,17 +3467,14 @@ export default function EventListingPage() {
             linear-gradient(
               135deg,
               rgba(14, 29, 48, 0.9),
-              rgba(239, 91, 12, 0.82)
+              rgba(239, 91, 12, 0.83)
             );
         }
 
         .finalContent {
           position: relative;
           z-index: 2;
-          width: min(
-            780px,
-            calc(100% - 40px)
-          );
+          width: min(780px, calc(100% - 40px));
           padding: 85px 0;
           color: #fff;
           text-align: center;
@@ -2956,11 +3486,7 @@ export default function EventListingPage() {
 
         .finalContent h2 {
           margin: 0;
-          font-size: clamp(
-            40px,
-            6vw,
-            67px
-          );
+          font-size: clamp(40px, 6vw, 67px);
           line-height: 1.25;
           letter-spacing: -0.055em;
         }
@@ -2986,12 +3512,9 @@ export default function EventListingPage() {
 
         .finalTags span {
           padding: 8px 13px;
-          border:
-            1px solid
-            rgba(255, 255, 255, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.3);
           border-radius: 999px;
-          background:
-            rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.12);
           font-size: 10px;
           font-weight: 900;
         }
@@ -3008,13 +3531,9 @@ export default function EventListingPage() {
         }
 
         .footerInner {
-          width: min(
-            1120px,
-            calc(100% - 40px)
-          );
+          width: min(1120px, calc(100% - 40px));
           display: grid;
-          grid-template-columns:
-            1fr auto 1fr;
+          grid-template-columns: 1fr auto 1fr;
           align-items: center;
           gap: 25px;
           margin: 0 auto;
@@ -3057,9 +3576,7 @@ export default function EventListingPage() {
           border: 5px solid #fff;
           border-radius: 50%;
           background: #08b84e;
-          box-shadow:
-            0 16px 40px
-            rgba(8, 184, 78, 0.35);
+          box-shadow: 0 16px 40px rgba(8, 184, 78, 0.35);
           color: #fff;
           text-decoration: none;
         }
@@ -3073,9 +3590,7 @@ export default function EventListingPage() {
           font-size: 11px;
         }
 
-        @media (
-          max-width: 1020px
-        ) {
+        @media (max-width: 1020px) {
           .heroInner,
           .informationLayout,
           .policyLayout,
@@ -3088,17 +3603,13 @@ export default function EventListingPage() {
           }
 
           .heroVisual {
-            width: min(
-              700px,
-              100%
-            );
+            width: min(700px, 100%);
             margin: 0 auto;
           }
 
           .categoryGrid,
           .benefitGrid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .solutionHeading {
@@ -3106,18 +3617,16 @@ export default function EventListingPage() {
           }
 
           .solutionTags {
-            justify-content:
-              flex-start;
+            justify-content: flex-start;
           }
 
-          .informationPhoto {
+          .informationVisual {
             min-height: 480px;
           }
 
           .stepGrid {
             display: grid;
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 15px;
           }
 
@@ -3131,18 +3640,14 @@ export default function EventListingPage() {
 
           .faqHeading {
             display: grid;
-            grid-template-columns:
-              1fr auto;
+            grid-template-columns: 1fr auto;
             align-items: center;
           }
         }
 
-        @media (
-          max-width: 720px
-        ) {
+        @media (max-width: 720px) {
           .headerInner {
-            width:
-              calc(100% - 24px);
+            width: calc(100% - 24px);
             min-height: 64px;
           }
 
@@ -3157,8 +3662,7 @@ export default function EventListingPage() {
           .container,
           .heroInner,
           .footerInner {
-            width:
-              calc(100% - 24px);
+            width: calc(100% - 24px);
           }
 
           .heroInner {
@@ -3187,25 +3691,22 @@ export default function EventListingPage() {
             grid-template-columns: 1fr;
           }
 
-          .photoCollage {
+          .heroCollage {
             min-height: 480px;
           }
 
-          .photoMain {
+          .heroMainScene {
             top: 35px;
             right: 0;
             width: 91%;
-            height: 340px;
           }
 
-          .photoSubOne {
+          .heroSubSceneOne {
             width: 54%;
-            height: 165px;
           }
 
-          .photoSubTwo {
+          .heroSubSceneTwo {
             width: 48%;
-            height: 150px;
           }
 
           .heroOrangeBadge {
@@ -3248,16 +3749,10 @@ export default function EventListingPage() {
             grid-template-columns: 1fr;
           }
 
-          .categoryImage {
-            height: 205px;
-          }
-
-          .worryImage {
-            height: 220px;
-          }
-
+          .categoryImage,
+          .worryImage,
           .benefitImage {
-            height: 220px;
+            height: 235px;
           }
 
           .solutionHeading {
@@ -3265,9 +3760,8 @@ export default function EventListingPage() {
           }
 
           .mockupArea {
-            min-height: 760px;
-            padding:
-              15px 0 210px;
+            min-height: 780px;
+            padding: 15px 0 215px;
           }
 
           .browserMockup {
@@ -3284,11 +3778,7 @@ export default function EventListingPage() {
           }
 
           .browserSide {
-            grid-template-columns:
-              repeat(
-                3,
-                minmax(0, 1fr)
-              );
+            grid-template-columns: repeat(3, minmax(0, 1fr));
           }
 
           .browserSide article {
@@ -3300,9 +3790,7 @@ export default function EventListingPage() {
             right: 50%;
             bottom: 0;
             width: 200px;
-            transform:
-              translateX(50%)
-              rotate(3deg);
+            transform: translateX(50%) rotate(3deg);
           }
 
           .mockupBadge,
@@ -3323,25 +3811,23 @@ export default function EventListingPage() {
           }
 
           .includedGrid article {
-            grid-template-columns:
-              52px minmax(0, 1fr)
-              27px;
+            grid-template-columns: 52px minmax(0, 1fr) 27px;
           }
 
           .futurePlan {
             align-items: flex-start;
           }
 
-          .informationPhoto {
-            min-height: 420px;
+          .informationVisual {
+            min-height: 430px;
           }
 
-          .informationPhotoText strong {
+          .informationVisualText strong {
             font-size: 23px;
           }
 
-          .policyImage {
-            min-height: 390px;
+          .policyVisual {
+            min-height: 400px;
           }
 
           .faqHeading {
@@ -3378,9 +3864,7 @@ export default function EventListingPage() {
           }
         }
 
-        @media (
-          max-width: 430px
-        ) {
+        @media (max-width: 430px) {
           .audienceLabel {
             font-size: 9px;
           }
@@ -3394,9 +3878,7 @@ export default function EventListingPage() {
           }
 
           .lineButton {
-            grid-template-columns:
-              43px minmax(0, 1fr)
-              20px;
+            grid-template-columns: 43px minmax(0, 1fr) 20px;
             gap: 10px;
             padding: 12px 14px;
           }
@@ -3429,8 +3911,7 @@ export default function EventListingPage() {
           }
 
           .includedGrid article {
-            grid-template-columns:
-              48px minmax(0, 1fr);
+            grid-template-columns: 48px minmax(0, 1fr);
           }
 
           .includedCheck {
@@ -3442,9 +3923,7 @@ export default function EventListingPage() {
           }
 
           .faqList summary {
-            grid-template-columns:
-              37px minmax(0, 1fr)
-              23px;
+            grid-template-columns: 37px minmax(0, 1fr) 23px;
             padding: 14px;
           }
 
