@@ -5,41 +5,6 @@ import OrganizerCta from "./components/OrganizerCta";
 import AreaSearch from "./components/AreaSearch";
 import CategorySearch from "./components/CategorySearch";
 import KeywordSearch from "./components/KeywordSearch";
-
-import {
-  getCategoryOptions,
-  getEvents,
-  type EventItem,
-} from "../lib/notion";
-次の記述が冒頭にあれば、まだ間違ったコードです。
-import { notFound } from "next/navigation";
-import EventDetailClient from "./EventDetailClient";
-import {
-  getEventById,
-  getEvents,
-} from "../../../lib/notion";
-貼り替え後にCommit changesを押してください。
-その次に、イベント詳細用コードが以下へ入っていることも確認します。
-
-app/events/[id]/page.tsx
-今回のエラーはEventDetailClient.tsxがないことではなく、TOPページが詳細ページ用コードのままになっていることが原因です。
-
-page.tsx
-コード
-
-
-ライブラリ
-/
-page.tsx
-
-
-import Image from "next/image";
-import Link from "next/link";
-import heroBanner from "../hero-banner.png";
-import OrganizerCta from "./components/OrganizerCta";
-import AreaSearch from "./components/AreaSearch";
-import CategorySearch from "./components/CategorySearch";
-import KeywordSearch from "./components/KeywordSearch";
 import {
   getCategoryOptions,
   getEvents,
