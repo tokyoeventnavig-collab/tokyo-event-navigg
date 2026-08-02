@@ -3,13 +3,13 @@ import Link from "next/link";
 export const metadata = {
   title: "イベント掲載について｜東京イベントナビ",
   description:
-    "あなたのイベントをもっと多くの人へ。東京イベントナビでは、東京都内で開催されるイベントの掲載を受け付けています。",
+    "あなたのイベントをもっと多くの人へ。東京イベントナビでは、東京都内で開催されるイベントの基本掲載を無料で受け付けています。",
 };
 
 const LINE_URL = "https://lin.ee/P179zyp";
 
 const IMAGES = {
-  party:
+  main:
     "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1800&q=90",
 
   boardGame:
@@ -30,9 +30,40 @@ const IMAGES = {
   business:
     "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1500&q=90",
 
-  event:
+  festival:
     "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1800&q=90",
 };
+
+const listingFeatures = [
+  {
+    number: "01",
+    icon: "▣",
+    title: "イベント専用ページ",
+    description:
+      "フライヤー、日時、会場、概要、申込先を一つのページにまとめます。",
+  },
+  {
+    number: "02",
+    icon: "17",
+    title: "カレンダー掲載",
+    description:
+      "開催日からイベントを探している方へ情報を届けられます。",
+  },
+  {
+    number: "03",
+    icon: "▦",
+    title: "カテゴリー掲載",
+    description:
+      "興味のあるジャンルからイベントを探せるようにします。",
+  },
+  {
+    number: "04",
+    icon: "↗",
+    title: "申込リンク設置",
+    description:
+      "公式LINEや申込フォームへ直接移動できるボタンを設置します。",
+  },
+];
 
 const categories = [
   {
@@ -40,13 +71,13 @@ const categories = [
     title: "飲み会・交流会",
     description:
       "友達づくり、恋活、社会人交流、異業種交流など。",
-    image: IMAGES.party,
+    image: IMAGES.main,
   },
   {
     icon: "☕",
     title: "カフェ会・ランチ会",
     description:
-      "少人数で会話や食事を楽しむカジュアルな交流イベント。",
+      "少人数で会話や食事を楽しむカジュアルなイベント。",
     image: IMAGES.cafe,
   },
   {
@@ -81,7 +112,7 @@ const categories = [
     icon: "🤝",
     title: "ビジネス交流会",
     description:
-      "経営者交流、異業種交流、名刺交換、マッチングイベント。",
+      "経営者交流、異業種交流、名刺交換、マッチングなど。",
     image: IMAGES.business,
   },
   {
@@ -89,65 +120,59 @@ const categories = [
     title: "その他のイベント",
     description:
       "ライブ、マルシェ、上映会などもご相談いただけます。",
-    image: IMAGES.event,
-  },
-];
-
-const features = [
-  {
-    icon: "▣",
-    english: "EVENT PAGE",
-    title: "専用ページ作成",
-    text: "必要な情報を一つのページへ整理します。",
-  },
-  {
-    icon: "17",
-    english: "CALENDAR",
-    title: "カレンダー掲載",
-    text: "開催日からイベントを探せます。",
-  },
-  {
-    icon: "▦",
-    english: "CATEGORY",
-    title: "カテゴリー掲載",
-    text: "ジャンルに興味のある方へ届けます。",
-  },
-  {
-    icon: "↗",
-    english: "APPLICATION",
-    title: "申込リンク設置",
-    text: "LINEやフォームへ直接案内します。",
+    image: IMAGES.festival,
   },
 ];
 
 const benefits = [
   {
     number: "01",
-    icon: "👥",
-    title: "新しい参加者との接点",
+    title: "新しい参加者へ届けられる",
     description:
-      "普段のSNSや知人への告知だけでは接点のなかった方へ、イベント情報を届けられます。",
+      "普段のSNSや知人への告知だけでは接点のなかった方にも、イベントを知ってもらえる入口を増やします。",
   },
   {
     number: "02",
-    icon: "🔍",
-    title: "複数の入口から発見",
+    title: "複数の方法で見つけてもらえる",
     description:
-      "新着、今週、カレンダー、カテゴリーなど、複数の探し方から見つけてもらえます。",
+      "人気、新着、今週、カレンダー、カテゴリーなど、さまざまな探し方から発見してもらえます。",
   },
   {
     number: "03",
-    icon: "🛡️",
-    title: "イベントの信頼感向上",
+    title: "初参加者の安心感を高める",
     description:
-      "日時、会場、参加条件、主催者情報を整理し、初参加の方にも安心感を与えます。",
+      "日時や会場、参加条件、主催者などの情報を整理し、初めての方にも分かりやすく伝えます。",
   },
   {
     number: "04",
-    icon: "📣",
-    title: "魅力を分かりやすく訴求",
+    title: "申込みまで迷わせない",
     description:
-      "フライヤーやイベント概要を見やすくまとめ、特徴や雰囲気を伝えます。",
+      "イベントの内容を確認したあと、そのままLINEやフォームへ進める申込導線を作ります。",
+  },
+];
+
+const problems = [
+  {
+    label: "告知・認知のお悩み",
+    title: "良いイベントなのに、まだ知られていない",
+    items: [
+      "毎回、知人への声かけに頼っている",
+      "SNSだけでは新しい人へ届かない",
+      "初開催で申込みが入るか不安",
+    ],
+    image: IMAGES.business,
+    className: "orangeProblem",
+  },
+  {
+    label: "運営・準備のお悩み",
+    title: "告知に追われて、準備に集中できない",
+    items: [
+      "開催直前まで参加人数が読めない",
+      "日時や会場の情報が伝わりにくい",
+      "イベントページを作る時間がない",
+    ],
+    image: IMAGES.seminar,
+    className: "greenProblem",
   },
 ];
 
@@ -155,60 +180,56 @@ const includedItems = [
   {
     icon: "🖼️",
     title: "フライヤー掲載",
-    description: "イベント画像を大きく見やすく掲載。",
+    description: "イベント画像を大きく見やすく掲載します。",
   },
   {
     icon: "📄",
-    title: "イベント専用ページ",
-    description: "イベントごとの詳細ページを作成。",
+    title: "専用ページ作成",
+    description: "イベントごとの詳細ページを作成します。",
   },
   {
     icon: "📅",
-    title: "日時・カレンダー掲載",
-    description: "開催日と時間をカレンダーへ反映。",
+    title: "日時・カレンダー",
+    description: "開催日と時間をカレンダーへ反映します。",
   },
   {
     icon: "📍",
     title: "会場・住所掲載",
-    description: "会場名と住所を分かりやすく表示。",
+    description: "会場名と住所を分かりやすく表示します。",
   },
   {
     icon: "🗂️",
     title: "カテゴリー掲載",
-    description: "イベントのジャンル別検索へ反映。",
+    description: "ジャンル別の検索結果へ反映します。",
   },
   {
     icon: "🔗",
     title: "申込リンク設置",
-    description: "LINEや申込フォームへ直接案内。",
+    description: "LINEや申込フォームへ直接案内します。",
   },
 ];
 
 const steps = [
   {
     number: "01",
-    icon: "💬",
     title: "LINEで相談",
     description:
       "公式LINEへ「イベント掲載希望」とお送りください。",
   },
   {
     number: "02",
-    icon: "📎",
     title: "イベント情報を送付",
     description:
-      "フライヤー、日時、会場、概要、申込先などを送ります。",
+      "フライヤー、日時、会場、概要、申込先をお送りします。",
   },
   {
     number: "03",
-    icon: "✅",
     title: "掲載内容を確認",
     description:
-      "完成したイベントページの内容をご確認いただきます。",
+      "作成したイベントページの内容をご確認いただきます。",
   },
   {
     number: "04",
-    icon: "🚀",
     title: "掲載スタート",
     description:
       "イベント一覧、カレンダー、カテゴリーへ反映します。",
@@ -219,7 +240,7 @@ const faqs = [
   {
     question: "掲載料金はかかりますか？",
     answer:
-      "現在、基本掲載は無料です。フライヤー、日時、会場、イベント概要、申込先などを掲載します。",
+      "現在、基本掲載は無料です。フライヤー、日時、会場、概要、申込先などを掲載します。",
   },
   {
     question: "どのようなイベントを掲載できますか？",
@@ -229,43 +250,39 @@ const faqs = [
   {
     question: "情報がすべて揃っていなくても相談できますか？",
     answer:
-      "はい。開催内容が完全に決まっていない段階でもご相談いただけます。必要な情報を順番にご案内します。",
+      "はい。内容が完全に決まっていない段階でもご相談いただけます。必要な情報をご案内します。",
   },
   {
     question: "人気イベント欄へ必ず掲載されますか？",
     answer:
-      "人気イベント欄への掲載は保証していません。開催時期や掲載内容により表示場所は異なります。",
+      "人気イベント欄への掲載は保証していません。開催時期や掲載内容により、表示される場所は異なります。",
   },
   {
-    question: "掲載後に内容を変更できますか？",
+    question: "掲載後に日時や会場を変更できますか？",
     answer:
-      "変更可能です。日時や会場などに変更が生じた場合は、公式LINEからご連絡ください。",
+      "変更可能です。変更内容が決まり次第、公式LINEからご連絡ください。",
   },
 ];
 
 function LineButton({
-  title = "無料で掲載について相談する",
+  title = "基本掲載について無料相談する",
   note = "公式LINEからお気軽にご連絡ください",
-  light = false,
+  white = false,
 }: {
   title?: string;
   note?: string;
-  light?: boolean;
+  white?: boolean;
 }) {
   return (
     <a
       href={LINE_URL}
       target="_blank"
       rel="noreferrer"
-      className={
-        light
-          ? "lineButton lineButtonLight"
-          : "lineButton"
-      }
+      className={white ? "lineButton whiteLineButton" : "lineButton"}
     >
-      <span className="lineLogo">LINE</span>
+      <span className="lineIcon">LINE</span>
 
-      <span className="lineButtonText">
+      <span className="lineCopy">
         <strong>{title}</strong>
         <small>{note}</small>
       </span>
@@ -276,169 +293,146 @@ function LineButton({
 }
 
 function SectionHeading({
-  label,
+  english,
   title,
   accent,
   description,
 }: {
-  label: string;
+  english: string;
   title: string;
   accent: string;
   description?: string;
 }) {
   return (
     <div className="sectionHeading">
-      <p className="sectionEyebrow">
-        {label}
-      </p>
+      <p>{english}</p>
 
       <h2>
         <span>{title}</span>
         <strong>{accent}</strong>
       </h2>
 
-      <div className="sectionHeadingLine" />
+      <div className="headingLine" />
 
-      {description && (
-        <p className="sectionLead">
-          {description}
-        </p>
-      )}
+      {description && <div className="sectionDescription">{description}</div>}
     </div>
   );
 }
 
 function ListingPreview() {
   return (
-    <div className="previewStage">
-      <div className="previewGlow previewGlowOne" />
-      <div className="previewGlow previewGlowTwo" />
-
-      <div className="desktopPreview">
-        <div className="browserTop">
+    <div className="listingPreview">
+      <div className="previewDesktop">
+        <div className="browserHeader">
           <div className="browserDots">
-            <span />
-            <span />
-            <span />
+            <i />
+            <i />
+            <i />
           </div>
 
-          <div className="browserAddress">
-            tokyo-event-navi.jp
-          </div>
+          <span>tokyo-event-navi.jp</span>
         </div>
 
-        <div className="browserPage">
-          <div className="browserTitle">
+        <div className="previewPage">
+          <div className="previewPageHeading">
             <div>
               <small>TOKYO EVENT NAVI</small>
-              <strong>人気イベント</strong>
+              <h3>人気イベント</h3>
             </div>
 
             <span>EVENT</span>
           </div>
 
-          <div className="browserLayout">
-            <article className="sampleEvent">
+          <div className="previewColumns">
+            <article className="previewEventCard">
               <img
-                src={IMAGES.party}
-                alt="イベント掲載イメージ"
+                src={IMAGES.main}
+                alt="東京交流イベントの掲載例"
               />
 
-              <div className="sampleEventBody">
-                <span>飲み会・交流会</span>
+              <div className="previewEventContent">
+                <span className="previewCategory">
+                  飲み会・交流会
+                </span>
 
-                <h3>
+                <h4>
                   20〜30代限定
                   <br />
                   東京交流イベント
-                </h3>
+                </h4>
 
-                <dl>
-                  <div>
-                    <dt>開催日</dt>
-                    <dd>2026年8月22日（土）</dd>
-                  </div>
+                <div className="previewEventInfo">
+                  <p>
+                    <span>開催日</span>
+                    2026年8月22日（土）
+                  </p>
 
-                  <div>
-                    <dt>開催時間</dt>
-                    <dd>18:00〜20:00</dd>
-                  </div>
+                  <p>
+                    <span>時間</span>
+                    18:00〜20:00
+                  </p>
 
-                  <div>
-                    <dt>会場</dt>
-                    <dd>新宿イベントスペース</dd>
-                  </div>
-                </dl>
+                  <p>
+                    <span>会場</span>
+                    新宿イベントスペース
+                  </p>
+                </div>
 
-                <strong className="sampleDetail">
-                  詳細を見る
-                </strong>
+                <strong>詳細を見る</strong>
               </div>
             </article>
 
-            <div className="sampleSide">
+            <div className="previewMenus">
               <article>
-                <span>NEW</span>
-                <strong>新着イベント</strong>
-                <small>
-                  新しく掲載されたイベント
-                </small>
+                <small>NEW</small>
+                <h4>新着イベント</h4>
+                <p>新しく掲載されたイベントから探せます。</p>
               </article>
 
               <article>
-                <span>7DAYS</span>
-                <strong>今週のイベント</strong>
-                <small>
-                  近日開催のイベント
-                </small>
+                <small>7 DAYS</small>
+                <h4>今週のイベント</h4>
+                <p>近日開催されるイベントから探せます。</p>
               </article>
 
               <article>
-                <span>SEARCH</span>
-                <strong>カテゴリー検索</strong>
-                <small>
-                  興味のあるジャンルから
-                </small>
+                <small>SEARCH</small>
+                <h4>カテゴリー検索</h4>
+                <p>興味のあるジャンルから探せます。</p>
               </article>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mobilePreview">
-        <div className="mobileSpeaker" />
+      <div className="previewPhone">
+        <div className="phoneSpeaker" />
 
-        <div className="mobilePage">
-          <img src={IMAGES.party} alt="" />
+        <div className="phoneScreen">
+          <img src={IMAGES.main} alt="" />
 
-          <span>飲み会・交流会</span>
-
-          <h3>
-            東京交流
-            <br />
-            イベント
-          </h3>
-
-          <p>8月22日 18:00〜</p>
-
-          <strong>詳細を見る</strong>
+          <div>
+            <span>飲み会・交流会</span>
+            <h4>東京交流イベント</h4>
+            <p>8月22日（土）18:00〜</p>
+            <strong>詳細を見る</strong>
+          </div>
         </div>
       </div>
 
-      <div className="previewFloating previewFloatingOne">
+      <div className="freeBadge">
+        <span>基本掲載</span>
+        <strong>無料</strong>
+      </div>
+
+      <div className="calendarBadge">
         <span>01</span>
         カレンダー掲載
       </div>
 
-      <div className="previewFloating previewFloatingTwo">
+      <div className="categoryBadge">
         <span>02</span>
         カテゴリー検索
-      </div>
-
-      <div className="previewFreeBadge">
-        <span>BASIC</span>
-        <strong>FREE</strong>
-        <small>基本掲載無料</small>
       </div>
     </div>
   );
@@ -450,26 +444,14 @@ export default function EventListingPage() {
       <header className="header">
         <div className="headerInner">
           <Link href="/" className="logo">
-            <span>東京</span>
-            イベントナビ
+            <span>東京</span>イベントナビ
           </Link>
 
           <nav>
-            <Link href="/">
-              イベントを探す
-            </Link>
-
-            <a href="#categories">
-              掲載できるイベント
-            </a>
-
-            <a href="#benefits">
-              掲載するメリット
-            </a>
-
-            <a href="#flow">
-              掲載までの流れ
-            </a>
+            <Link href="/">イベントを探す</Link>
+            <a href="#categories">掲載できるイベント</a>
+            <a href="#benefits">掲載するメリット</a>
+            <a href="#flow">掲載までの流れ</a>
 
             <a
               href={LINE_URL}
@@ -484,17 +466,12 @@ export default function EventListingPage() {
       </header>
 
       <section className="hero">
-        <div className="heroNoise" />
-        <div className="heroCircle heroCircleOne" />
-        <div className="heroCircle heroCircleTwo" />
-        <div className="heroDot heroDotOne" />
-        <div className="heroDot heroDotTwo" />
-        <div className="heroDot heroDotThree" />
+        <div className="heroDecoration heroDecorationOne" />
+        <div className="heroDecoration heroDecorationTwo" />
 
         <div className="heroInner">
           <div className="heroCopy">
-            <div className="heroTarget">
-              <span>FOR EVENT ORGANIZERS</span>
+            <div className="heroLabel">
               東京でイベントを主催している方へ
             </div>
 
@@ -503,16 +480,11 @@ export default function EventListingPage() {
             </p>
 
             <h1>
-              <span className="heroTitleFirst">
-                あなたのイベントを
-              </span>
-
-              <span className="heroTitleSecond">
-                もっと多くの人へ。
-              </span>
+              <span>あなたのイベントを</span>
+              <strong>もっと多くの人へ。</strong>
             </h1>
 
-            <p className="heroCatch">
+            <p className="heroMessage">
               イベントの魅力を、
               <br />
               探している人へ届けます。
@@ -520,21 +492,21 @@ export default function EventListingPage() {
 
             <p className="heroDescription">
               東京イベントナビでは、東京都内で開催される
-              飲み会・交流会・趣味イベント・セミナーなどを
-              掲載しています。
+              飲み会・交流会・趣味イベント・セミナーなどの
+              イベント掲載を受け付けています。
             </p>
 
-            <div className="heroFeatureGrid">
-              {features.map((feature) => (
-                <article key={feature.title}>
-                  <span className="heroFeatureIcon">
+            <div className="featureGrid">
+              {listingFeatures.map((feature) => (
+                <article key={feature.number}>
+                  <span className="featureIcon">
                     {feature.icon}
                   </span>
 
                   <div>
-                    <small>{feature.english}</small>
-                    <strong>{feature.title}</strong>
-                    <p>{feature.text}</p>
+                    <small>{feature.number}</small>
+                    <h2>{feature.title}</h2>
+                    <p>{feature.description}</p>
                   </div>
                 </article>
               ))}
@@ -543,66 +515,48 @@ export default function EventListingPage() {
             <div className="heroAction">
               <LineButton />
 
-              <div className="heroActionNote">
-                <strong>相談だけでもOK</strong>
-                <span>
-                  掲載できる内容か分からない場合も問題ありません。
-                </span>
-              </div>
+              <p>
+                掲載できる内容か分からない場合も、
+                <br />
+                相談だけで問題ありません。
+              </p>
             </div>
           </div>
 
           <div className="heroVisual">
-            <div className="heroVisualLabel">
-              TOKYO EVENT NAVI
-            </div>
-
-            <div className="heroPhoto heroPhotoMain">
+            <figure className="heroMainImage">
               <img
-                src={IMAGES.party}
-                alt="交流イベント"
+                src={IMAGES.main}
+                alt="東京の交流イベント"
               />
 
-              <div className="photoCaption">
-                <span>01</span>
+              <figcaption>
+                <small>交流イベント</small>
+                <strong>
+                  新しい参加者との
+                  <br />
+                  出会いにつながる
+                </strong>
+              </figcaption>
+            </figure>
 
-                <div>
-                  <small>交流イベント</small>
-                  <strong>
-                    人と人がつながる時間
-                  </strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="heroPhoto heroPhotoSubOne">
+            <figure className="heroSubImage heroBoardGame">
               <img
                 src={IMAGES.boardGame}
                 alt="ボードゲームイベント"
               />
-            </div>
+            </figure>
 
-            <div className="heroPhoto heroPhotoSubTwo">
+            <figure className="heroSubImage heroSeminar">
               <img
                 src={IMAGES.seminar}
                 alt="セミナーイベント"
               />
-            </div>
+            </figure>
 
-            <div className="heroVisualCard">
-              <span>掲載対象</span>
-
-              <strong>
-                飲み会・交流会・趣味
-                <br />
-                セミナー・スポーツなど
-              </strong>
-            </div>
-
-            <div className="heroFree">
-              <small>BASIC</small>
-              <strong>FREE</strong>
-              <span>基本掲載無料</span>
+            <div className="heroFreeBadge">
+              <span>基本掲載</span>
+              <strong>無料</strong>
             </div>
           </div>
         </div>
@@ -610,7 +564,7 @@ export default function EventListingPage() {
         <div className="heroBottom">
           <div>
             <span>01</span>
-            掲載無料
+            基本掲載無料
           </div>
 
           <div>
@@ -631,62 +585,52 @@ export default function EventListingPage() {
       </section>
 
       <section
-        className="categorySection"
+        className="categorySection section"
         id="categories"
       >
         <div className="container">
           <SectionHeading
-            label="EVENT CATEGORIES"
+            english="EVENT CATEGORIES"
             title="こんなイベントを"
             accent="掲載できます"
             description="東京で開催される、さまざまなジャンルのイベントに対応しています。"
           />
 
           <div className="categoryGrid">
-            {categories.map(
-              (category, index) => (
-                <article
-                  className="categoryCard"
-                  key={category.title}
-                >
-                  <div className="categoryImage">
-                    <img
-                      src={category.image}
-                      alt={category.title}
-                    />
+            {categories.map((category, index) => (
+              <article
+                className="categoryCard"
+                key={category.title}
+              >
+                <div className="categoryImage">
+                  <img
+                    src={category.image}
+                    alt={category.title}
+                  />
 
-                    <div className="categoryOverlay" />
+                  <span className="categoryIndex">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
 
-                    <span className="categoryNumber">
-                      {String(index + 1).padStart(
-                        2,
-                        "0",
-                      )}
-                    </span>
+                  <span className="categoryIcon">
+                    {category.icon}
+                  </span>
+                </div>
 
-                    <span className="categoryIcon">
-                      {category.icon}
-                    </span>
-                  </div>
-
-                  <div className="categoryContent">
-                    <h3>{category.title}</h3>
-                    <p>{category.description}</p>
-                  </div>
-                </article>
-              ),
-            )}
+                <div className="categoryContent">
+                  <h3>{category.title}</h3>
+                  <p>{category.description}</p>
+                </div>
+              </article>
+            ))}
           </div>
 
-          <div className="categoryBottom">
+          <div className="categoryCta">
             <div>
-              <small>
-                NOT FOUND YOUR CATEGORY?
-              </small>
-
+              <small>その他のジャンルも相談可能</small>
               <strong>
-                記載のないジャンルも
-                お気軽にご相談ください。
+                掲載できるか分からないイベントも、
+                まずはお気軽にご相談ください。
               </strong>
             </div>
 
@@ -702,114 +646,57 @@ export default function EventListingPage() {
         </div>
       </section>
 
-      <section className="problemSection">
-        <div className="problemBackgroundNumber">
-          02
-        </div>
-
+      <section className="problemSection section">
         <div className="container">
           <SectionHeading
-            label="ORGANIZER PROBLEMS"
+            english="ORGANIZER PROBLEMS"
             title="イベントの告知・運営で"
             accent="こんなお悩みありませんか？"
           />
 
           <div className="problemGrid">
-            <article className="problemCard problemCardOrange">
-              <div className="problemPhoto">
-                <img
-                  src={IMAGES.business}
-                  alt="イベントの企画や告知"
-                />
+            {problems.map((problem, index) => (
+              <article
+                className={`problemCard ${problem.className}`}
+                key={problem.title}
+              >
+                <div className="problemImage">
+                  <img
+                    src={problem.image}
+                    alt={problem.label}
+                  />
 
-                <span>01</span>
-              </div>
-
-              <div className="problemContent">
-                <p className="problemType">
-                  AWARENESS PROBLEM
-                </p>
-
-                <h3>
-                  良いイベントなのに、
-                  <br />
-                  まだ知られていない。
-                </h3>
-
-                <div className="problemList">
-                  <p>
-                    <span>✓</span>
-                    毎回、知人への声かけに頼っている
-                  </p>
-
-                  <p>
-                    <span>✓</span>
-                    SNSだけでは新しい人に届かない
-                  </p>
-
-                  <p>
-                    <span>✓</span>
-                    初開催で申込みが入るか不安
-                  </p>
+                  <span>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
                 </div>
-              </div>
-            </article>
 
-            <article className="problemCard problemCardGreen">
-              <div className="problemContent">
-                <p className="problemType">
-                  OPERATION PROBLEM
-                </p>
+                <div className="problemContent">
+                  <small>{problem.label}</small>
+                  <h3>{problem.title}</h3>
 
-                <h3>
-                  告知に追われて、
-                  <br />
-                  準備に集中できない。
-                </h3>
-
-                <div className="problemList">
-                  <p>
-                    <span>✓</span>
-                    開催直前まで人数が読めない
-                  </p>
-
-                  <p>
-                    <span>✓</span>
-                    日時や会場情報が伝わりにくい
-                  </p>
-
-                  <p>
-                    <span>✓</span>
-                    イベントページを作る時間がない
-                  </p>
+                  <div className="problemItems">
+                    {problem.items.map((item) => (
+                      <p key={item}>
+                        <span>✓</span>
+                        {item}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              <div className="problemPhoto">
-                <img
-                  src={IMAGES.seminar}
-                  alt="イベント運営と準備"
-                />
-
-                <span>02</span>
-              </div>
-            </article>
+              </article>
+            ))}
           </div>
 
-          <div className="problemSolution">
-            <div className="problemSolutionIcon">
-              ↗
-            </div>
+          <div className="solutionBox">
+            <span className="solutionIcon">↗</span>
 
             <div>
-              <small>
-                TOKYO EVENT NAVI
-              </small>
+              <small>TOKYO EVENT NAVI</small>
 
               <strong>
                 イベントの魅力はある。
-                足りないのは、
-                見つけてもらう入口かもしれません。
+                足りないのは、見つけてもらう入口かもしれません。
               </strong>
             </div>
 
@@ -820,34 +707,14 @@ export default function EventListingPage() {
         </div>
       </section>
 
-      <section className="previewSection">
+      <section className="previewSection section">
         <div className="container">
-          <div className="previewHeading">
-            <div>
-              <p>LISTING EXPERIENCE</p>
-
-              <h2>
-                <span>掲載後は、</span>
-                <strong>
-                  このように表示されます
-                </strong>
-              </h2>
-
-              <p className="previewDescription">
-                フライヤー、開催日時、会場、参加条件などを
-                一つのページへ整理。TOPページ、カレンダー、
-                カテゴリーなどからイベントを探せます。
-              </p>
-            </div>
-
-            <div className="previewTagArea">
-              <span>人気イベント</span>
-              <span>新着イベント</span>
-              <span>今週のイベント</span>
-              <span>カレンダー</span>
-              <span>カテゴリー検索</span>
-            </div>
-          </div>
+          <SectionHeading
+            english="LISTING IMAGE"
+            title="掲載後は"
+            accent="このように表示されます"
+            description="イベントの内容を読みやすく整理し、申込みまで迷わないページを作成します。"
+          />
 
           <ListingPreview />
 
@@ -859,14 +726,14 @@ export default function EventListingPage() {
       </section>
 
       <section
-        className="benefitSection"
+        className="benefitSection section"
         id="benefits"
       >
         <div className="container">
           <SectionHeading
-            label="WHY TOKYO EVENT NAVI"
-            title="掲載することで"
-            accent="増やせる可能性"
+            english="LISTING BENEFITS"
+            title="東京イベントナビに"
+            accent="掲載するメリット"
             description="イベントの認知・信頼・申込みにつながる入口を増やします。"
           />
 
@@ -876,36 +743,26 @@ export default function EventListingPage() {
                 className="benefitCard"
                 key={benefit.number}
               >
-                <div className="benefitTop">
-                  <span className="benefitNumber">
-                    {benefit.number}
-                  </span>
-
-                  <span className="benefitIcon">
-                    {benefit.icon}
-                  </span>
-                </div>
+                <span className="benefitNumber">
+                  {benefit.number}
+                </span>
 
                 <h3>{benefit.title}</h3>
                 <p>{benefit.description}</p>
 
-                <div className="benefitLine" />
+                <div className="benefitBar" />
               </article>
             ))}
           </div>
 
-          <div className="benefitBanner">
-            <div className="benefitBannerImage">
-              <img
-                src={IMAGES.party}
-                alt="イベントを楽しむ参加者"
-              />
-            </div>
+          <div className="connectionBanner">
+            <img
+              src={IMAGES.main}
+              alt="イベント参加者"
+            />
 
-            <div className="benefitBannerContent">
-              <small>
-                CREATE NEW CONNECTIONS
-              </small>
+            <div>
+              <small>CREATE NEW CONNECTIONS</small>
 
               <h3>
                 あなたのイベントが、
@@ -914,24 +771,20 @@ export default function EventListingPage() {
               </h3>
 
               <p>
-                参加者にとっても、主催者にとっても、
-                新しいつながりが生まれる入口を目指します。
+                参加者と主催者の新しいつながりが生まれる
+                入口を目指しています。
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="freeSection">
-        <div className="freeShape freeShapeOne" />
-        <div className="freeShape freeShapeTwo" />
-
+      <section className="freeSection section">
         <div className="container">
           <div className="freeHeading">
-            <div className="freeStamp">
-              <small>BASIC</small>
-              <strong>FREE</strong>
-              <span>基本掲載無料</span>
+            <div className="largeFreeBadge">
+              <span>基本掲載</span>
+              <strong>無料</strong>
             </div>
 
             <div>
@@ -942,83 +795,65 @@ export default function EventListingPage() {
                 <span>含まれる内容</span>
               </h2>
 
-              <strong className="freeHeadingLead">
-                イベント掲載に必要な基本機能をまとめてご用意します。
+              <strong>
+                イベント掲載に必要な基本情報を
+                分かりやすくまとめます。
               </strong>
             </div>
           </div>
 
           <div className="includedGrid">
-            {includedItems.map(
-              (item, index) => (
-                <article key={item.title}>
-                  <span className="includedNumber">
-                    {String(index + 1).padStart(
-                      2,
-                      "0",
-                    )}
-                  </span>
+            {includedItems.map((item, index) => (
+              <article key={item.title}>
+                <span className="includedNumber">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
 
-                  <span className="includedIcon">
-                    {item.icon}
-                  </span>
+                <span className="includedIcon">
+                  {item.icon}
+                </span>
 
-                  <div>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                  </div>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </div>
 
-                  <span className="includedCheck">
-                    ✓
-                  </span>
-                </article>
-              ),
-            )}
+                <span className="includedCheck">✓</span>
+              </article>
+            ))}
           </div>
 
-          <div className="freeNote">
-            <span>＋</span>
-
-            <p>
-              SNS投稿、公式LINE配信、優先表示などの追加施策は、
-              今後別途ご案内する場合があります。
-            </p>
+          <div className="freeInformation">
+            現在、基本掲載は無料です。優先表示、SNS投稿、
+            LINE配信などは今後別プランとしてご案内する場合があります。
           </div>
         </div>
       </section>
 
-      <section className="flowSection" id="flow">
+      <section
+        className="flowSection section"
+        id="flow"
+      >
         <div className="container">
           <SectionHeading
-            label="HOW TO START"
+            english="HOW TO START"
             title="掲載までは"
             accent="簡単4ステップ"
-            description="最初の相談から掲載開始まで、公式LINEでご案内します。"
+            description="最初のご相談から掲載開始まで、公式LINEでご案内します。"
           />
 
           <div className="stepGrid">
             {steps.map((step, index) => (
-              <div
-                className="stepItem"
-                key={step.number}
-              >
+              <div className="stepItem" key={step.number}>
                 <article>
-                  <span className="stepNumber">
-                    STEP {step.number}
-                  </span>
-
-                  <div className="stepIcon">
-                    {step.icon}
-                  </div>
-
+                  <span>STEP {step.number}</span>
+                  <strong>{step.number}</strong>
                   <h3>{step.title}</h3>
                   <p>{step.description}</p>
                 </article>
 
                 {index < steps.length - 1 && (
-                  <span className="stepArrow">
-                    →
-                  </span>
+                  <div className="stepArrow">→</div>
                 )}
               </div>
             ))}
@@ -1027,23 +862,17 @@ export default function EventListingPage() {
           <div className="flowAction">
             <LineButton />
 
-            <div>
-              <strong>
-                最初に送るメッセージ
-              </strong>
-
-              <p>
-                「イベント掲載希望」と一言お送りいただければ、
-                必要な情報をご案内します。
-              </p>
-            </div>
+            <p>
+              最初は「イベント掲載希望」と
+              一言お送りいただければ大丈夫です。
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="faqSection">
+      <section className="faqSection section">
         <div className="container faqLayout">
-          <div className="faqIntro">
+          <div className="faqHeading">
             <p>FAQ</p>
 
             <h2>
@@ -1051,13 +880,11 @@ export default function EventListingPage() {
               <span>ご質問</span>
             </h2>
 
-            <div className="faqIllustration">
-              <span>?</span>
-            </div>
+            <div className="questionIcon">?</div>
 
-            <p className="faqIntroText">
-              掲載できるイベントか分からない場合も、
-              公式LINEからお気軽にご相談ください。
+            <p>
+              掲載できるイベントか分からない場合は、
+              公式LINEからご相談ください。
             </p>
           </div>
 
@@ -1065,18 +892,13 @@ export default function EventListingPage() {
             {faqs.map((faq, index) => (
               <details key={faq.question}>
                 <summary>
-                  <span className="faqNumber">
-                    {String(index + 1).padStart(
-                      2,
-                      "0",
-                    )}
+                  <span>
+                    {String(index + 1).padStart(2, "0")}
                   </span>
 
                   <strong>{faq.question}</strong>
 
-                  <span className="faqToggle">
-                    ＋
-                  </span>
+                  <i>＋</i>
                 </summary>
 
                 <div className="faqAnswer">
@@ -1089,9 +911,9 @@ export default function EventListingPage() {
         </div>
       </section>
 
-      <section className="finalSection">
+      <section className="finalCta">
         <img
-          src={IMAGES.event}
+          src={IMAGES.festival}
           alt=""
           className="finalBackground"
         />
@@ -1104,9 +926,7 @@ export default function EventListingPage() {
 
             <h2>
               <span>あなたのイベントを</span>
-              <strong>
-                もっと多くの人へ。
-              </strong>
+              <strong>もっと多くの人へ。</strong>
             </h2>
 
             <p className="finalDescription">
@@ -1122,17 +942,17 @@ export default function EventListingPage() {
           </div>
 
           <LineButton
-            title="掲載について無料相談する"
+            title="基本掲載について相談する"
             note="「イベント掲載希望」とお送りください"
-            light
+            white
           />
         </div>
       </section>
 
       <footer className="footer">
         <div className="footerInner">
-          <div className="footerBrand">
-            <Link href="/">
+          <div>
+            <Link href="/" className="footerLogo">
               東京イベントナビ
             </Link>
 
@@ -1143,27 +963,15 @@ export default function EventListingPage() {
           </div>
 
           <nav>
-            <strong>EVENT</strong>
-
-            <Link href="/">
-              イベントを探す
-            </Link>
-
-            <a href="#categories">
-              掲載できるイベント
-            </a>
-
-            <a href="#benefits">
-              掲載するメリット
-            </a>
+            <strong>イベントを探す</strong>
+            <Link href="/">TOPページ</Link>
+            <a href="#categories">カテゴリー</a>
+            <a href="#benefits">掲載メリット</a>
           </nav>
 
           <nav>
-            <strong>SUPPORT</strong>
-
-            <a href="#flow">
-              掲載までの流れ
-            </a>
+            <strong>主催者の方へ</strong>
+            <a href="#flow">掲載までの流れ</a>
 
             <a
               href={LINE_URL}
@@ -1175,22 +983,20 @@ export default function EventListingPage() {
           </nav>
 
           <div className="footerCta">
-            <strong>
-              イベント主催者の方へ
-            </strong>
+            <strong>基本掲載は無料です</strong>
 
             <a
               href={LINE_URL}
               target="_blank"
               rel="noreferrer"
             >
-              無料で掲載相談する
+              掲載について相談する
               <span>→</span>
             </a>
           </div>
         </div>
 
-        <div className="footerBottom">
+        <div className="copyright">
           © TOKYO EVENT NAVI
         </div>
       </footer>
@@ -1226,7 +1032,7 @@ export default function EventListingPage() {
         .page {
           min-height: 100vh;
           overflow: hidden;
-          background: #fff;
+          background: #ffffff;
           color: #17243b;
           font-family:
             -apple-system,
@@ -1238,59 +1044,28 @@ export default function EventListingPage() {
         }
 
         .container {
-          width: min(
-            1160px,
-            calc(100% - 40px)
-          );
+          width: min(1160px, calc(100% - 40px));
           margin: 0 auto;
         }
 
-        .heroPhoto img,
-        .categoryImage img,
-        .problemPhoto img,
-        .benefitBannerImage img,
-        .sampleEvent > img,
-        .mobilePage img,
-        .finalBackground {
-          filter:
-            saturate(0.88)
-            contrast(0.97)
-            brightness(0.95);
-        }
-
-        .heroPhoto,
-        .categoryImage,
-        .problemPhoto,
-        .benefitBannerImage {
-          background:
-            linear-gradient(
-              135deg,
-              #f8ede2,
-              #e9efe9
-            );
+        .section {
+          padding: 105px 0;
         }
 
         .header {
           position: sticky;
           z-index: 100;
           top: 0;
-          border-bottom:
-            1px solid
-            rgba(23, 36, 59, 0.07);
-          background:
-            rgba(255, 255, 255, 0.9);
+          border-bottom: 1px solid rgba(23, 36, 59, 0.08);
+          background: rgba(255, 255, 255, 0.94);
           backdrop-filter: blur(18px);
         }
 
         .headerInner {
-          width: min(
-            1200px,
-            calc(100% - 40px)
-          );
+          width: min(1200px, calc(100% - 40px));
           min-height: 70px;
           display: flex;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           align-items: center;
           gap: 30px;
           margin: 0 auto;
@@ -1325,7 +1100,7 @@ export default function EventListingPage() {
           padding: 12px 17px;
           border-radius: 10px;
           background: #08b84e;
-          color: #fff;
+          color: #ffffff;
         }
 
         .hero {
@@ -1350,113 +1125,51 @@ export default function EventListingPage() {
             );
         }
 
-        .heroNoise {
-          position: absolute;
-          inset: 0;
-          opacity: 0.18;
-          background-image:
-            linear-gradient(
-              rgba(242, 100, 25, 0.055)
-                1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(242, 100, 25, 0.055)
-                1px,
-              transparent 1px
-            );
-          background-size: 55px 55px;
-        }
-
-        .heroCircle {
+        .heroDecoration {
           position: absolute;
           border-radius: 50%;
         }
 
-        .heroCircleOne {
+        .heroDecorationOne {
           top: -160px;
           right: -110px;
           width: 430px;
           height: 430px;
-          border:
-            82px solid
-            rgba(242, 100, 25, 0.06);
+          border: 82px solid rgba(242, 100, 25, 0.06);
         }
 
-        .heroCircleTwo {
+        .heroDecorationTwo {
           bottom: -175px;
           left: -130px;
           width: 370px;
           height: 370px;
-          background:
-            rgba(255, 193, 116, 0.14);
-        }
-
-        .heroDot {
-          position: absolute;
-          width: 13px;
-          height: 13px;
-          border-radius: 50%;
-        }
-
-        .heroDotOne {
-          top: 155px;
-          left: 49%;
-          background: #f26419;
-        }
-
-        .heroDotTwo {
-          top: 205px;
-          left: 46%;
-          background: #2d8058;
-        }
-
-        .heroDotThree {
-          top: 118px;
-          left: 52%;
-          background: #f4b151;
+          background: rgba(255, 193, 116, 0.14);
         }
 
         .heroInner {
           position: relative;
           z-index: 2;
-          width: min(
-            1200px,
-            calc(100% - 48px)
-          );
+          width: min(1200px, calc(100% - 48px));
           min-height: 760px;
           display: grid;
           grid-template-columns:
-            minmax(520px, 0.94fr)
-            minmax(510px, 1.06fr);
+            minmax(520px, 0.95fr)
+            minmax(500px, 1.05fr);
           align-items: center;
           gap: 65px;
           margin: 0 auto;
           padding: 70px 0 84px;
         }
 
-        .heroCopy {
-          min-width: 0;
-        }
-
-        .heroTarget {
+        .heroLabel {
           width: fit-content;
-          display: grid;
-          gap: 2px;
-          margin-bottom: 18px;
+          margin-bottom: 17px;
           padding: 9px 15px;
           border-radius: 999px;
           background: #17243b;
-          color: #fff;
+          color: #ffffff;
           font-size: 9px;
           font-weight: 900;
-        }
-
-        .heroTarget span {
-          color: #ffb476;
-          font-size: 6px;
-          letter-spacing: 0.18em;
         }
 
         .heroEnglish {
@@ -1471,34 +1184,26 @@ export default function EventListingPage() {
           display: grid;
           gap: 5px;
           margin: 0;
-          font-size: clamp(
-            48px,
-            5.15vw,
-            70px
-          );
+          font-size: clamp(48px, 5.15vw, 70px);
           line-height: 1.14;
           letter-spacing: -0.065em;
         }
 
-        .heroTitleFirst,
-        .heroTitleSecond {
+        .heroCopy h1 span,
+        .heroCopy h1 strong {
           display: block;
           width: max-content;
           max-width: 100%;
           white-space: nowrap;
         }
 
-        .heroTitleFirst {
-          color: #17243b;
-        }
-
-        .heroTitleSecond {
+        .heroCopy h1 strong {
           position: relative;
           z-index: 1;
           color: #f26419;
         }
 
-        .heroTitleSecond::before {
+        .heroCopy h1 strong::before {
           position: absolute;
           z-index: -1;
           right: -8px;
@@ -1506,13 +1211,12 @@ export default function EventListingPage() {
           left: -5px;
           height: 17px;
           border-radius: 999px;
-          background:
-            rgba(255, 190, 117, 0.47);
+          background: rgba(255, 190, 117, 0.47);
           content: "";
           transform: rotate(-1deg);
         }
 
-        .heroCatch {
+        .heroMessage {
           margin: 25px 0 0;
           color: #24334a;
           font-size: 17px;
@@ -1529,36 +1233,29 @@ export default function EventListingPage() {
           font-weight: 600;
         }
 
-        .heroFeatureGrid {
+        .featureGrid {
           display: grid;
-          grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-          gap: 9px;
-          margin-top: 22px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 23px;
         }
 
-        .heroFeatureGrid article {
+        .featureGrid article {
           display: grid;
-          grid-template-columns:
-            43px minmax(0, 1fr);
+          grid-template-columns: 44px minmax(0, 1fr);
           align-items: center;
-          gap: 11px;
-          min-height: 72px;
-          padding: 11px 13px;
-          border:
-            1px solid
-            rgba(234, 190, 151, 0.68);
-          border-radius: 13px;
-          background:
-            rgba(255, 255, 255, 0.86);
-          box-shadow:
-            0 8px 24px
-            rgba(70, 47, 27, 0.055);
+          gap: 12px;
+          min-height: 92px;
+          padding: 13px;
+          border: 1px solid rgba(234, 190, 151, 0.68);
+          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.9);
+          box-shadow: 0 8px 24px rgba(70, 47, 27, 0.06);
         }
 
-        .heroFeatureIcon {
-          width: 42px;
-          height: 42px;
+        .featureIcon {
+          width: 43px;
+          height: 43px;
           display: grid;
           place-items: center;
           border-radius: 12px;
@@ -1568,81 +1265,59 @@ export default function EventListingPage() {
           font-weight: 1000;
         }
 
-        .heroFeatureGrid article > div {
-          display: grid;
-          gap: 2px;
+        .featureGrid article > div {
+          min-width: 0;
         }
 
-        .heroFeatureGrid small {
-          color: #e96b27;
-          font-size: 6px;
-          font-weight: 1000;
-          letter-spacing: 0.13em;
-        }
-
-        .heroFeatureGrid strong {
-          color: #2b384e;
-          font-size: 11px;
-        }
-
-        .heroFeatureGrid p {
-          margin: 0;
-          color: #8a8e97;
+        .featureGrid small {
+          color: #f26419;
           font-size: 7px;
-          line-height: 1.4;
+          font-weight: 1000;
+        }
+
+        .featureGrid h2 {
+          margin: 3px 0 4px;
+          color: #2b384e;
+          font-size: 12px;
+        }
+
+        .featureGrid p {
+          margin: 0;
+          color: #858b96;
+          font-size: 8px;
+          line-height: 1.55;
         }
 
         .heroAction {
           display: flex;
           align-items: center;
-          gap: 15px;
-          margin-top: 20px;
+          gap: 17px;
+          margin-top: 21px;
         }
 
         .heroAction .lineButton {
           margin-top: 0;
         }
 
-        .heroActionNote {
-          display: grid;
-          gap: 3px;
-          max-width: 160px;
-        }
-
-        .heroActionNote strong {
-          color: #554739;
-          font-size: 9px;
-        }
-
-        .heroActionNote span {
-          color: #928270;
-          font-size: 7px;
-          line-height: 1.5;
+        .heroAction > p {
+          margin: 0;
+          color: #8c7d6e;
+          font-size: 8px;
+          line-height: 1.65;
         }
 
         .lineButton {
           display: inline-grid;
-          grid-template-columns:
-            45px minmax(0, 1fr) 20px;
+          grid-template-columns: 45px minmax(0, 1fr) 20px;
           align-items: center;
           gap: 12px;
-          width: min(
-            430px,
-            100%
-          );
+          width: min(430px, 100%);
           margin-top: 21px;
           padding: 13px 17px;
           border-radius: 14px;
-          background:
-            linear-gradient(
-              135deg,
-              #08b84e,
-              #05a643
-            );
-          box-shadow:
-            0 16px 36px
-            rgba(8, 184, 78, 0.22);
-          color: #fff;
+          background: linear-gradient(135deg, #08b84e, #05a643);
+          box-shadow: 0 16px 36px rgba(8, 184, 78, 0.22);
+          color: #ffffff;
           text-decoration: none;
           transition:
             transform 0.2s ease,
@@ -1651,35 +1326,32 @@ export default function EventListingPage() {
 
         .lineButton:hover {
           transform: translateY(-3px);
-          box-shadow:
-            0 21px 43px
-            rgba(8, 184, 78, 0.3);
+          box-shadow: 0 21px 43px rgba(8, 184, 78, 0.3);
         }
 
-        .lineLogo {
+        .lineIcon {
           width: 45px;
           height: 45px;
           display: grid;
           place-items: center;
           border-radius: 12px;
-          background: #fff;
+          background: #ffffff;
           color: #08a948;
           font-size: 8px;
           font-weight: 1000;
         }
 
-        .lineButtonText {
+        .lineCopy {
           display: grid;
           gap: 3px;
         }
 
-        .lineButtonText strong {
+        .lineCopy strong {
           font-size: 13px;
         }
 
-        .lineButtonText small {
-          color:
-            rgba(255, 255, 255, 0.8);
+        .lineCopy small {
+          color: rgba(255, 255, 255, 0.82);
           font-size: 8px;
         }
 
@@ -1688,224 +1360,142 @@ export default function EventListingPage() {
           font-weight: 900;
         }
 
-        .lineButtonLight {
-          background: #fff;
+        .whiteLineButton {
+          background: #ffffff;
           color: #17243b;
-          box-shadow:
-            0 17px 40px
-            rgba(0, 0, 0, 0.19);
+          box-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
         }
 
-        .lineButtonLight
-          .lineButtonText small {
-          color: #788091;
+        .whiteLineButton .lineCopy small {
+          color: #7f8794;
         }
 
         .heroVisual {
           position: relative;
-          min-height: 535px;
+          min-height: 540px;
         }
 
-        .heroVisualLabel {
-          position: absolute;
-          z-index: 8;
-          top: 0;
-          left: 45px;
-          padding: 8px 12px;
-          border-radius: 999px;
-          background: #fff;
-          box-shadow:
-            0 9px 24px
-            rgba(31, 38, 49, 0.12);
-          color: #f26419;
-          font-size: 7px;
-          font-weight: 1000;
-          letter-spacing: 0.17em;
-          transform: rotate(-4deg);
-        }
-
-        .heroPhoto {
+        .heroMainImage,
+        .heroSubImage {
           position: absolute;
           overflow: hidden;
           margin: 0;
-          border: 7px solid #fff;
-          border-radius: 22px;
-          background: #ddd;
-          box-shadow:
-            0 24px 60px
-            rgba(30, 35, 44, 0.18);
+          border: 7px solid #ffffff;
+          background: #eeeeee;
+          box-shadow: 0 24px 60px rgba(30, 35, 44, 0.18);
         }
 
-        .heroPhoto img {
+        .heroMainImage {
+          top: 35px;
+          right: 25px;
+          width: 80%;
+          height: 380px;
+          border-radius: 24px;
+          transform: rotate(1.5deg);
+        }
+
+        .heroMainImage img,
+        .heroSubImage img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          filter:
+            saturate(0.9)
+            contrast(0.97)
+            brightness(0.95);
         }
 
-        .heroPhotoMain {
-          top: 40px;
-          right: 30px;
-          width: 78%;
-          height: 370px;
-          transform: rotate(1.8deg);
-        }
-
-        .heroPhotoMain img {
-          object-position: center 42%;
-        }
-
-        .heroPhotoSubOne {
-          z-index: 3;
-          bottom: 7px;
-          left: 0;
-          width: 43%;
-          height: 185px;
-          transform: rotate(-4deg);
-        }
-
-        .heroPhotoSubTwo {
-          z-index: 4;
-          right: 0;
-          bottom: -3px;
-          width: 39%;
-          height: 180px;
-          transform: rotate(4deg);
-        }
-
-        .photoCaption {
+        .heroMainImage figcaption {
           position: absolute;
           right: 18px;
           bottom: 18px;
           left: 18px;
-          display: flex;
-          align-items: center;
-          gap: 11px;
-          padding: 12px 14px;
-          border:
-            1px solid
-            rgba(255, 255, 255, 0.22);
-          border-radius: 13px;
-          background:
-            rgba(23, 36, 59, 0.78);
-          backdrop-filter: blur(9px);
-          color: #fff;
-        }
-
-        .photoCaption > span {
-          width: 34px;
-          height: 34px;
-          display: grid;
-          place-items: center;
-          flex: 0 0 auto;
-          border-radius: 10px;
-          background: #f26419;
-          font-size: 8px;
-          font-weight: 1000;
-        }
-
-        .photoCaption > div {
-          display: grid;
-          gap: 2px;
-        }
-
-        .photoCaption small {
-          color: #ffb47a;
-          font-size: 7px;
-        }
-
-        .photoCaption strong {
-          font-size: 10px;
-        }
-
-        .heroVisualCard {
-          position: absolute;
-          z-index: 7;
-          top: 135px;
-          left: -15px;
           display: grid;
           gap: 4px;
-          padding: 13px 15px;
-          border-radius: 13px;
-          background: #fff;
-          box-shadow:
-            0 15px 35px
-            rgba(31, 38, 49, 0.15);
+          padding: 14px 16px;
+          border-radius: 14px;
+          background: rgba(23, 36, 59, 0.82);
+          color: #ffffff;
+          backdrop-filter: blur(8px);
+        }
+
+        .heroMainImage figcaption small {
+          color: #ffb27a;
+          font-size: 8px;
+        }
+
+        .heroMainImage figcaption strong {
+          font-size: 12px;
+          line-height: 1.5;
+        }
+
+        .heroSubImage {
+          z-index: 3;
+          bottom: 3px;
+          width: 42%;
+          height: 185px;
+          border-radius: 20px;
+        }
+
+        .heroBoardGame {
+          left: 0;
           transform: rotate(-4deg);
         }
 
-        .heroVisualCard span {
-          color: #f26419;
-          font-size: 7px;
-          font-weight: 1000;
+        .heroSeminar {
+          right: 0;
+          transform: rotate(4deg);
         }
 
-        .heroVisualCard strong {
-          color: #344055;
-          font-size: 9px;
-          line-height: 1.45;
-        }
-
-        .heroFree {
-          position: absolute;
-          z-index: 10;
-          top: 325px;
-          left: 54%;
-          width: 122px;
-          height: 122px;
+        .heroFreeBadge,
+        .freeBadge {
           display: grid;
           place-items: center;
           align-content: center;
-          border: 8px solid #fff7ec;
           border-radius: 50%;
-          background:
-            linear-gradient(
-              145deg,
-              #ff762c,
-              #ed530e
-            );
-          box-shadow:
-            0 17px 40px
-            rgba(242, 100, 25, 0.32);
-          color: #fff;
+          background: linear-gradient(145deg, #ff762c, #ed530e);
+          color: #ffffff;
           text-align: center;
-          transform:
-            translate(-50%, -50%)
-            rotate(6deg);
         }
 
-        .heroFree small {
-          font-size: 7px;
-          letter-spacing: 0.1em;
+        .heroFreeBadge {
+          position: absolute;
+          z-index: 8;
+          top: 345px;
+          left: 54%;
+          width: 125px;
+          height: 125px;
+          border: 8px solid #fff7ec;
+          box-shadow: 0 17px 40px rgba(242, 100, 25, 0.32);
+          transform: translate(-50%, -50%) rotate(5deg);
         }
 
-        .heroFree strong {
-          font-size: 29px;
+        .heroFreeBadge span {
+          font-size: 9px;
+          font-weight: 900;
+        }
+
+        .heroFreeBadge strong {
+          font-size: 31px;
           line-height: 1.05;
-        }
-
-        .heroFree span {
-          font-size: 7px;
         }
 
         .heroBottom {
           position: relative;
-          z-index: 4;
+          z-index: 3;
           display: grid;
-          grid-template-columns:
-            repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           background: #17243b;
         }
 
         .heroBottom > div {
+          min-height: 72px;
           display: flex;
           justify-content: center;
           align-items: center;
           gap: 10px;
-          min-height: 72px;
-          border-right:
-            1px solid
-            rgba(255, 255, 255, 0.1);
-          color: #fff;
+          border-right: 1px solid rgba(255, 255, 255, 0.1);
+          color: #ffffff;
           font-size: 10px;
           font-weight: 800;
         }
@@ -1920,23 +1510,13 @@ export default function EventListingPage() {
           font-weight: 1000;
         }
 
-        .categorySection,
-        .problemSection,
-        .previewSection,
-        .benefitSection,
-        .freeSection,
-        .flowSection,
-        .faqSection {
-          padding: 105px 0;
-        }
-
         .sectionHeading {
           max-width: 820px;
           margin: 0 auto;
           text-align: center;
         }
 
-        .sectionEyebrow {
+        .sectionHeading > p {
           margin: 0 0 12px;
           color: #f26419;
           font-size: 8px;
@@ -1948,12 +1528,7 @@ export default function EventListingPage() {
           display: grid;
           gap: 2px;
           margin: 0;
-          color: #17243b;
-          font-size: clamp(
-            34px,
-            4.7vw,
-            52px
-          );
+          font-size: clamp(34px, 4.7vw, 52px);
           line-height: 1.3;
           letter-spacing: -0.05em;
         }
@@ -1967,7 +1542,7 @@ export default function EventListingPage() {
           color: #f26419;
         }
 
-        .sectionHeadingLine {
+        .headingLine {
           width: 56px;
           height: 4px;
           margin: 18px auto 0;
@@ -1975,8 +1550,8 @@ export default function EventListingPage() {
           background: #f26419;
         }
 
-        .sectionLead {
-          max-width: 690px;
+        .sectionDescription {
+          max-width: 700px;
           margin: 20px auto 0;
           color: #6a7383;
           font-size: 12px;
@@ -1984,13 +1559,12 @@ export default function EventListingPage() {
         }
 
         .categorySection {
-          background: #fff;
+          background: #ffffff;
         }
 
         .categoryGrid {
           display: grid;
-          grid-template-columns:
-            repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 17px;
           margin-top: 48px;
         }
@@ -1998,10 +1572,8 @@ export default function EventListingPage() {
         .categoryCard {
           overflow: hidden;
           border-radius: 18px;
-          background: #fff;
-          box-shadow:
-            0 13px 35px
-            rgba(45, 40, 34, 0.085);
+          background: #ffffff;
+          box-shadow: 0 13px 35px rgba(45, 40, 34, 0.085);
           transition:
             transform 0.25s ease,
             box-shadow 0.25s ease;
@@ -2009,9 +1581,7 @@ export default function EventListingPage() {
 
         .categoryCard:hover {
           transform: translateY(-7px);
-          box-shadow:
-            0 22px 48px
-            rgba(45, 40, 34, 0.14);
+          box-shadow: 0 22px 48px rgba(45, 40, 34, 0.14);
         }
 
         .categoryImage {
@@ -2020,56 +1590,54 @@ export default function EventListingPage() {
           overflow: hidden;
         }
 
+        .categoryImage::after {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            transparent 45%,
+            rgba(13, 28, 48, 0.55)
+          );
+          content: "";
+        }
+
         .categoryImage img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center;
-          transition:
-            transform 0.4s ease;
+          filter:
+            saturate(0.9)
+            contrast(0.97)
+            brightness(0.95);
+          transition: transform 0.4s ease;
         }
 
-        .categoryCard:hover
-          .categoryImage img {
+        .categoryCard:hover .categoryImage img {
           transform: scale(1.07);
         }
 
-        .categoryOverlay {
+        .categoryIndex {
           position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(
-              transparent 45%,
-              rgba(13, 28, 48, 0.56)
-            );
-        }
-
-        .categoryNumber {
-          position: absolute;
+          z-index: 2;
           top: 13px;
           right: 13px;
-          color:
-            rgba(255, 255, 255, 0.8);
+          color: rgba(255, 255, 255, 0.86);
           font-size: 9px;
           font-weight: 1000;
         }
 
         .categoryIcon {
           position: absolute;
+          z-index: 2;
           bottom: 13px;
           left: 14px;
           width: 46px;
           height: 46px;
           display: grid;
           place-items: center;
-          border:
-            4px solid
-            rgba(255, 255, 255, 0.95);
+          border: 4px solid #ffffff;
           border-radius: 50%;
           background: #fff1df;
-          box-shadow:
-            0 9px 22px
-            rgba(0, 0, 0, 0.18);
+          box-shadow: 0 9px 22px rgba(0, 0, 0, 0.18);
           font-size: 21px;
         }
 
@@ -2091,231 +1659,191 @@ export default function EventListingPage() {
           line-height: 1.75;
         }
 
-        .categoryBottom {
+        .categoryCta {
           display: flex;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           align-items: center;
           gap: 30px;
           margin-top: 27px;
           padding: 23px 26px;
           border-radius: 17px;
-          background:
-            linear-gradient(
-              135deg,
-              #f26419,
-              #ff963c
-            );
-          box-shadow:
-            0 16px 38px
-            rgba(242, 100, 25, 0.2);
-          color: #fff;
+          background: linear-gradient(135deg, #f26419, #ff963c);
+          box-shadow: 0 16px 38px rgba(242, 100, 25, 0.2);
+          color: #ffffff;
         }
 
-        .categoryBottom > div {
+        .categoryCta > div {
           display: grid;
           gap: 5px;
         }
 
-        .categoryBottom small {
+        .categoryCta small {
           color: #ffd9c1;
-          font-size: 7px;
-          font-weight: 1000;
-          letter-spacing: 0.16em;
+          font-size: 8px;
+          font-weight: 900;
         }
 
-        .categoryBottom strong {
+        .categoryCta strong {
           font-size: 15px;
           line-height: 1.5;
         }
 
-        .categoryBottom a {
+        .categoryCta a {
           display: flex;
           align-items: center;
           gap: 18px;
           flex: 0 0 auto;
           padding: 13px 17px;
           border-radius: 11px;
-          background: #fff;
+          background: #ffffff;
           color: #d9510c;
           text-decoration: none;
           font-size: 10px;
           font-weight: 900;
         }
 
-        .categoryBottom a span {
+        .categoryCta a span {
           font-size: 17px;
         }
 
         .problemSection {
-          position: relative;
-          overflow: hidden;
-          background:
-            linear-gradient(
-              180deg,
-              #fff9f1,
-              #f1faf4
-            );
-        }
-
-        .problemBackgroundNumber {
-          position: absolute;
-          top: 15px;
-          left: 50%;
-          color:
-            rgba(242, 100, 25, 0.04);
-          font-size: 280px;
-          line-height: 1;
-          font-weight: 1000;
-          transform: translateX(-50%);
+          background: linear-gradient(180deg, #fff9f1, #f1faf4);
         }
 
         .problemGrid {
-          position: relative;
           display: grid;
-          grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-          gap: 18px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 19px;
           margin-top: 48px;
         }
 
         .problemCard {
           overflow: hidden;
-          border-radius: 20px;
-          background: #fff;
-          box-shadow:
-            0 15px 40px
-            rgba(30, 39, 52, 0.09);
+          border-radius: 21px;
+          background: #ffffff;
+          box-shadow: 0 15px 40px rgba(30, 39, 52, 0.09);
         }
 
-        .problemCardOrange {
-          border:
-            1px solid
-            rgba(238, 136, 73, 0.27);
+        .orangeProblem {
+          border: 1px solid rgba(238, 136, 73, 0.27);
         }
 
-        .problemCardGreen {
-          border:
-            1px solid
-            rgba(64, 148, 99, 0.25);
+        .greenProblem {
+          border: 1px solid rgba(64, 148, 99, 0.25);
         }
 
-        .problemPhoto {
+        .problemImage {
           position: relative;
-          height: 240px;
+          height: 250px;
           overflow: hidden;
         }
 
-        .problemPhoto img {
+        .problemImage::after {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            transparent 50%,
+            rgba(18, 31, 48, 0.45)
+          );
+          content: "";
+        }
+
+        .problemImage img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           object-position: center 42%;
+          filter:
+            saturate(0.85)
+            contrast(0.96)
+            brightness(0.95);
         }
 
-        .problemPhoto::after {
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(
-              transparent 50%,
-              rgba(18, 31, 48, 0.4)
-            );
-          content: "";
-        }
-
-        .problemPhoto > span {
+        .problemImage > span {
           position: absolute;
           z-index: 2;
-          right: 17px;
-          bottom: 15px;
-          color: #fff;
+          right: 18px;
+          bottom: 16px;
+          color: #ffffff;
           font-size: 40px;
           line-height: 1;
           font-weight: 1000;
-          opacity: 0.85;
         }
 
         .problemContent {
-          padding: 26px;
+          padding: 28px;
         }
 
-        .problemType {
-          margin: 0;
+        .problemContent > small {
           color: #f26419;
-          font-size: 7px;
-          font-weight: 1000;
-          letter-spacing: 0.16em;
+          font-size: 8px;
+          font-weight: 900;
         }
 
-        .problemCardGreen
-          .problemType {
+        .greenProblem .problemContent > small {
           color: #27865a;
         }
 
         .problemContent h3 {
-          margin: 13px 0 20px;
+          margin: 13px 0 22px;
           color: #26344b;
           font-size: 21px;
           line-height: 1.55;
         }
 
-        .problemList {
+        .problemItems {
           display: grid;
-          gap: 9px;
+          gap: 10px;
         }
 
-        .problemList p {
+        .problemItems p {
           display: flex;
           align-items: center;
-          gap: 9px;
+          gap: 10px;
           margin: 0;
-          padding: 10px 11px;
+          padding: 11px 12px;
           border-radius: 10px;
           background: #faf8f4;
           color: #5f6878;
           font-size: 10px;
-          line-height: 1.5;
+          line-height: 1.55;
           font-weight: 700;
         }
 
-        .problemList span {
-          width: 20px;
-          height: 20px;
+        .problemItems p span {
+          width: 21px;
+          height: 21px;
           display: grid;
           place-items: center;
           flex: 0 0 auto;
           border-radius: 50%;
           background: #f26419;
-          color: #fff;
+          color: #ffffff;
           font-size: 8px;
         }
 
-        .problemCardGreen
-          .problemList span {
+        .greenProblem .problemItems p span {
           background: #27865a;
         }
 
-        .problemSolution {
+        .solutionBox {
           display: grid;
           grid-template-columns:
             55px minmax(0, 1fr)
-            minmax(250px, 0.55fr);
+            minmax(240px, 0.55fr);
           align-items: center;
           gap: 20px;
-          margin-top: 26px;
-          padding: 24px 27px;
-          border-radius: 17px;
+          margin-top: 27px;
+          padding: 25px 28px;
+          border-radius: 18px;
           background: #17243b;
-          box-shadow:
-            0 18px 40px
-            rgba(23, 36, 59, 0.16);
-          color: #fff;
+          box-shadow: 0 18px 40px rgba(23, 36, 59, 0.16);
+          color: #ffffff;
         }
 
-        .problemSolutionIcon {
-          width: 53px;
-          height: 53px;
+        .solutionIcon {
+          width: 54px;
+          height: 54px;
           display: grid;
           place-items: center;
           border-radius: 15px;
@@ -2324,24 +1852,23 @@ export default function EventListingPage() {
           font-weight: 900;
         }
 
-        .problemSolution > div:nth-child(2) {
+        .solutionBox > div {
           display: grid;
           gap: 5px;
         }
 
-        .problemSolution small {
+        .solutionBox small {
           color: #ffb67d;
           font-size: 7px;
           font-weight: 1000;
-          letter-spacing: 0.15em;
         }
 
-        .problemSolution strong {
+        .solutionBox strong {
           font-size: 14px;
-          line-height: 1.55;
+          line-height: 1.6;
         }
 
-        .problemSolution p {
+        .solutionBox p {
           margin: 0;
           color: #c8cfda;
           font-size: 9px;
@@ -2352,124 +1879,26 @@ export default function EventListingPage() {
           background: #fff5e9;
         }
 
-        .previewHeading {
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1fr)
-            360px;
-          align-items: end;
-          gap: 50px;
-          margin-bottom: 46px;
-        }
-
-        .previewHeading > div > p:first-child {
-          margin: 0 0 12px;
-          color: #f26419;
-          font-size: 8px;
-          font-weight: 1000;
-          letter-spacing: 0.23em;
-        }
-
-        .previewHeading h2 {
-          display: grid;
-          gap: 2px;
-          margin: 0;
-          font-size: clamp(
-            34px,
-            4.7vw,
-            52px
-          );
-          line-height: 1.3;
-          letter-spacing: -0.05em;
-        }
-
-        .previewHeading h2 span,
-        .previewHeading h2 strong {
-          display: block;
-        }
-
-        .previewHeading h2 strong {
-          color: #f26419;
-        }
-
-        .previewDescription {
-          max-width: 680px;
-          margin: 19px 0 0;
-          color: #6a7383;
-          font-size: 12px;
-          line-height: 1.85;
-        }
-
-        .previewTagArea {
-          display: flex;
-          justify-content: flex-end;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .previewTagArea span {
-          padding: 9px 13px;
-          border:
-            1px solid
-            rgba(226, 167, 115, 0.3);
-          border-radius: 999px;
-          background: #fff;
-          box-shadow:
-            0 7px 18px
-            rgba(64, 43, 23, 0.06);
-          color: #a94f1e;
-          font-size: 8px;
-          font-weight: 900;
-        }
-
-        .previewStage {
+        .listingPreview {
           position: relative;
-          min-height: 630px;
-          padding:
-            20px 125px 50px 15px;
+          min-height: 640px;
+          margin-top: 50px;
+          padding: 15px 125px 55px 15px;
         }
 
-        .previewGlow {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(1px);
-        }
-
-        .previewGlowOne {
-          top: 50px;
-          left: -80px;
-          width: 250px;
-          height: 250px;
-          background:
-            rgba(242, 100, 25, 0.09);
-        }
-
-        .previewGlowTwo {
-          right: 50px;
-          bottom: 40px;
-          width: 260px;
-          height: 260px;
-          background:
-            rgba(39, 134, 90, 0.08);
-        }
-
-        .desktopPreview {
-          position: relative;
-          z-index: 2;
+        .previewDesktop {
           overflow: hidden;
-          border: 9px solid #fff;
+          border: 9px solid #ffffff;
           border-radius: 25px;
           background: #f7f7f5;
-          box-shadow:
-            0 30px 75px
-            rgba(39, 35, 32, 0.2);
+          box-shadow: 0 30px 75px rgba(39, 35, 32, 0.2);
           transform:
             perspective(1200px)
-            rotateY(2deg)
-            rotateZ(-0.6deg);
+            rotateY(1.5deg)
+            rotateZ(-0.4deg);
         }
 
-        .browserTop {
+        .browserHeader {
           display: flex;
           align-items: center;
           gap: 18px;
@@ -2482,198 +1911,185 @@ export default function EventListingPage() {
           gap: 5px;
         }
 
-        .browserDots span {
+        .browserDots i {
           width: 8px;
           height: 8px;
           border-radius: 50%;
           background: #f26419;
         }
 
-        .browserDots span:nth-child(2) {
+        .browserDots i:nth-child(2) {
           background: #f4c54b;
         }
 
-        .browserDots span:nth-child(3) {
+        .browserDots i:nth-child(3) {
           background: #45aa72;
         }
 
-        .browserAddress {
+        .browserHeader > span {
           flex: 1;
           padding: 6px;
           border-radius: 6px;
-          background:
-            rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.1);
           color: #dce1eb;
           text-align: center;
-          font-size: 7px;
-        }
-
-        .browserPage {
-          padding: 23px;
-        }
-
-        .browserTitle {
-          display: flex;
-          justify-content:
-            space-between;
-          align-items: flex-end;
-          margin-bottom: 16px;
-          padding-bottom: 11px;
-          border-bottom:
-            1px solid #dddcd7;
-        }
-
-        .browserTitle > div {
-          display: grid;
-          gap: 3px;
-        }
-
-        .browserTitle small {
-          color: #f26419;
-          font-size: 6px;
-          font-weight: 900;
-          letter-spacing: 0.18em;
-        }
-
-        .browserTitle strong {
-          font-size: 18px;
-        }
-
-        .browserTitle > span {
-          color: #c5c3bc;
           font-size: 8px;
         }
 
-        .browserLayout {
+        .previewPage {
+          padding: 24px;
+        }
+
+        .previewPageHeading {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-bottom: 18px;
+          padding-bottom: 13px;
+          border-bottom: 1px solid #deddd8;
+        }
+
+        .previewPageHeading small {
+          color: #f26419;
+          font-size: 7px;
+          font-weight: 900;
+        }
+
+        .previewPageHeading h3 {
+          margin: 4px 0 0;
+          font-size: 20px;
+        }
+
+        .previewPageHeading > span {
+          color: #b9b9b5;
+          font-size: 8px;
+        }
+
+        .previewColumns {
           display: grid;
           grid-template-columns:
-            minmax(0, 1.3fr)
-            minmax(170px, 0.7fr);
-          gap: 13px;
+            minmax(0, 1.35fr)
+            minmax(190px, 0.65fr);
+          gap: 15px;
         }
 
-        .sampleEvent {
+        .previewEventCard {
           overflow: hidden;
-          border-radius: 14px;
-          background: #fff;
-          box-shadow:
-            0 8px 20px
-            rgba(0, 0, 0, 0.08);
+          border-radius: 15px;
+          background: #ffffff;
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
         }
 
-        .sampleEvent > img {
-          height: 205px;
+        .previewEventCard > img {
+          height: 235px;
           object-fit: cover;
-          object-position: center;
+          filter:
+            saturate(0.9)
+            contrast(0.97)
+            brightness(0.95);
         }
 
-        .sampleEventBody {
-          padding: 15px;
+        .previewEventContent {
+          padding: 18px;
         }
 
-        .sampleEventBody > span {
+        .previewCategory {
           display: inline-flex;
-          padding: 5px 8px;
+          padding: 6px 9px;
           border-radius: 999px;
           background: #fff0df;
           color: #a94d1c;
-          font-size: 7px;
+          font-size: 8px;
           font-weight: 900;
         }
 
-        .sampleEventBody h3 {
-          margin: 10px 0;
-          font-size: 14px;
-          line-height: 1.4;
+        .previewEventContent h4 {
+          margin: 12px 0 15px;
+          color: #26344b;
+          font-size: 17px;
+          line-height: 1.45;
         }
 
-        .sampleEventBody dl {
+        .previewEventInfo {
           display: grid;
-          gap: 7px;
-          margin: 0;
+          gap: 8px;
         }
 
-        .sampleEventBody dl > div {
+        .previewEventInfo p {
           display: grid;
-          grid-template-columns:
-            52px minmax(0, 1fr);
-          gap: 7px;
-        }
-
-        .sampleEventBody dt {
-          color: #9a9da5;
-          font-size: 6px;
-        }
-
-        .sampleEventBody dd {
+          grid-template-columns: 62px minmax(0, 1fr);
+          gap: 10px;
           margin: 0;
-          color: #626977;
-          font-size: 7px;
-          font-weight: 700;
+          color: #4e5868;
+          font-size: 9px;
+          line-height: 1.5;
         }
 
-        .sampleDetail {
-          display: block;
-          margin-top: 12px;
-          padding: 9px;
-          border-radius: 7px;
-          background: #17243b;
-          color: #fff;
-          text-align: center;
+        .previewEventInfo p span {
+          color: #999da5;
           font-size: 8px;
         }
 
-        .sampleSide {
-          display: grid;
-          gap: 9px;
+        .previewEventContent > strong {
+          display: block;
+          margin-top: 16px;
+          padding: 11px;
+          border-radius: 8px;
+          background: #17243b;
+          color: #ffffff;
+          text-align: center;
+          font-size: 9px;
         }
 
-        .sampleSide article {
+        .previewMenus {
+          display: grid;
+          gap: 11px;
+        }
+
+        .previewMenus article {
           display: grid;
           align-content: center;
-          gap: 5px;
-          min-height: 113px;
-          padding: 14px;
-          border-radius: 12px;
-          background: #fff;
-          box-shadow:
-            0 6px 16px
-            rgba(0, 0, 0, 0.06);
+          min-height: 133px;
+          padding: 18px;
+          border-radius: 14px;
+          background: #ffffff;
+          box-shadow: 0 7px 18px rgba(0, 0, 0, 0.06);
         }
 
-        .sampleSide article > span {
+        .previewMenus small {
           color: #f26419;
           font-size: 7px;
           font-weight: 1000;
-          letter-spacing: 0.1em;
         }
 
-        .sampleSide strong {
-          font-size: 10px;
+        .previewMenus h4 {
+          margin: 8px 0 6px;
+          color: #26344b;
+          font-size: 12px;
         }
 
-        .sampleSide small {
-          color: #8a8e99;
-          font-size: 7px;
+        .previewMenus p {
+          margin: 0;
+          color: #818792;
+          font-size: 8px;
+          line-height: 1.6;
         }
 
-        .mobilePreview {
+        .previewPhone {
           position: absolute;
           z-index: 5;
-          right: 9px;
+          right: 8px;
           bottom: 0;
-          width: 220px;
+          width: 225px;
           padding: 11px;
           border: 8px solid #19263c;
           border-radius: 32px;
-          background: #fff;
-          box-shadow:
-            0 25px 58px
-            rgba(25, 38, 60, 0.3);
+          background: #ffffff;
+          box-shadow: 0 25px 58px rgba(25, 38, 60, 0.3);
           transform: rotate(5deg);
         }
 
-        .mobileSpeaker {
+        .phoneSpeaker {
           width: 58px;
           height: 5px;
           margin: 0 auto 9px;
@@ -2681,21 +2097,23 @@ export default function EventListingPage() {
           background: #19263c;
         }
 
-        .mobilePage {
+        .phoneScreen {
           overflow: hidden;
           border-radius: 17px;
           background: #f6f6f3;
         }
 
-        .mobilePage img {
-          height: 160px;
+        .phoneScreen > img {
+          height: 165px;
           object-fit: cover;
-          object-position: center;
         }
 
-        .mobilePage > span {
+        .phoneScreen > div {
+          padding: 14px;
+        }
+
+        .phoneScreen span {
           display: inline-flex;
-          margin: 12px 12px 7px;
           padding: 5px 8px;
           border-radius: 999px;
           background: #fff0df;
@@ -2704,100 +2122,86 @@ export default function EventListingPage() {
           font-weight: 900;
         }
 
-        .mobilePage h3 {
-          margin: 0;
-          padding: 0 12px;
+        .phoneScreen h4 {
+          margin: 9px 0 7px;
           font-size: 13px;
-          line-height: 1.4;
         }
 
-        .mobilePage p {
-          margin: 8px 12px;
-          color: #777;
+        .phoneScreen p {
+          margin: 0;
+          color: #777777;
           font-size: 7px;
         }
 
-        .mobilePage > strong {
+        .phoneScreen strong {
           display: block;
-          margin: 11px 12px 14px;
-          padding: 8px;
-          border-radius: 6px;
+          margin-top: 12px;
+          padding: 9px;
+          border-radius: 7px;
           background: #17243b;
-          color: #fff;
+          color: #ffffff;
           text-align: center;
           font-size: 7px;
         }
 
-        .previewFloating {
+        .freeBadge {
+          position: absolute;
+          z-index: 8;
+          top: -25px;
+          right: 75px;
+          width: 120px;
+          height: 120px;
+          border: 8px solid #fff7e8;
+          box-shadow: 0 17px 40px rgba(242, 100, 25, 0.31);
+          transform: rotate(7deg);
+        }
+
+        .freeBadge span {
+          font-size: 9px;
+          font-weight: 900;
+        }
+
+        .freeBadge strong {
+          font-size: 30px;
+          line-height: 1.05;
+        }
+
+        .calendarBadge,
+        .categoryBadge {
           position: absolute;
           z-index: 7;
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 10px 13px;
+          padding: 11px 14px;
           border-radius: 11px;
-          background: #fff;
-          box-shadow:
-            0 15px 34px
-            rgba(32, 39, 54, 0.16);
+          background: #ffffff;
+          box-shadow: 0 15px 34px rgba(32, 39, 54, 0.16);
           color: #344055;
           font-size: 9px;
           font-weight: 900;
         }
 
-        .previewFloating span {
+        .calendarBadge span,
+        .categoryBadge span {
           color: #f26419;
           font-size: 7px;
         }
 
-        .previewFloatingOne {
-          top: 66px;
+        .calendarBadge {
+          top: 65px;
           left: -15px;
           transform: rotate(-5deg);
         }
 
-        .previewFloatingTwo {
+        .categoryBadge {
           right: 0;
-          bottom: 175px;
+          bottom: 180px;
           transform: rotate(4deg);
         }
 
-        .previewFreeBadge {
-          position: absolute;
-          z-index: 8;
-          top: -18px;
-          right: 76px;
-          width: 116px;
-          height: 116px;
-          display: grid;
-          place-items: center;
-          align-content: center;
-          border: 8px solid #fff7e8;
-          border-radius: 50%;
-          background: #f26419;
-          box-shadow:
-            0 17px 40px
-            rgba(242, 100, 25, 0.31);
-          color: #fff;
-          text-align: center;
-          transform: rotate(7deg);
-        }
-
-        .previewFreeBadge > span {
-          font-size: 7px;
-        }
-
-        .previewFreeBadge strong {
-          font-size: 26px;
-          line-height: 1.05;
-        }
-
-        .previewFreeBadge small {
-          font-size: 7px;
-        }
-
         .previewNotice {
-          margin: 18px 0 0;
+          margin: 20px 0 0;
           color: #92715a;
           text-align: center;
           font-size: 9px;
@@ -2810,8 +2214,7 @@ export default function EventListingPage() {
 
         .benefitGrid {
           display: grid;
-          grid-template-columns:
-            repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 16px;
           margin-top: 48px;
         }
@@ -2820,49 +2223,21 @@ export default function EventListingPage() {
           position: relative;
           min-height: 285px;
           overflow: hidden;
-          padding: 24px;
-          border:
-            1px solid
-            rgba(39, 134, 90, 0.17);
+          padding: 25px;
+          border: 1px solid rgba(39, 134, 90, 0.17);
           border-radius: 19px;
-          background: #fff;
-          box-shadow:
-            0 12px 32px
-            rgba(27, 75, 47, 0.06);
-          transition:
-            transform 0.25s ease;
-        }
-
-        .benefitCard:hover {
-          transform: translateY(-6px);
-        }
-
-        .benefitTop {
-          display: flex;
-          justify-content:
-            space-between;
-          align-items: center;
+          background: #ffffff;
+          box-shadow: 0 12px 32px rgba(27, 75, 47, 0.06);
         }
 
         .benefitNumber {
-          color:
-            rgba(39, 134, 90, 0.24);
-          font-size: 26px;
+          color: rgba(39, 134, 90, 0.3);
+          font-size: 29px;
           font-weight: 1000;
         }
 
-        .benefitIcon {
-          width: 56px;
-          height: 56px;
-          display: grid;
-          place-items: center;
-          border-radius: 17px;
-          background: #e1f4e7;
-          font-size: 25px;
-        }
-
         .benefitCard h3 {
-          margin: 34px 0 12px;
+          margin: 36px 0 13px;
           color: #24543b;
           font-size: 17px;
           line-height: 1.5;
@@ -2872,71 +2247,67 @@ export default function EventListingPage() {
           margin: 0;
           color: #68766d;
           font-size: 10px;
-          line-height: 1.8;
+          line-height: 1.85;
         }
 
-        .benefitLine {
+        .benefitBar {
           position: absolute;
-          right: 24px;
-          bottom: 22px;
-          left: 24px;
-          height: 3px;
+          right: 25px;
+          bottom: 23px;
+          left: 25px;
+          height: 4px;
           border-radius: 999px;
-          background:
-            linear-gradient(
-              90deg,
-              #27865a 0 28%,
-              #e1eee5 28%
-            );
+          background: linear-gradient(
+            90deg,
+            #27865a 0 30%,
+            #e1eee5 30%
+          );
         }
 
-        .benefitBanner {
+        .connectionBanner {
           display: grid;
           grid-template-columns:
             minmax(340px, 0.85fr)
             minmax(0, 1.15fr);
           overflow: hidden;
-          margin-top: 26px;
-          border-radius: 21px;
+          margin-top: 27px;
+          border-radius: 22px;
           background: #17243b;
-          box-shadow:
-            0 19px 45px
-            rgba(23, 36, 59, 0.14);
+          box-shadow: 0 19px 45px rgba(23, 36, 59, 0.14);
         }
 
-        .benefitBannerImage {
-          min-height: 315px;
-          overflow: hidden;
-        }
-
-        .benefitBannerImage img {
+        .connectionBanner > img {
           width: 100%;
           height: 100%;
+          min-height: 320px;
           object-fit: cover;
-          object-position: center;
+          filter:
+            saturate(0.88)
+            contrast(0.96)
+            brightness(0.91);
         }
 
-        .benefitBannerContent {
+        .connectionBanner > div {
           display: grid;
           align-content: center;
-          padding: 43px;
-          color: #fff;
+          padding: 44px;
+          color: #ffffff;
         }
 
-        .benefitBannerContent small {
+        .connectionBanner small {
           color: #ffad70;
           font-size: 7px;
           font-weight: 1000;
-          letter-spacing: 0.19em;
+          letter-spacing: 0.18em;
         }
 
-        .benefitBannerContent h3 {
-          margin: 13px 0 15px;
-          font-size: 27px;
+        .connectionBanner h3 {
+          margin: 14px 0 16px;
+          font-size: 28px;
           line-height: 1.5;
         }
 
-        .benefitBannerContent p {
+        .connectionBanner p {
           margin: 0;
           color: #cbd1db;
           font-size: 10px;
@@ -2944,79 +2315,40 @@ export default function EventListingPage() {
         }
 
         .freeSection {
-          position: relative;
-          overflow: hidden;
-          background: #fff;
-        }
-
-        .freeShape {
-          position: absolute;
-          border-radius: 50%;
-        }
-
-        .freeShapeOne {
-          top: -150px;
-          left: -110px;
-          width: 340px;
-          height: 340px;
-          background:
-            rgba(39, 134, 90, 0.055);
-        }
-
-        .freeShapeTwo {
-          right: -120px;
-          bottom: -160px;
-          width: 370px;
-          height: 370px;
-          border:
-            70px solid
-            rgba(242, 100, 25, 0.045);
+          background: #ffffff;
         }
 
         .freeHeading {
-          position: relative;
           display: flex;
           justify-content: center;
           align-items: center;
           gap: 42px;
         }
 
-        .freeStamp {
-          width: 140px;
-          height: 140px;
-          flex: 0 0 auto;
+        .largeFreeBadge {
+          width: 145px;
+          height: 145px;
           display: grid;
           place-items: center;
           align-content: center;
-          gap: 2px;
+          flex: 0 0 auto;
           border: 8px solid #e9f6ed;
           border-radius: 50%;
-          background:
-            linear-gradient(
-              145deg,
-              #27865a,
-              #176b42
-            );
-          box-shadow:
-            0 18px 40px
-            rgba(39, 134, 90, 0.2);
-          color: #fff;
+          background: linear-gradient(145deg, #27865a, #176b42);
+          box-shadow: 0 18px 40px rgba(39, 134, 90, 0.2);
+          color: #ffffff;
           text-align: center;
-          transform: rotate(-7deg);
+          transform: rotate(-6deg);
         }
 
-        .freeStamp small {
-          font-size: 8px;
-          letter-spacing: 0.14em;
+        .largeFreeBadge span {
+          font-size: 10px;
+          font-weight: 900;
         }
 
-        .freeStamp strong {
-          font-size: 30px;
+        .largeFreeBadge strong {
+          font-size: 34px;
           line-height: 1.05;
-        }
-
-        .freeStamp span {
-          font-size: 8px;
         }
 
         .freeHeading > div:last-child > p {
@@ -3029,11 +2361,7 @@ export default function EventListingPage() {
 
         .freeHeading h2 {
           margin: 0;
-          font-size: clamp(
-            34px,
-            4.7vw,
-            52px
-          );
+          font-size: clamp(34px, 4.7vw, 52px);
           line-height: 1.3;
           letter-spacing: -0.05em;
         }
@@ -3043,7 +2371,7 @@ export default function EventListingPage() {
           color: #27865a;
         }
 
-        .freeHeadingLead {
+        .freeHeading > div:last-child > strong {
           display: block;
           margin-top: 13px;
           color: #6b756e;
@@ -3053,33 +2381,29 @@ export default function EventListingPage() {
         }
 
         .includedGrid {
-          position: relative;
           display: grid;
-          grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 14px;
-          margin-top: 45px;
+          margin-top: 46px;
         }
 
         .includedGrid article {
           display: grid;
           grid-template-columns:
-            31px 55px
-            minmax(0, 1fr) 27px;
+            29px 55px
+            minmax(0, 1fr)
+            27px;
           align-items: center;
           gap: 13px;
-          min-height: 115px;
+          min-height: 118px;
           padding: 18px;
-          border:
-            1px solid
-            rgba(39, 134, 90, 0.18);
+          border: 1px solid rgba(39, 134, 90, 0.18);
           border-radius: 15px;
           background: #f5faf6;
         }
 
         .includedNumber {
-          color:
-            rgba(39, 134, 90, 0.35);
+          color: rgba(39, 134, 90, 0.4);
           font-size: 10px;
           font-weight: 1000;
         }
@@ -3114,38 +2438,18 @@ export default function EventListingPage() {
           place-items: center;
           border-radius: 50%;
           background: #27865a;
-          color: #fff;
+          color: #ffffff;
           font-size: 10px;
           font-weight: 900;
         }
 
-        .freeNote {
-          position: relative;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-top: 19px;
-          padding: 15px 17px;
+        .freeInformation {
+          margin-top: 20px;
+          padding: 16px 18px;
           border-radius: 12px;
           background: #edf7f0;
-        }
-
-        .freeNote span {
-          width: 29px;
-          height: 29px;
-          display: grid;
-          place-items: center;
-          flex: 0 0 auto;
-          border-radius: 9px;
-          background: #27865a;
-          color: #fff;
-          font-size: 16px;
-          font-weight: 900;
-        }
-
-        .freeNote p {
-          margin: 0;
           color: #607067;
+          text-align: center;
           font-size: 9px;
           line-height: 1.7;
         }
@@ -3168,35 +2472,32 @@ export default function EventListingPage() {
 
         .stepItem article {
           flex: 1;
-          min-height: 285px;
-          padding: 24px 20px;
-          border:
-            1px solid
-            rgba(237, 168, 116, 0.34);
+          min-height: 280px;
+          padding: 25px 21px;
+          border: 1px solid rgba(237, 168, 116, 0.34);
           border-radius: 18px;
-          background: #fff;
-          box-shadow:
-            0 10px 27px
-            rgba(61, 46, 31, 0.055);
+          background: #ffffff;
+          box-shadow: 0 10px 27px rgba(61, 46, 31, 0.055);
           text-align: center;
         }
 
-        .stepNumber {
+        .stepItem article > span {
           color: #f26419;
           font-size: 8px;
           font-weight: 1000;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.13em;
         }
 
-        .stepIcon {
-          width: 76px;
-          height: 76px;
+        .stepItem article > strong {
+          width: 78px;
+          height: 78px;
           display: grid;
           place-items: center;
-          margin: 24px auto 18px;
-          border-radius: 23px;
+          margin: 23px auto 19px;
+          border-radius: 24px;
           background: #fff0df;
-          font-size: 33px;
+          color: #f26419;
+          font-size: 29px;
           transform: rotate(-4deg);
         }
 
@@ -3226,45 +2527,33 @@ export default function EventListingPage() {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 24px;
-          margin-top: 37px;
+          gap: 25px;
+          margin-top: 38px;
         }
 
         .flowAction .lineButton {
           margin-top: 0;
         }
 
-        .flowAction > div:last-child {
-          display: grid;
-          gap: 4px;
-          max-width: 260px;
-        }
-
-        .flowAction > div:last-child
-          strong {
-          color: #54493f;
-          font-size: 10px;
-        }
-
-        .flowAction > div:last-child p {
+        .flowAction > p {
+          max-width: 250px;
           margin: 0;
           color: #8a7c70;
-          font-size: 8px;
-          line-height: 1.6;
+          font-size: 9px;
+          line-height: 1.7;
         }
 
         .faqSection {
-          background: #fff;
+          background: #ffffff;
         }
 
         .faqLayout {
           display: grid;
-          grid-template-columns:
-            280px minmax(0, 1fr);
+          grid-template-columns: 280px minmax(0, 1fr);
           gap: 66px;
         }
 
-        .faqIntro > p:first-child {
+        .faqHeading > p:first-child {
           margin: 0 0 11px;
           color: #f26419;
           font-size: 8px;
@@ -3272,7 +2561,7 @@ export default function EventListingPage() {
           letter-spacing: 0.22em;
         }
 
-        .faqIntro h2 {
+        .faqHeading h2 {
           display: grid;
           margin: 0;
           font-size: 47px;
@@ -3280,31 +2569,26 @@ export default function EventListingPage() {
           letter-spacing: -0.05em;
         }
 
-        .faqIntro h2 span {
+        .faqHeading h2 span {
           color: #f26419;
         }
 
-        .faqIllustration {
+        .questionIcon {
           width: 135px;
           height: 135px;
           display: grid;
           place-items: center;
           margin-top: 28px;
-          border-radius:
-            43% 57% 50% 50%;
+          border-radius: 43% 57% 50% 50%;
           background: #fff0df;
-          transform: rotate(-5deg);
-        }
-
-        .faqIllustration span {
           color: #f26419;
           font-size: 66px;
           line-height: 1;
           font-weight: 1000;
-          transform: rotate(5deg);
+          transform: rotate(-5deg);
         }
 
-        .faqIntroText {
+        .faqHeading > p:last-child {
           margin: 21px 0 0;
           color: #7b6d62;
           font-size: 9px;
@@ -3318,13 +2602,9 @@ export default function EventListingPage() {
 
         .faqList details {
           overflow: hidden;
-          border:
-            1px solid
-            rgba(221, 217, 210, 0.9);
+          border: 1px solid rgba(221, 217, 210, 0.9);
           border-radius: 14px;
           background: #fafaf8;
-          transition:
-            background 0.2s ease;
         }
 
         .faqList details[open] {
@@ -3347,14 +2627,14 @@ export default function EventListingPage() {
           display: none;
         }
 
-        .faqNumber {
+        .faqList summary > span {
           width: 40px;
           height: 40px;
           display: grid;
           place-items: center;
           border-radius: 12px;
           background: #17243b;
-          color: #fff;
+          color: #ffffff;
           font-size: 9px;
           font-weight: 1000;
         }
@@ -3365,17 +2645,17 @@ export default function EventListingPage() {
           line-height: 1.55;
         }
 
-        .faqToggle {
+        .faqList summary i {
           color: #f26419;
           text-align: center;
           font-size: 20px;
+          font-style: normal;
           font-weight: 900;
         }
 
         .faqAnswer {
           display: grid;
-          grid-template-columns:
-            39px minmax(0, 1fr);
+          grid-template-columns: 39px minmax(0, 1fr);
           gap: 13px;
           padding: 0 17px 17px;
         }
@@ -3387,7 +2667,7 @@ export default function EventListingPage() {
           place-items: center;
           border-radius: 12px;
           background: #f26419;
-          color: #fff;
+          color: #ffffff;
           font-size: 11px;
           font-weight: 900;
         }
@@ -3399,7 +2679,7 @@ export default function EventListingPage() {
           line-height: 1.75;
         }
 
-        .finalSection {
+        .finalCta {
           position: relative;
           min-height: 520px;
           display: grid;
@@ -3414,31 +2694,27 @@ export default function EventListingPage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center;
+          filter:
+            saturate(0.82)
+            contrast(0.95)
+            brightness(0.8);
         }
 
         .finalOverlay {
           position: absolute;
           inset: 0;
-          background:
-            linear-gradient(
-              100deg,
-              rgba(17, 32, 52, 0.94)
-                0%,
-              rgba(26, 42, 65, 0.85)
-                47%,
-              rgba(235, 84, 13, 0.82)
-                100%
-            );
+          background: linear-gradient(
+            100deg,
+            rgba(17, 32, 52, 0.95) 0%,
+            rgba(26, 42, 65, 0.88) 48%,
+            rgba(235, 84, 13, 0.83) 100%
+          );
         }
 
         .finalInner {
           position: relative;
           z-index: 2;
-          width: min(
-            1080px,
-            calc(100% - 40px)
-          );
+          width: min(1080px, calc(100% - 40px));
           display: grid;
           grid-template-columns:
             minmax(0, 1fr)
@@ -3447,11 +2723,10 @@ export default function EventListingPage() {
           gap: 60px;
           margin: 0 auto;
           padding: 75px 0;
-          color: #fff;
+          color: #ffffff;
         }
 
-        .finalInner > div:first-child
-          > p:first-child {
+        .finalInner > div:first-child > p:first-child {
           margin: 0 0 14px;
           color: #ffbd8b;
           font-size: 8px;
@@ -3463,11 +2738,7 @@ export default function EventListingPage() {
           display: grid;
           gap: 2px;
           margin: 0;
-          font-size: clamp(
-            39px,
-            5vw,
-            59px
-          );
+          font-size: clamp(39px, 5vw, 59px);
           line-height: 1.28;
           letter-spacing: -0.055em;
         }
@@ -3498,12 +2769,9 @@ export default function EventListingPage() {
 
         .finalTags span {
           padding: 8px 12px;
-          border:
-            1px solid
-            rgba(255, 255, 255, 0.24);
+          border: 1px solid rgba(255, 255, 255, 0.24);
           border-radius: 999px;
-          background:
-            rgba(255, 255, 255, 0.09);
+          background: rgba(255, 255, 255, 0.09);
           font-size: 8px;
           font-weight: 900;
         }
@@ -3518,10 +2786,7 @@ export default function EventListingPage() {
         }
 
         .footerInner {
-          width: min(
-            1100px,
-            calc(100% - 40px)
-          );
+          width: min(1100px, calc(100% - 40px));
           display: grid;
           grid-template-columns:
             1.25fr 0.7fr 0.7fr 1fr;
@@ -3530,14 +2795,14 @@ export default function EventListingPage() {
           padding: 48px 0;
         }
 
-        .footerBrand > a {
-          color: #fff;
+        .footerLogo {
+          color: #ffffff;
           text-decoration: none;
           font-size: 17px;
           font-weight: 900;
         }
 
-        .footerBrand p {
+        .footerInner > div:first-child > p {
           max-width: 290px;
           margin: 13px 0 0;
           color: #9da8b7;
@@ -3555,8 +2820,7 @@ export default function EventListingPage() {
         .footerCta > strong {
           margin-bottom: 4px;
           color: #f09b65;
-          font-size: 7px;
-          letter-spacing: 0.16em;
+          font-size: 8px;
         }
 
         .footer nav a {
@@ -3573,13 +2837,12 @@ export default function EventListingPage() {
 
         .footerCta a {
           display: flex;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           align-items: center;
           padding: 13px 14px;
           border-radius: 10px;
           background: #08b84e;
-          color: #fff;
+          color: #ffffff;
           text-decoration: none;
           font-size: 9px;
           font-weight: 900;
@@ -3589,11 +2852,9 @@ export default function EventListingPage() {
           font-size: 16px;
         }
 
-        .footerBottom {
+        .copyright {
           padding: 17px;
-          border-top:
-            1px solid
-            rgba(255, 255, 255, 0.08);
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
           color: #728092;
           text-align: center;
           font-size: 7px;
@@ -3611,13 +2872,11 @@ export default function EventListingPage() {
           place-items: center;
           align-content: center;
           gap: 2px;
-          border: 5px solid #fff;
+          border: 5px solid #ffffff;
           border-radius: 50%;
           background: #08b84e;
-          box-shadow:
-            0 16px 40px
-            rgba(8, 184, 78, 0.35);
-          color: #fff;
+          box-shadow: 0 16px 40px rgba(8, 184, 78, 0.35);
+          color: #ffffff;
           text-decoration: none;
         }
 
@@ -3631,9 +2890,7 @@ export default function EventListingPage() {
         }
 
         @media (max-width: 1050px) {
-          .header nav a:not(
-              .headerLine
-            ) {
+          .header nav a:not(.headerLine) {
             display: none;
           }
 
@@ -3646,30 +2903,17 @@ export default function EventListingPage() {
           }
 
           .heroVisual {
-            width: min(
-              720px,
-              100%
-            );
+            width: min(720px, 100%);
             margin: 0 auto;
           }
 
           .categoryGrid,
           .benefitGrid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
-          }
-
-          .previewHeading {
-            grid-template-columns: 1fr;
-          }
-
-          .previewTagArea {
-            justify-content: flex-start;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .includedGrid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .finalInner {
@@ -3677,19 +2921,17 @@ export default function EventListingPage() {
           }
 
           .footerInner {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
 
         @media (max-width: 720px) {
-          .headerInner,
           .container,
+          .headerInner,
           .heroInner,
-          .footerInner,
-          .finalInner {
-            width:
-              calc(100% - 24px);
+          .finalInner,
+          .footerInner {
+            width: calc(100% - 24px);
           }
 
           .headerInner {
@@ -3701,8 +2943,7 @@ export default function EventListingPage() {
           }
 
           .headerLine {
-            padding:
-              10px 13px !important;
+            padding: 10px 13px !important;
           }
 
           .heroInner {
@@ -3715,13 +2956,13 @@ export default function EventListingPage() {
             font-size: 41px;
           }
 
-          .heroTitleFirst,
-          .heroTitleSecond {
+          .heroCopy h1 span,
+          .heroCopy h1 strong {
             width: auto;
             white-space: normal;
           }
 
-          .heroFeatureGrid {
+          .featureGrid {
             grid-template-columns: 1fr;
           }
 
@@ -3729,67 +2970,53 @@ export default function EventListingPage() {
             display: grid;
           }
 
-          .heroActionNote {
-            max-width: none;
-          }
-
           .heroVisual {
             min-height: 480px;
           }
 
-          .heroPhotoMain {
+          .heroMainImage {
             top: 30px;
             right: 0;
             width: 91%;
             height: 320px;
           }
 
-          .heroPhotoSubOne {
-            width: 53%;
+          .heroSubImage {
             height: 155px;
           }
 
-          .heroPhotoSubTwo {
+          .heroBoardGame {
+            width: 53%;
+          }
+
+          .heroSeminar {
             width: 47%;
-            height: 150px;
           }
 
-          .heroVisualCard {
-            display: none;
-          }
-
-          .heroFree {
+          .heroFreeBadge {
             top: 330px;
-            width: 96px;
-            height: 96px;
+            width: 98px;
+            height: 98px;
             border-width: 6px;
           }
 
-          .heroFree strong {
-            font-size: 22px;
+          .heroFreeBadge strong {
+            font-size: 24px;
           }
 
           .heroBottom {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .heroBottom > div {
             min-height: 58px;
           }
 
-          .categorySection,
-          .problemSection,
-          .previewSection,
-          .benefitSection,
-          .freeSection,
-          .flowSection,
-          .faqSection {
+          .section {
             padding: 74px 0;
           }
 
-          .sectionHeading h2,
-          .previewHeading h2 {
+          .sectionHeading h2 {
             font-size: 31px;
           }
 
@@ -3804,79 +3031,71 @@ export default function EventListingPage() {
             height: 225px;
           }
 
-          .categoryBottom {
+          .categoryCta {
             display: grid;
           }
 
-          .categoryBottom a {
-            justify-content:
-              space-between;
+          .categoryCta a {
+            justify-content: space-between;
           }
 
-          .problemSolution {
-            grid-template-columns:
-              50px minmax(0, 1fr);
+          .solutionBox {
+            grid-template-columns: 50px minmax(0, 1fr);
           }
 
-          .problemSolution > p {
+          .solutionBox > p {
             grid-column: 1 / -1;
           }
 
-          .previewStage {
-            min-height: 770px;
-            padding:
-              10px 0 215px;
+          .listingPreview {
+            min-height: 790px;
+            padding: 10px 0 220px;
           }
 
-          .desktopPreview {
+          .previewDesktop {
             border-width: 6px;
             transform: none;
           }
 
-          .browserPage {
+          .previewPage {
             padding: 14px;
           }
 
-          .browserLayout {
+          .previewColumns {
             grid-template-columns: 1fr;
           }
 
-          .sampleSide {
-            grid-template-columns:
-              repeat(
-                3,
-                minmax(0, 1fr)
-              );
+          .previewMenus {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
           }
 
-          .sampleSide article {
-            min-height: 92px;
-            padding: 10px;
+          .previewMenus article {
+            min-height: 105px;
+            padding: 11px;
           }
 
-          .mobilePreview {
+          .previewPhone {
             right: 50%;
             width: 195px;
-            transform:
-              translateX(50%)
-              rotate(3deg);
+            transform: translateX(50%) rotate(3deg);
           }
 
-          .previewFloating,
-          .previewFreeBadge {
+          .freeBadge,
+          .calendarBadge,
+          .categoryBadge {
             display: none;
           }
 
-          .benefitBanner {
+          .connectionBanner {
             grid-template-columns: 1fr;
           }
 
-          .benefitBannerImage {
+          .connectionBanner > img {
             min-height: 240px;
           }
 
-          .benefitBannerContent {
-            padding: 29px;
+          .connectionBanner > div {
+            padding: 30px;
           }
 
           .freeHeading {
@@ -3894,8 +3113,7 @@ export default function EventListingPage() {
 
           .stepGrid {
             display: grid;
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 14px;
           }
 
@@ -3915,15 +3133,15 @@ export default function EventListingPage() {
             grid-template-columns: 1fr;
           }
 
-          .faqIntro {
+          .faqHeading {
             text-align: center;
           }
 
-          .faqIntro h2 {
+          .faqHeading h2 {
             font-size: 38px;
           }
 
-          .faqIllustration {
+          .questionIcon {
             display: none;
           }
 
@@ -3941,7 +3159,7 @@ export default function EventListingPage() {
             text-align: center;
           }
 
-          .footerBrand p {
+          .footerInner > div:first-child > p {
             margin-right: auto;
             margin-left: auto;
           }
@@ -3963,7 +3181,7 @@ export default function EventListingPage() {
             font-size: 36px;
           }
 
-          .heroCatch {
+          .heroMessage {
             font-size: 15px;
           }
 
@@ -3979,25 +3197,20 @@ export default function EventListingPage() {
             padding: 12px 13px;
           }
 
-          .lineLogo {
+          .lineIcon {
             width: 41px;
             height: 41px;
           }
 
-          .lineButtonText strong {
+          .lineCopy strong {
             font-size: 11px;
           }
 
-          .heroBottom > div {
-            font-size: 8px;
-          }
-
-          .sectionHeading h2,
-          .previewHeading h2 {
+          .sectionHeading h2 {
             font-size: 28px;
           }
 
-          .sampleSide {
+          .previewMenus {
             grid-template-columns: 1fr;
           }
 
