@@ -617,7 +617,7 @@ export default function EventDetailClient({
         </a>
       </div>
 
-      <style jsx>{`
+      <style jsx global>{`
         * {
           box-sizing: border-box;
         }
@@ -721,7 +721,7 @@ export default function EventDetailClient({
           background: #e9e9e9;
         }
 
-        .flyerImage :global(img) {
+        .flyerImage img {
           position: absolute;
           inset: 0;
           display: block;
@@ -1056,14 +1056,31 @@ export default function EventDetailClient({
           margin: 0 auto;
         }
 
+        .sectionHead,
         .compactHead {
+          display: block;
+          width: 100%;
           margin-bottom: 17px;
+          text-align: left;
         }
 
+        .sectionHead p,
+        .compactHead p {
+          display: block;
+          width: 100%;
+          margin: 0 0 7px;
+          text-align: left;
+        }
+
+        .sectionHead h2,
         .compactHead h2 {
+          display: block;
+          width: 100%;
+          margin: 0;
           color: #111111;
           font-size: 20px;
           line-height: 1.4;
+          text-align: left;
         }
 
         .smallCardGrid {
@@ -1079,7 +1096,9 @@ export default function EventDetailClient({
 
         .smallCard {
           min-width: 0;
+          width: 100%;
           height: 100%;
+          margin: 0;
           display: flex;
           flex-direction: column;
           overflow: hidden;
@@ -1091,7 +1110,12 @@ export default function EventDetailClient({
 
         .smallImageLink {
           display: block;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
           background: #eeeeec;
+          text-decoration: none;
         }
 
         .smallImageWrap {
@@ -1101,7 +1125,7 @@ export default function EventDetailClient({
           overflow: hidden;
         }
 
-        .smallImageWrap :global(img) {
+        .smallImageWrap img {
           position: absolute;
           inset: 0;
           display: block;
@@ -1109,6 +1133,10 @@ export default function EventDetailClient({
           height: 100%;
           object-fit: cover;
           object-position: center;
+          max-width: none;
+          max-height: none;
+          margin: 0;
+          padding: 0;
         }
 
         .smallPlaceholder {
