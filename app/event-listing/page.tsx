@@ -8,27 +8,30 @@ export const metadata = {
 
 const LINE_URL = "https://lin.ee/P179zyp";
 
-/*
- * 使用画像はここで一括管理しています。
- * 後から画像を変更するときは、このURLだけ差し替えれば反映されます。
- */
 const IMAGES = {
   party:
-    "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1400&q=88",
+    "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1800&q=90",
+
   boardGame:
-    "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=1200&q=88",
+    "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=1400&q=90",
+
   seminar:
-    "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1400&q=88",
+    "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1600&q=90",
+
   cafe:
-    "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=88",
+    "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1400&q=90",
+
   sports:
-    "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=1200&q=88",
+    "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=1400&q=90",
+
   workshop:
-    "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1200&q=88",
+    "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1400&q=90",
+
   business:
-    "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=88",
+    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1500&q=90",
+
   event:
-    "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1400&q=88",
+    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1800&q=90",
 };
 
 const categories = [
@@ -433,7 +436,7 @@ function ListingPreview() {
       </div>
 
       <div className="previewFreeBadge">
-        BASIC
+        <span>BASIC</span>
         <strong>FREE</strong>
         <small>基本掲載無料</small>
       </div>
@@ -1242,6 +1245,31 @@ export default function EventListingPage() {
           margin: 0 auto;
         }
 
+        .heroPhoto img,
+        .categoryImage img,
+        .problemPhoto img,
+        .benefitBannerImage img,
+        .sampleEvent > img,
+        .mobilePage img,
+        .finalBackground {
+          filter:
+            saturate(0.88)
+            contrast(0.97)
+            brightness(0.95);
+        }
+
+        .heroPhoto,
+        .categoryImage,
+        .problemPhoto,
+        .benefitBannerImage {
+          background:
+            linear-gradient(
+              135deg,
+              #f8ede2,
+              #e9efe9
+            );
+        }
+
         .header {
           position: sticky;
           z-index: 100;
@@ -1722,6 +1750,10 @@ export default function EventListingPage() {
           transform: rotate(1.8deg);
         }
 
+        .heroPhotoMain img {
+          object-position: center 42%;
+        }
+
         .heroPhotoSubOne {
           z-index: 3;
           bottom: 7px;
@@ -1992,6 +2024,7 @@ export default function EventListingPage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: center;
           transition:
             transform 0.4s ease;
         }
@@ -2177,6 +2210,7 @@ export default function EventListingPage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: center 42%;
         }
 
         .problemPhoto::after {
@@ -2530,6 +2564,7 @@ export default function EventListingPage() {
         .sampleEvent > img {
           height: 205px;
           object-fit: cover;
+          object-position: center;
         }
 
         .sampleEventBody {
@@ -2655,6 +2690,7 @@ export default function EventListingPage() {
         .mobilePage img {
           height: 160px;
           object-fit: cover;
+          object-position: center;
         }
 
         .mobilePage > span {
@@ -2877,6 +2913,7 @@ export default function EventListingPage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: center;
         }
 
         .benefitBannerContent {
@@ -3377,6 +3414,7 @@ export default function EventListingPage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: center;
         }
 
         .finalOverlay {
